@@ -1,11 +1,14 @@
 using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using LostNFound.Api.Data;
 
 #nullable disable
 
 namespace LostNFound.Api.Migrations
 {
-    /// <inheritdoc />
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20240101000000_InitialCreate")]
     public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
