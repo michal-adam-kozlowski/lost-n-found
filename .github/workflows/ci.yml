@@ -6,7 +6,6 @@ on:
   pull_request:
 
 jobs:
-  # ── Frontend ─────────────────────────────────────────────────────────────────
   frontend:
     name: Frontend (Next.js)
     runs-on: ubuntu-latest
@@ -32,10 +31,9 @@ jobs:
       - name: Build
         run: pnpm --filter web build
         env:
-          # Provide a placeholder so Next.js doesn't warn about a missing env var
+          # Placeholder to suppress Next.js missing env var warning during CI build.
           NEXT_PUBLIC_API_URL: http://localhost:8080
 
-  # ── Backend ──────────────────────────────────────────────────────────────────
   backend:
     name: Backend (.NET 9)
     runs-on: ubuntu-latest

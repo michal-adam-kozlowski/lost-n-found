@@ -3,18 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Kestrel: honour Railway's PORT env var (falls back to 8080 locally) ──────
+// Railway injects PORT at runtime; falls back to 8080 locally.
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
-// ── Database ──────────────────────────────────────────────────────────────────
 var connectionString = ResolveConnectionString(builder.Configuration);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// ── CORS ──────────────────────────────────────────────────────────────────────
-// Set CORS_ORIGINS in Railway to your frontend URL (comma-separated if multiple).
-// Example: https://my-app.up.railway.app,https://custom-domain.com
+// CORS_ORIGINS accepts a comma-separated list of allowed origins (e.g. the Railway frontend URL).
 var corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "http://localhost:3000")
     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -25,14 +22,12 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod()));
 
-// ── MVC + Swagger ─────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// ── Auto-migrate + seed on startup ───────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -46,7 +41,6 @@ using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(db);
 }
 
-// ── Middleware ────────────────────────────────────────────────────────────────
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -55,7 +49,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 
-// ── Routes ────────────────────────────────────────────────────────────────────
 app.MapGet("/health", () => Results.Ok(new { status = "ok", timestamp = DateTime.UtcNow }));
 app.MapControllers();
 
@@ -82,7 +75,7 @@ static string ConvertDatabaseUrl(string databaseUrl)
 {
     databaseUrl = databaseUrl.Trim();
 
-    // remove surrounding quotes if present
+    // Strip surrounding quotes that some platforms inject around env var values.
     if ((databaseUrl.StartsWith("\"") && databaseUrl.EndsWith("\"")) ||
         (databaseUrl.StartsWith("'") && databaseUrl.EndsWith("'")))
     {
@@ -92,7 +85,6 @@ static string ConvertDatabaseUrl(string databaseUrl)
     if (!databaseUrl.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) &&
         !databaseUrl.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
     {
-        // assume already key=value
         return databaseUrl;
     }
 

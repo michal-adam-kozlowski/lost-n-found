@@ -1,14 +1,7 @@
 version: '3.9'
 
-# Run from the infra/ directory:
-#   docker compose up --build
-#
-# Or from repo root:
-#   docker compose -f infra/docker-compose.yml up --build
-
 services:
 
-  # ── PostgreSQL ──────────────────────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
     environment:
@@ -25,14 +18,13 @@ services:
       timeout: 5s
       retries: 10
 
-  # ── ASP.NET Core API ────────────────────────────────────────────────────────
   api:
     build:
-      context: ../apps/api               # self-contained; matches Railway Root Directory
+      context: ../apps/api  # matches Railway Root Directory
       dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      PORT: "8080"                       # Program.cs reads this; mirrors Railway behaviour
+      PORT: "8080"  # mirrors Railway's injected PORT
       ConnectionStrings__Default: >-
         Host=postgres;Port=5432;Database=lostnfound;
         Username=postgres;Password=postgres

@@ -1,10 +1,8 @@
-# Build context: apps/api/
-# Works both with Railway (Root Directory = apps/api) and docker compose (context: ../apps/api)
+# Compatible with Railway (Root Directory = apps/api) and docker compose (context: ../apps/api).
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Restore layer — cached unless .csproj changes
 COPY LostNFound.Api.csproj ./
 RUN dotnet restore
 
@@ -14,12 +12,10 @@ RUN dotnet publish LostNFound.Api.csproj \
     -o /app/publish \
     --no-restore
 
-# ── Runtime image ─────────────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
-# PORT is injected by Railway at runtime; Program.cs reads it.
-# No hardcoded ASPNETCORE_URLS here.
+# Railway injects PORT at runtime; ASPNETCORE_URLS is intentionally not hardcoded.
 EXPOSE 8080
 
 COPY --from=build /app/publish .
