@@ -55,19 +55,12 @@ app.MapControllers();
 
 app.Run();
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
-/// <summary>
-/// Resolves an Npgsql-compatible connection string from configuration.
-/// Priority:
-///   1. ConnectionStrings:Default  (env var: ConnectionStrings__Default)
-///   2. DATABASE_URL               (Railway's auto-provisioned postgres:// URI)
-/// </summary>
 static string ResolveConnectionString(IConfiguration config)
 {
     var connStr = config.GetConnectionString("Default");
     if (!string.IsNullOrWhiteSpace(connStr))
-        return connStr;
+        return connStr.Trim();
 
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
     if (string.IsNullOrWhiteSpace(databaseUrl))
@@ -79,22 +72,26 @@ static string ResolveConnectionString(IConfiguration config)
     return ConvertDatabaseUrl(databaseUrl);
 }
 
-/// <summary>
-/// Converts a postgres:// or postgresql:// URI into an Npgsql key=value connection string.
-/// Handles URL-encoded passwords and adds SSL settings required by Railway.
-/// </summary>
 static string ConvertDatabaseUrl(string databaseUrl)
 {
-    // If it doesn't look like a URI, assume it's already a valid Npgsql string.
+    databaseUrl = databaseUrl.Trim();
+
+    // remove surrounding quotes if present
+    if ((databaseUrl.StartsWith("\"") && databaseUrl.EndsWith("\"")) ||
+        (databaseUrl.StartsWith("'") && databaseUrl.EndsWith("'")))
+    {
+        databaseUrl = databaseUrl.Substring(1, databaseUrl.Length - 2).Trim();
+    }
+
     if (!databaseUrl.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) &&
         !databaseUrl.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
     {
+        // assume already key=value
         return databaseUrl;
     }
 
     var uri = new Uri(databaseUrl);
 
-    // UserInfo is "username:password" — split on the first colon only.
     var userInfo = uri.UserInfo.Split(':', 2);
     var username = Uri.UnescapeDataString(userInfo[0]);
     var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
@@ -103,7 +100,6 @@ static string ConvertDatabaseUrl(string databaseUrl)
     var port     = uri.Port > 0 ? uri.Port : 5432;
     var database = uri.AbsolutePath.TrimStart('/');
 
-    // Railway PostgreSQL requires SSL; Trust Server Certificate avoids cert-chain issues.
     return $"Host={host};Port={port};Database={database};" +
            $"Username={username};Password={password};" +
            "Ssl Mode=Require;Trust Server Certificate=true";
