@@ -36,7 +36,13 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+
+    var pending = (await db.Database.GetPendingMigrationsAsync()).ToList();
+    app.Logger.LogInformation("Pending EF migrations: {Count} ({Names})",
+        pending.Count,
+        pending.Count == 0 ? "none" : string.Join(", ", pending));
+
+    await db.Database.MigrateAsync();
     await DbSeeder.SeedAsync(db);
 }
 
