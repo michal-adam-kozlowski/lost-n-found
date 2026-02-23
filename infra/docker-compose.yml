@@ -28,11 +28,11 @@ services:
   # ── ASP.NET Core API ────────────────────────────────────────────────────────
   api:
     build:
-      context: ..                        # repo root (Dockerfile copies apps/api/)
-      dockerfile: apps/api/Dockerfile
+      context: ../apps/api               # self-contained; matches Railway Root Directory
+      dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8080
+      PORT: "8080"                       # Program.cs reads this; mirrors Railway behaviour
       ConnectionStrings__Default: >-
         Host=postgres;Port=5432;Database=lostnfound;
         Username=postgres;Password=postgres
