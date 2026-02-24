@@ -8,7 +8,7 @@
 lost-n-found/
 ├── apps/
 │   ├── web/          # Next.js 14 · TypeScript · Tailwind CSS  (port 3000)
-│   └── api/          # ASP.NET Core 9 Web API · EF Core · PostgreSQL  (port 8080)
+│   └── api/          # ASP.NET Core 10 Web API · EF Core · PostgreSQL  (port 8080)
 ├── infra/
 │   └── docker-compose.yml   # PostgreSQL 16 + API container
 ├── .github/
@@ -16,11 +16,6 @@ lost-n-found/
 ├── pnpm-workspace.yaml
 └── README.md
 ```
-
-> **Note on .NET version:** .NET 9 (current, STS) is used. To switch to .NET 8 LTS, change
-> `net9.0` → `net8.0` in `apps/api/LostNFound.Api.csproj` and update the Docker image tags
-> (`mcr.microsoft.com/dotnet/sdk:8.0`, `mcr.microsoft.com/dotnet/aspnet:8.0`).
-
 ---
 
 ## Prerequisites
@@ -29,7 +24,7 @@ lost-n-found/
 |------|----------------|
 | Node.js | 20 |
 | pnpm | 9 |
-| .NET SDK | 9 |
+| .NET SDK | 10 |
 | Docker + Docker Compose | recent stable |
 
 ---
