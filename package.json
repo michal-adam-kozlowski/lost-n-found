@@ -9,7 +9,7 @@
     "lint": "pnpm --filter web lint"
   },
   "engines": {
-    "node": ">=20",
+    "node": ">=24",
     "pnpm": ">=9"
   }
 }

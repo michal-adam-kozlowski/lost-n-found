@@ -7,7 +7,7 @@
 ```
 lost-n-found/
 ├── apps/
-│   ├── web/          # Next.js 14 · TypeScript · Tailwind CSS  (port 3000)
+│   ├── web/          # Next.js 16 · TypeScript · Tailwind CSS  (port 3000)
 │   └── api/          # ASP.NET Core 10 Web API · EF Core · PostgreSQL  (port 8080)
 ├── infra/
 │   └── docker-compose.yml   # PostgreSQL 16 + API container
@@ -20,12 +20,12 @@ lost-n-found/
 
 ## Prerequisites
 
-| Tool | Minimum version |
-|------|----------------|
-| Node.js | 20 |
-| pnpm | 9 |
-| .NET SDK | 10 |
-| Docker + Docker Compose | recent stable |
+| Tool                    | Minimum version |
+|-------------------------|-----------------|
+| Node.js                 | 24              |
+| pnpm                    | 9               |
+| .NET SDK                | 10              |
+| Docker + Docker Compose | recent stable   |
 
 ---
 
