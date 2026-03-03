@@ -1,23 +1,35 @@
 import type { Metadata } from "next";
-import "./globals.css";
 import "@mantine/core/styles.css";
-import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from "@mantine/core";
+import "@mantine/dates/styles.css";
+import "./globals.scss";
+import { ColorSchemeScript, createTheme, mantineHtmlProps, MantineProvider } from "@mantine/core";
 import React from "react";
+import { Inter } from "next/font/google";
+import ClientProviders from "@/app/ClientProviders";
+
+const inter = Inter({ weight: "variable", subsets: ["latin", "latin-ext"] });
 
 export const metadata: Metadata = {
   title: "LostNFound",
-  description: "Virtual lost-and-found office",
+  description: "Wirtualne biuro rzeczy znalezionych",
 };
+
+const theme = createTheme({
+  fontFamily: "Inter, sans-serif",
+  primaryColor: "blue",
+});
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" {...mantineHtmlProps}>
+    <html lang="en" className={inter.className} {...mantineHtmlProps}>
       <head>
         <title></title>
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          <ClientProviders>{children}</ClientProviders>
+        </MantineProvider>
       </body>
     </html>
   );

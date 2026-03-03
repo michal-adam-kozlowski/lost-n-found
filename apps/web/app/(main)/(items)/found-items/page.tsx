@@ -5,11 +5,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
 export default async function ItemsPage() {
   "use cache";
+
   cacheLife("hours");
   cacheTag("items");
-  const items = await fetch(`${API_URL}/api/items`).then((r) => {
-    return r.json() as Promise<object[]>;
-  });
+  const items = (
+    await fetch(`${API_URL}/api/items`).then((r) => {
+      return r.json() as Promise<{ type: string }[]>;
+    })
+  ).filter((item) => item.type === "found");
 
   const addItem = async () => {
     "use server";
@@ -36,6 +39,7 @@ export default async function ItemsPage() {
           Add item
         </Button>
       </form>
+      <h1>Znalezione</h1>
       <div>{JSON.stringify(items)}</div>
     </>
   );
