@@ -5,6 +5,9 @@ import React from "react";
 import TypePicker from "@components/TypePicker";
 import { useForm } from "@mantine/form";
 import { DatePickerInput } from "@mantine/dates";
+import LocationPicker from "@components/LocationPicker";
+import { MarkerLocation } from "@components/CustomMap";
+import { addItem } from "@/actions/items";
 
 interface FormValues {
   type: "found" | "lost";
@@ -12,7 +15,7 @@ interface FormValues {
   category: string;
   description: string;
   foundLostDate: Date;
-  location: string;
+  location: MarkerLocation | null;
 }
 
 export default function Page() {
@@ -24,20 +27,33 @@ export default function Page() {
       category: "",
       description: "",
       foundLostDate: new Date(),
-      location: "",
+      location: null,
     },
   });
+
+  const handleSubmit = async (values: FormValues) => {
+    console.log("FORM VALUES", values);
+
+    const item = {
+      title: values.title,
+      type: values.type,
+      description: values.description,
+      latitude: values.location?.latitude ?? 0,
+      longitude: values.location?.longitude ?? 0,
+    };
+    await addItem(item);
+  };
 
   return (
     <Container size="md" px="md">
       <Card withBorder>
-        <form onSubmit={form.onSubmit((values) => console.log(values))}>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
           <Card.Section p="lg" withBorder>
             <Center>
               <Title order={2}>Dodaj nowe ogłoszenie</Title>
             </Center>
           </Card.Section>
-          <Card.Section p="lg" withBorder>
+          <Card.Section p="lg" withBorder className="flex! flex-col gap-3">
             <Container size="xs" px="xl">
               <TypePicker size="md" value={form.values.type} onChange={(value) => form.setFieldValue("type", value)} />
             </Container>
@@ -66,6 +82,7 @@ export default function Page() {
               locale="pl"
               {...form.getInputProps("foundLostDate")}
             />
+            <LocationPicker {...form.getInputProps("location")} />
           </Card.Section>
           <Card.Section p="lg" withBorder>
             <Group justify="flex-end">

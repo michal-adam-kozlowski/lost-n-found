@@ -1,0 +1,34 @@
+.Container {
+  &,
+  > *,
+  canvas {
+    outline: none !important;
+  }
+}
+
+.Placeholder {
+  background: #f6f2ee;
+}
+
+.Container,
+.Placeholder {
+  display: block;
+  position: relative;
+  border: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-gray-4);
+  border-radius: var(--mantine-radius-default);
+  overflow: hidden;
+  height: 600px;
+  z-index: 1;
+
+  &:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    box-shadow: inset 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+  }
+}
