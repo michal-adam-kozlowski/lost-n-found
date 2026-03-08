@@ -1,4 +1,6 @@
 using LostNFound.Api.Data;
+using LostNFound.Api.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,15 @@ builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 var connectionString = ResolveConnectionString(builder.Configuration);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+builder.Services.AddIdentityCore<ApplicationUser>(options =>
+      {
+          options.User.RequireUniqueEmail = true;
+          // change password reqs and lockout policy
+      })
+      .AddRoles<IdentityRole<Guid>>()
+      .AddEntityFrameworkStores<AppDbContext>()
+      .AddSignInManager();
 
 // CORS_ORIGINS accepts a comma-separated list of allowed origins (e.g. the Railway frontend URL).
 var corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "http://localhost:3000")
