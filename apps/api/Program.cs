@@ -16,7 +16,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
       {
           options.User.RequireUniqueEmail = true;
+
           // change password reqs and lockout policy
+          options.Password.RequireDigit = false;
+          options.Password.RequireLowercase = false;
+          options.Password.RequireUppercase = false;
+          options.Password.RequireNonAlphanumeric = false;
+          options.Password.RequiredLength = 6; 
       })
       .AddRoles<IdentityRole<Guid>>()
       .AddEntityFrameworkStores<AppDbContext>()
