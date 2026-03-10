@@ -2,6 +2,7 @@ using LostNFound.Api.Data;
 using LostNFound.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +42,11 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, "LostNFound.Api.xml");
+    options.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
 
