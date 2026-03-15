@@ -1,3 +1,4 @@
+using System.Reflection;
 using Amazon.S3;
 using LostNFound.Api.Configuration;
 using LostNFound.Api.Data;
@@ -8,11 +9,16 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Build-time tools (GetDocument.Insider for OpenAPI generation, dotnet-ef for migrations)
+// load and invoke this entry point. The entry assembly is the tool, not this app.
+// Side effects like database access and options validation must be skipped in that case.
+var isDesignTime = Assembly.GetEntryAssembly()?.GetName().Name != "LostNFound.Api";
+
 // Railway injects PORT at runtime; falls back to 8080 locally.
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
-var connectionString = ResolveConnectionString(builder.Configuration);
+var connectionString = ResolveConnectionString(builder.Configuration, isDesignTime);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -32,7 +38,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
       .AddSignInManager();
 
 // ── Storage (S3-compatible) ───────────────────────────────────────────────
-builder.Services.AddOptions<StorageOptions>()
+var storageOptionsBuilder = builder.Services.AddOptions<StorageOptions>()
     .Configure(o =>
     {
         o.EndpointUrl = Environment.GetEnvironmentVariable("AWS_ENDPOINT_URL") ?? "";
@@ -40,12 +46,17 @@ builder.Services.AddOptions<StorageOptions>()
         o.Region = Environment.GetEnvironmentVariable("AWS_DEFAULT_REGION") ?? "";
         o.AccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID") ?? "";
         o.SecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY") ?? "";
-    })
-    .Validate(o => !string.IsNullOrWhiteSpace(o.EndpointUrl), "AWS_ENDPOINT_URL is required.")
-    .Validate(o => !string.IsNullOrWhiteSpace(o.BucketName), "AWS_S3_BUCKET_NAME is required.")
-    .Validate(o => !string.IsNullOrWhiteSpace(o.AccessKeyId), "AWS_ACCESS_KEY_ID is required.")
-    .Validate(o => !string.IsNullOrWhiteSpace(o.SecretAccessKey), "AWS_SECRET_ACCESS_KEY is required.")
-    .ValidateOnStart();
+    });
+
+if (!isDesignTime)
+{
+    storageOptionsBuilder
+        .Validate(o => !string.IsNullOrWhiteSpace(o.EndpointUrl), "AWS_ENDPOINT_URL is required.")
+        .Validate(o => !string.IsNullOrWhiteSpace(o.BucketName), "AWS_S3_BUCKET_NAME is required.")
+        .Validate(o => !string.IsNullOrWhiteSpace(o.AccessKeyId), "AWS_ACCESS_KEY_ID is required.")
+        .Validate(o => !string.IsNullOrWhiteSpace(o.SecretAccessKey), "AWS_SECRET_ACCESS_KEY is required.")
+        .ValidateOnStart();
+}
 
 builder.Services.AddOptions<UploadOptions>()
     .Configure(o =>
@@ -94,25 +105,34 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath);
 });
 
+// Built-in OpenAPI document — used by Microsoft.Extensions.ApiDescription.Server
+// to generate openapi/v1.json at build time.
+builder.Services.AddOpenApi();
+
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+// Database migration and seeding — skip during build-time document generation and EF tooling.
+if (!isDesignTime)
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    var pending = (await db.Database.GetPendingMigrationsAsync()).ToList();
-    app.Logger.LogInformation("Pending EF migrations: {Count} ({Names})",
-        pending.Count,
-        pending.Count == 0 ? "none" : string.Join(", ", pending));
+        var pending = (await db.Database.GetPendingMigrationsAsync()).ToList();
+        app.Logger.LogInformation("Pending EF migrations: {Count} ({Names})",
+            pending.Count,
+            pending.Count == 0 ? "none" : string.Join(", ", pending));
 
-    await db.Database.MigrateAsync();
-    await DbSeeder.SeedAsync(db);
+        await db.Database.MigrateAsync();
+        await DbSeeder.SeedAsync(db);
+    }
 }
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.MapOpenApi();
 }
 
 app.UseCors("AllowFrontend");
@@ -123,7 +143,7 @@ app.MapControllers();
 app.Run();
 
 
-static string ResolveConnectionString(IConfiguration config)
+static string ResolveConnectionString(IConfiguration config, bool isDesignTime)
 {
     var connStr = config.GetConnectionString("Default");
     if (!string.IsNullOrWhiteSpace(connStr))
@@ -131,10 +151,17 @@ static string ResolveConnectionString(IConfiguration config)
 
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
     if (string.IsNullOrWhiteSpace(databaseUrl))
+    {
+        // During build-time document generation, a real database is not needed.
+        // Return a placeholder so service registration (AddDbContext) succeeds.
+        if (isDesignTime)
+            return "Host=localhost;Database=placeholder";
+
         throw new InvalidOperationException(
             "No database connection string found. " +
             "Set either 'ConnectionStrings__Default' (Npgsql key=value format) " +
             "or 'DATABASE_URL' (postgres:// URI) as an environment variable.");
+    }
 
     return ConvertDatabaseUrl(databaseUrl);
 }
@@ -144,10 +171,10 @@ static string ConvertDatabaseUrl(string databaseUrl)
     databaseUrl = databaseUrl.Trim();
 
     // Strip surrounding quotes that some platforms inject around env var values.
-    if ((databaseUrl.StartsWith("\"") && databaseUrl.EndsWith("\"")) ||
-        (databaseUrl.StartsWith("'") && databaseUrl.EndsWith("'")))
+    if ((databaseUrl.StartsWith('"') && databaseUrl.EndsWith('"')) ||
+        (databaseUrl.StartsWith('\'') && databaseUrl.EndsWith('\'')))
     {
-        databaseUrl = databaseUrl.Substring(1, databaseUrl.Length - 2).Trim();
+        databaseUrl = databaseUrl[1..^1].Trim();
     }
 
     if (!databaseUrl.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) &&
