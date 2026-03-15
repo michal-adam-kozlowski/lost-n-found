@@ -1,8 +1,10 @@
+using Amazon.S3;
+using LostNFound.Api.Configuration;
 using LostNFound.Api.Data;
 using LostNFound.Api.Models;
+using LostNFound.Api.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,11 +25,55 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
           options.Password.RequireLowercase = false;
           options.Password.RequireUppercase = false;
           options.Password.RequireNonAlphanumeric = false;
-          options.Password.RequiredLength = 6; 
+          options.Password.RequiredLength = 6;
       })
       .AddRoles<IdentityRole<Guid>>()
       .AddEntityFrameworkStores<AppDbContext>()
       .AddSignInManager();
+
+// ── Storage (S3-compatible) ───────────────────────────────────────────────
+builder.Services.AddOptions<StorageOptions>()
+    .Configure(o =>
+    {
+        o.EndpointUrl = Environment.GetEnvironmentVariable("AWS_ENDPOINT_URL") ?? "";
+        o.BucketName = Environment.GetEnvironmentVariable("AWS_S3_BUCKET_NAME") ?? "";
+        o.Region = Environment.GetEnvironmentVariable("AWS_DEFAULT_REGION") ?? "";
+        o.AccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID") ?? "";
+        o.SecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY") ?? "";
+    })
+    .Validate(o => !string.IsNullOrWhiteSpace(o.EndpointUrl), "AWS_ENDPOINT_URL is required.")
+    .Validate(o => !string.IsNullOrWhiteSpace(o.BucketName), "AWS_S3_BUCKET_NAME is required.")
+    .Validate(o => !string.IsNullOrWhiteSpace(o.AccessKeyId), "AWS_ACCESS_KEY_ID is required.")
+    .Validate(o => !string.IsNullOrWhiteSpace(o.SecretAccessKey), "AWS_SECRET_ACCESS_KEY is required.")
+    .ValidateOnStart();
+
+builder.Services.AddOptions<UploadOptions>()
+    .Configure(o =>
+    {
+        var maxSize = Environment.GetEnvironmentVariable("UPLOAD_MAX_FILE_SIZE_MB");
+        if (int.TryParse(maxSize, out var mb)) o.MaxFileSizeMb = mb;
+        var mimeTypes = Environment.GetEnvironmentVariable("UPLOAD_ALLOWED_MIME_TYPES");
+        if (!string.IsNullOrWhiteSpace(mimeTypes))
+            o.AllowedMimeTypes = mimeTypes.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var expiry = Environment.GetEnvironmentVariable("UPLOAD_PRESIGNED_URL_EXPIRY_SECONDS");
+        if (int.TryParse(expiry, out var s)) o.PresignedUrlExpirySeconds = s;
+        var prefix = Environment.GetEnvironmentVariable("UPLOAD_OBJECT_PREFIX");
+        if (!string.IsNullOrWhiteSpace(prefix)) o.ObjectPrefix = prefix;
+    });
+
+builder.Services.AddSingleton<IAmazonS3>(sp =>
+{
+    var opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<StorageOptions>>().Value;
+    var config = new AmazonS3Config
+    {
+        ServiceURL = opts.EndpointUrl,
+        ForcePathStyle = true, // Required for S3-compatible providers (Railway, MinIO, etc.)
+    };
+    return new AmazonS3Client(opts.AccessKeyId, opts.SecretAccessKey, config);
+});
+
+builder.Services.AddSingleton<IFileStorageService, S3FileStorageService>();
+builder.Services.AddScoped<IItemImageService, ItemImageService>();
 
 // CORS_ORIGINS accepts a comma-separated list of allowed origins (e.g. the Railway frontend URL).
 var corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "http://localhost:3000")

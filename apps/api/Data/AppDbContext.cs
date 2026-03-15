@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace LostNFound.Api.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) 
+public class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
 {
     public DbSet<Item> Items => Set<Item>();
+    public DbSet<ItemImage> ItemImages => Set<ItemImage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,6 +21,33 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.Property(x => x.Title).IsRequired();
             e.Property(x => x.Type).IsRequired();
             e.Property(x => x.CreatedAt).HasColumnType("timestamptz");
+        });
+
+        modelBuilder.Entity<ItemImage>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.ObjectKey).IsRequired();
+            e.Property(x => x.StorageBucket).IsRequired();
+            e.Property(x => x.OriginalFileName).IsRequired().HasMaxLength(255);
+            e.Property(x => x.MimeType).IsRequired().HasMaxLength(100);
+            e.Property(x => x.CreatedAt).HasColumnType("timestamptz");
+
+            e.Property(x => x.UploadStatus)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            e.HasOne(x => x.Item)
+                .WithMany()
+                .HasForeignKey(x => x.ItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(x => x.UploadedBy)
+                .WithMany()
+                .HasForeignKey(x => x.UploadedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            e.HasIndex(x => new { x.ItemId, x.UploadStatus });
+            e.HasIndex(x => x.UploadedByUserId);
         });
     }
 }
