@@ -13,6 +13,13 @@
     <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)/openapi</OpenApiDocumentsDirectory>
   </PropertyGroup>
 
+  <!-- Rename the build-time OpenAPI output from {ProjectName}.json to a stable, project-agnostic name. -->
+  <Target Name="RenameOpenApiDocument" AfterTargets="GenerateOpenApiDocuments"
+          Condition="Exists('$(OpenApiDocumentsDirectory)/$(MSBuildProjectName).json')">
+    <Move SourceFiles="$(OpenApiDocumentsDirectory)/$(MSBuildProjectName).json"
+          DestinationFiles="$(OpenApiDocumentsDirectory)/openapi.json" />
+  </Target>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>

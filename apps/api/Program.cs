@@ -10,8 +10,11 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Build-time tools (GetDocument.Insider for OpenAPI generation, dotnet-ef for migrations)
-// load and invoke this entry point. The entry assembly is the tool, not this app.
-// Side effects like database access and options validation must be skipped in that case.
+// load this assembly and invoke its entry point inside the tool's own host process.
+// Assembly.GetEntryAssembly() returns the tool (not this app) in that scenario, which
+// lets us gate side effects like database access and options validation.
+// Note: builder.Environment.ApplicationName cannot be used here because the tool
+// overrides it to match the target project name.
 var isDesignTime = Assembly.GetEntryAssembly()?.GetName().Name != "LostNFound.Api";
 
 // Railway injects PORT at runtime; falls back to 8080 locally.

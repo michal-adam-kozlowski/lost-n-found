@@ -9,6 +9,8 @@ lost-n-found/
 ├── apps/
 │   ├── web/          # Next.js 16 · TypeScript · Tailwind CSS  (port 3000)
 │   └── api/          # ASP.NET Core 10 Web API · EF Core · PostgreSQL  (port 8080)
+├── packages/
+│   └── api-client/   # Generated TypeScript client from OpenAPI schema
 ├── infra/
 │   └── docker-compose.yml   # PostgreSQL 16 + API container
 ├── .github/
@@ -20,12 +22,13 @@ lost-n-found/
 
 ## Prerequisites
 
-| Tool                    | Minimum version |
-|-------------------------|-----------------|
-| Node.js                 | 24              |
-| pnpm                    | 9               |
-| .NET SDK                | 10              |
-| Docker + Docker Compose | recent stable   |
+| Tool                    | Minimum version | Notes |
+|-------------------------|-----------------|-------|
+| Node.js                 | 24              | |
+| pnpm                    | 9               | |
+| .NET SDK                | 10              | |
+| Docker + Docker Compose | recent stable   | |
+| Java                    | 11              | Only needed to regenerate API client |
 
 ---
 
@@ -110,6 +113,26 @@ Frontend: **http://localhost:3000**
 
 ---
 
+## API Client (`packages/api-client`)
+
+A shared TypeScript client generated from the backend's OpenAPI schema. Used by `apps/web` to call the API with typed methods instead of raw `fetch()`.
+
+**How it works:**
+
+1. `dotnet build apps/api` produces `apps/api/openapi/openapi.json` (gitignored build artifact)
+2. `pnpm generate:api-client` runs OpenAPI Generator to produce TypeScript code in `packages/api-client/src/generated/`
+3. The generated code **is committed** so frontend devs don't need Java or .NET SDK
+4. `apps/web` imports from `@lost-n-found/api-client` via pnpm workspace
+
+**Regenerating after API changes:**
+
+```bash
+dotnet build apps/api                  # regenerate OpenAPI schema
+pnpm generate:api-client               # regenerate TypeScript client
+```
+
+---
+
 ## Common Commands
 
 ### Frontend
@@ -118,6 +141,7 @@ Frontend: **http://localhost:3000**
 pnpm dev                    # dev server  → http://localhost:3000
 pnpm build                  # production build
 pnpm lint                   # ESLint
+pnpm generate:api-client    # regenerate API client from OpenAPI schema
 
 # with workspace filter (from repo root):
 pnpm --filter web dev
@@ -131,7 +155,7 @@ pnpm --filter web lint
 cd apps/api
 
 dotnet run                  # run locally (needs Postgres on localhost:5432)
-dotnet build                # build only
+dotnet build                # build only (also generates openapi/openapi.json)
 dotnet build -c Release     # release build
 
 # EF Core migrations

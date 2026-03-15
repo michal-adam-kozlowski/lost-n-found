@@ -1,0 +1,9 @@
+.openapi-generator-ignore
+apis/AuthApi.ts
+apis/ItemImagesApi.ts
+apis/ItemsApi.ts
+apis/LostNFoundApiApi.ts
+apis/index.ts
+index.ts
+models/index.ts
+runtime.ts

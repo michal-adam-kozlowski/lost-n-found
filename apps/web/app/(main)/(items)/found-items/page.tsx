@@ -1,18 +1,10 @@
-import { cacheLife, cacheTag } from "next/cache";
+import { connection } from "next/server";
 import MapList from "@components/MapList";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+import { getItems } from "@/lib/api";
 
 export default async function ItemsPage() {
-  "use cache";
-
-  cacheLife("hours");
-  cacheTag("items");
-  const items = (
-    await fetch(`${API_URL}/api/items`).then((r) => {
-      return r.json() as Promise<{ type: string; latitude: number; longitude: number }[]>;
-    })
-  ).filter((item) => item.type === "found");
+  await connection();
+  const items = (await getItems()).filter((item) => item.type === "found");
 
   const markers = items.map((item, index) => ({
     key: index,

@@ -1,0 +1,15 @@
+{
+  "name": "@lost-n-found/api-client",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "generate": "openapi-generator-cli generate -i ../../apps/api/openapi/openapi.json -g typescript-fetch -o src/generated --additional-properties=supportsES6=true,useSingleRequestParameter=true,withInterfaces=true,modelPropertyNaming=original,withoutRuntimeChecks=true,enumPropertyNaming=original"
+  },
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.16.3",
+    "typescript": "^5.7.0"
+  }
+}

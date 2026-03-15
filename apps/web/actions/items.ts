@@ -1,8 +1,7 @@
 "use server";
 
 import { updateTag } from "next/cache";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+import { itemsApi } from "@/lib/api";
 
 export async function addItem(item: {
   title: string;
@@ -11,14 +10,8 @@ export async function addItem(item: {
   latitude: number;
   longitude: number;
 }) {
-  await fetch(`${API_URL}/api/items`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      ...item,
-    }),
+  await itemsApi.apiItemsPost({
+    createItemRequest: item,
   });
   updateTag("items");
 }
