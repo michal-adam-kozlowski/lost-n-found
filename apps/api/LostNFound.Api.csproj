@@ -14,10 +14,8 @@
   </PropertyGroup>
 
   <!-- Rename the build-time OpenAPI output from {ProjectName}.json to a stable, project-agnostic name. -->
-  <Target Name="RenameOpenApiDocument" AfterTargets="GenerateOpenApiDocuments"
-          Condition="Exists('$(OpenApiDocumentsDirectory)/$(MSBuildProjectName).json')">
-    <Move SourceFiles="$(OpenApiDocumentsDirectory)/$(MSBuildProjectName).json"
-          DestinationFiles="$(OpenApiDocumentsDirectory)/openapi.json" />
+  <Target Name="RenameOpenApiDocument" AfterTargets="GenerateOpenApiDocuments" Condition="Exists('$(OpenApiDocumentsDirectory)/$(MSBuildProjectName).json')">
+    <Move SourceFiles="$(OpenApiDocumentsDirectory)/$(MSBuildProjectName).json" DestinationFiles="$(OpenApiDocumentsDirectory)/openapi.json" />
   </Target>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -30,6 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="4.0.19" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.*">

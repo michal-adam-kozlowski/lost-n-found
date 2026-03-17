@@ -1,13 +1,16 @@
 ﻿using LostNFound.Api.Models;
+using LostNFound.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace LostNFound.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(UserManager<ApplicationUser> userManager) : ControllerBase
+public class AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenService jwtTokenService) : ControllerBase
 {
     [HttpPost("register")]
     [ProducesResponseType<RegisterUserResponse>(StatusCodes.Status201Created)]
@@ -34,23 +37,51 @@ public class AuthController(UserManager<ApplicationUser> userManager) : Controll
         return Created("/api/auth/register", new RegisterUserResponse(user.Id, req.Email));
     }
 
+    [HttpPost("login")]
     [ProducesResponseType<LoginUserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
-    [HttpPost("login")]
     public async Task<ActionResult<LoginUserResponse>> Login([FromBody] LoginUserRequest req)
     {
         var user = await userManager.FindByEmailAsync(req.Email);
 
-        if (user == null || !await userManager.CheckPasswordAsync(user, req.Password))
+        if (user == null)
+            return UnauthorizedProblem();
+
+        var signInResult = await signInManager.CheckPasswordSignInAsync(user, req.Password, false);
+
+        if (!signInResult.Succeeded)
+            return UnauthorizedProblem();
+
+        var token = jwtTokenService.CreateToken(user);
+
+        return Ok(new LoginUserResponse(token.AccessToken, token.ExpiresAtUtc, user.Id, user.Email!));
+    }
+    //for testing 
+    [HttpGet("me")]
+    [Authorize]
+    [ProducesResponseType<CurrentUserResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public ActionResult<CurrentUserResponse> Me()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var emailClaim = User.FindFirstValue(ClaimTypes.Email);
+
+        if (!Guid.TryParse(userIdClaim, out var userId) || string.IsNullOrWhiteSpace(emailClaim))
         {
-            return Problem(
-                statusCode: StatusCodes.Status401Unauthorized,
-                title: "Unauthorized",
-                detail: "Invalid email or password");
+            return UnauthorizedProblem();
         }
 
-        return Ok(new LoginUserResponse(user.Id, user.Email!));
+        return Ok(new CurrentUserResponse(userId, emailClaim));
     }
+
+    private ObjectResult UnauthorizedProblem()
+    {
+        return Problem(
+            statusCode: StatusCodes.Status401Unauthorized,
+            title: "Unauthorized",
+            detail: "Invalid email or password");
+    }
+
 }
 
 public record RegisterUserRequest(
@@ -63,4 +94,6 @@ public record LoginUserRequest(
     [Required, EmailAddress] string Email,
     [Required] string Password
 );
-public record LoginUserResponse(Guid Id, string Email);
+public record LoginUserResponse(string AccessToken, DateTime ExpiresAtUtc, Guid Id, string Email);
+
+public record CurrentUserResponse(Guid UserId, string Email);

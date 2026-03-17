@@ -1,14 +1,12 @@
 
-# LoginUserResponse
+# CurrentUserResponse
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`accessToken` | string
-`expiresAtUtc` | string
-`id` | string
+`userId` | string
 `email` | string
 
 

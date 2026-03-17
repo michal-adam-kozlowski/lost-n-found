@@ -1,11 +1,14 @@
-using System.Reflection;
 using Amazon.S3;
 using LostNFound.Api.Configuration;
 using LostNFound.Api.Data;
 using LostNFound.Api.Models;
 using LostNFound.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +42,45 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
       .AddRoles<IdentityRole<Guid>>()
       .AddEntityFrameworkStores<AppDbContext>()
       .AddSignInManager();
+
+var jwtSection = builder.Configuration.GetSection("JWT");
+
+builder.Services
+    .AddOptions<JwtOptions>()
+    .Bind(jwtSection)
+    .Validate(o => !string.IsNullOrWhiteSpace(o.Key), "JWT:Key is required.")
+    .Validate(o => o.Key.Length >= 32, "JWT:Key must be at least 32 characters.")
+    .Validate(o => !string.IsNullOrWhiteSpace(o.Issuer), "JWT:Issuer is required.")
+    .Validate(o => !string.IsNullOrWhiteSpace(o.Audience), "JWT:Audience is required.")
+    .Validate(o => o.DurationInMinutes > 0, "JWT:DurationInMinutes must be greater than 0.")
+    .ValidateOnStart(); //app won't boot if JWT config is missing or invalid
+
+var jwtSettings = jwtSection.Get<JwtOptions>()
+    ?? throw new InvalidOperationException("JWT configuration section is missing.");
+
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings.Issuer,
+
+            ValidateAudience = true,
+            ValidAudience = jwtSettings.Audience,
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 // ── Storage (S3-compatible) ───────────────────────────────────────────────
 var storageOptionsBuilder = builder.Services.AddOptions<StorageOptions>()
@@ -139,6 +181,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowFrontend");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok", timestamp = DateTime.UtcNow }));
 app.MapControllers();

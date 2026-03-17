@@ -47,6 +47,25 @@ export interface CreateItemRequestLatitude {
 /**
  * 
  * @export
+ * @interface CurrentUserResponse
+ */
+export interface CurrentUserResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof CurrentUserResponse
+     */
+    userId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CurrentUserResponse
+     */
+    email: string;
+}
+/**
+ * 
+ * @export
  * @interface Item
  */
 export interface Item {
@@ -92,6 +111,56 @@ export interface Item {
      * @memberof Item
      */
     createdAt?: string;
+}
+/**
+ * 
+ * @export
+ * @interface LoginUserRequest
+ */
+export interface LoginUserRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUserRequest
+     */
+    email: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUserRequest
+     */
+    password: string;
+}
+/**
+ * 
+ * @export
+ * @interface LoginUserResponse
+ */
+export interface LoginUserResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUserResponse
+     */
+    accessToken: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUserResponse
+     */
+    expiresAtUtc: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUserResponse
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUserResponse
+     */
+    email: string;
 }
 /**
  * 
