@@ -26,6 +26,12 @@ services:
       ConnectionStrings__Default: >-
         Host=postgres;Port=5432;Database=lostnfound;
         Username=postgres;Password=postgres
+      # fake values so the api can boot
+      AWS_ENDPOINT_URL: 'localhost:4572'
+      AWS_S3_BUCKET_NAME: 'fake'
+      AWS_DEFAULT_REGION: 'us-east-1'
+      AWS_ACCESS_KEY_ID: '123'
+      AWS_SECRET_ACCESS_KEY: 'xyz'
     ports:
       - "8080:8080"
     depends_on:
