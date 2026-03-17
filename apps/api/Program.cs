@@ -144,11 +144,6 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, "LostNFound.Api.xml");
-    options.IncludeXmlComments(xmlPath);
-});
 
 // Built-in OpenAPI document — used by Microsoft.Extensions.ApiDescription.Server
 // to generate openapi/v1.json at build time.
@@ -175,8 +170,7 @@ if (!isDesignTime)
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "Swagger"));
     app.MapOpenApi();
 }
 
