@@ -15,7 +15,6 @@ export default function MapList({ markers }: Readonly<{ markers: InteractiveMark
   const pathname = usePathname();
   const CustomMap = useMemo(
     () => dynamic(() => import("@components/CustomMap"), { ssr: false, loading: CustomMapPlaceholder }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [pathname],
   );
 
