@@ -34,7 +34,7 @@ export default function Page() {
   const handleSubmit = async (values: FormValues) => {
     console.log("FORM VALUES", values);
 
-    const item = {
+    const item: Parameters<typeof addItem>[0] = {
       title: values.title,
       type: values.type,
       description: values.description,

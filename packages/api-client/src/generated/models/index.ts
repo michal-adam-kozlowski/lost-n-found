@@ -47,6 +47,55 @@ export interface CreateItemRequestLatitude {
 /**
  * 
  * @export
+ * @interface Item
+ */
+export interface Item {
+    /**
+     * 
+     * @type {string}
+     * @memberof Item
+     */
+    id?: string;
+    /**
+     * "lost" | "found"
+     * @type {string}
+     * @memberof Item
+     */
+    title: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Item
+     */
+    type: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Item
+     */
+    description?: string | null;
+    /**
+     * 
+     * @type {CreateItemRequestLatitude}
+     * @memberof Item
+     */
+    latitude?: CreateItemRequestLatitude | null;
+    /**
+     * 
+     * @type {CreateItemRequestLatitude}
+     * @memberof Item
+     */
+    longitude?: CreateItemRequestLatitude | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Item
+     */
+    createdAt?: string;
+}
+/**
+ * 
+ * @export
  * @interface PresignImageRequest
  */
 export interface PresignImageRequest {

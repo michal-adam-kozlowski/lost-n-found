@@ -6,6 +6,7 @@ apis/index.ts
 docs/AuthApi.md
 docs/CreateItemRequest.md
 docs/CreateItemRequestLatitude.md
+docs/Item.md
 docs/ItemImagesApi.md
 docs/ItemsApi.md
 docs/LostNFoundApiApi.md
