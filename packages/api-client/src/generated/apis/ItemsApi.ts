@@ -30,6 +30,13 @@ export interface ApiItemsPostRequest {
  */
 export interface ItemsApiInterface {
     /**
+     * Creates request options for apiItemsGet without sending the request
+     * @throws {RequiredError}
+     * @memberof ItemsApiInterface
+     */
+    apiItemsGetRequestOpts(): Promise<runtime.RequestOpts>;
+
+    /**
      * 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -40,6 +47,14 @@ export interface ItemsApiInterface {
     /**
      */
     apiItemsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * Creates request options for apiItemsPost without sending the request
+     * @param {CreateItemRequest} createItemRequest 
+     * @throws {RequiredError}
+     * @memberof ItemsApiInterface
+     */
+    apiItemsPostRequestOpts(requestParameters: ApiItemsPostRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -62,18 +77,29 @@ export interface ItemsApiInterface {
 export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
 
     /**
+     * Creates request options for apiItemsGet without sending the request
      */
-    async apiItemsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiItemsGetRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/api/Items`,
+
+        let urlPath = `/api/Items`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async apiItemsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.apiItemsGetRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -85,8 +111,9 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
     }
 
     /**
+     * Creates request options for apiItemsPost without sending the request
      */
-    async apiItemsPostRaw(requestParameters: ApiItemsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiItemsPostRequestOpts(requestParameters: ApiItemsPostRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['createItemRequest'] == null) {
             throw new runtime.RequiredError(
                 'createItemRequest',
@@ -100,13 +127,23 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        const response = await this.request({
-            path: `/api/Items`,
+
+        let urlPath = `/api/Items`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: requestParameters['createItemRequest'],
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async apiItemsPostRaw(requestParameters: ApiItemsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.apiItemsPostRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

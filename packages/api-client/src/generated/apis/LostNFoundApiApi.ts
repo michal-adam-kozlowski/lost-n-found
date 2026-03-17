@@ -23,6 +23,13 @@ import * as runtime from '../runtime';
  */
 export interface LostNFoundApiApiInterface {
     /**
+     * Creates request options for healthGet without sending the request
+     * @throws {RequiredError}
+     * @memberof LostNFoundApiApiInterface
+     */
+    healthGetRequestOpts(): Promise<runtime.RequestOpts>;
+
+    /**
      * 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -42,18 +49,29 @@ export interface LostNFoundApiApiInterface {
 export class LostNFoundApiApi extends runtime.BaseAPI implements LostNFoundApiApiInterface {
 
     /**
+     * Creates request options for healthGet without sending the request
      */
-    async healthGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async healthGetRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/health`,
+
+        let urlPath = `/health`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async healthGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.healthGetRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }

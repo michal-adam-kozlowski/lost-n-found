@@ -15,8 +15,17 @@
 
 import * as runtime from '../runtime';
 import type {
+  LoginUserRequest,
+  LoginUserResponse,
+  ProblemDetails,
   RegisterUserRequest,
+  RegisterUserResponse,
+  ValidationProblemDetails,
 } from '../models/index';
+
+export interface ApiAuthLoginPostRequest {
+    loginUserRequest: LoginUserRequest;
+}
 
 export interface ApiAuthRegisterPostRequest {
     registerUserRequest: RegisterUserRequest;
@@ -30,17 +39,46 @@ export interface ApiAuthRegisterPostRequest {
  */
 export interface AuthApiInterface {
     /**
+     * Creates request options for apiAuthLoginPost without sending the request
+     * @param {LoginUserRequest} loginUserRequest 
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthLoginPostRequestOpts(requestParameters: ApiAuthLoginPostRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {LoginUserRequest} loginUserRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthLoginPostRaw(requestParameters: ApiAuthLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginUserResponse>>;
+
+    /**
+     */
+    apiAuthLoginPost(requestParameters: ApiAuthLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginUserResponse>;
+
+    /**
+     * Creates request options for apiAuthRegisterPost without sending the request
+     * @param {RegisterUserRequest} registerUserRequest 
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthRegisterPostRequestOpts(requestParameters: ApiAuthRegisterPostRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * 
      * @param {RegisterUserRequest} registerUserRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    apiAuthRegisterPostRaw(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    apiAuthRegisterPostRaw(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterUserResponse>>;
 
     /**
      */
-    apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterUserResponse>;
 
 }
 
@@ -50,8 +88,54 @@ export interface AuthApiInterface {
 export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
 
     /**
+     * Creates request options for apiAuthLoginPost without sending the request
      */
-    async apiAuthRegisterPostRaw(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiAuthLoginPostRequestOpts(requestParameters: ApiAuthLoginPostRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['loginUserRequest'] == null) {
+            throw new runtime.RequiredError(
+                'loginUserRequest',
+                'Required parameter "loginUserRequest" was null or undefined when calling apiAuthLoginPost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/auth/login`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['loginUserRequest'],
+        };
+    }
+
+    /**
+     */
+    async apiAuthLoginPostRaw(requestParameters: ApiAuthLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginUserResponse>> {
+        const requestOptions = await this.apiAuthLoginPostRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response);
+    }
+
+    /**
+     */
+    async apiAuthLoginPost(requestParameters: ApiAuthLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginUserResponse> {
+        const response = await this.apiAuthLoginPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for apiAuthRegisterPost without sending the request
+     */
+    async apiAuthRegisterPostRequestOpts(requestParameters: ApiAuthRegisterPostRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['registerUserRequest'] == null) {
             throw new runtime.RequiredError(
                 'registerUserRequest',
@@ -65,21 +149,32 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        const response = await this.request({
-            path: `/api/auth/register`,
+
+        let urlPath = `/api/auth/register`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: requestParameters['registerUserRequest'],
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
+        };
     }
 
     /**
      */
-    async apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAuthRegisterPostRaw(requestParameters, initOverrides);
+    async apiAuthRegisterPostRaw(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterUserResponse>> {
+        const requestOptions = await this.apiAuthRegisterPostRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response);
+    }
+
+    /**
+     */
+    async apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterUserResponse> {
+        const response = await this.apiAuthRegisterPostRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

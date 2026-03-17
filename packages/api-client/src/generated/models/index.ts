@@ -47,6 +47,44 @@ export interface CreateItemRequestLatitude {
 /**
  * 
  * @export
+ * @interface LoginUserRequest
+ */
+export interface LoginUserRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUserRequest
+     */
+    email: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUserRequest
+     */
+    password: string;
+}
+/**
+ * 
+ * @export
+ * @interface LoginUserResponse
+ */
+export interface LoginUserResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUserResponse
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginUserResponse
+     */
+    email: string;
+}
+/**
+ * 
+ * @export
  * @interface PresignImageRequest
  */
 export interface PresignImageRequest {
@@ -79,6 +117,50 @@ export interface PresignImageRequestSizeBytes {
 /**
  * 
  * @export
+ * @interface ProblemDetails
+ */
+export interface ProblemDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof ProblemDetails
+     */
+    type?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProblemDetails
+     */
+    title?: string | null;
+    /**
+     * 
+     * @type {ProblemDetailsStatus}
+     * @memberof ProblemDetails
+     */
+    status?: ProblemDetailsStatus | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProblemDetails
+     */
+    detail?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProblemDetails
+     */
+    instance?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface ProblemDetailsStatus
+ */
+export interface ProblemDetailsStatus {
+}
+/**
+ * 
+ * @export
  * @interface RegisterUserRequest
  */
 export interface RegisterUserRequest {
@@ -94,4 +176,66 @@ export interface RegisterUserRequest {
      * @memberof RegisterUserRequest
      */
     password: string;
+}
+/**
+ * 
+ * @export
+ * @interface RegisterUserResponse
+ */
+export interface RegisterUserResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterUserResponse
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterUserResponse
+     */
+    email: string;
+}
+/**
+ * 
+ * @export
+ * @interface ValidationProblemDetails
+ */
+export interface ValidationProblemDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof ValidationProblemDetails
+     */
+    type?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ValidationProblemDetails
+     */
+    title?: string | null;
+    /**
+     * 
+     * @type {ProblemDetailsStatus}
+     * @memberof ValidationProblemDetails
+     */
+    status?: ProblemDetailsStatus | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ValidationProblemDetails
+     */
+    detail?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ValidationProblemDetails
+     */
+    instance?: string | null;
+    /**
+     * 
+     * @type {{ [key: string]: Array<string>; }}
+     * @memberof ValidationProblemDetails
+     */
+    errors?: { [key: string]: Array<string>; };
 }
