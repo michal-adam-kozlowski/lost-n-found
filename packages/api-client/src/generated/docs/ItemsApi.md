@@ -11,7 +11,7 @@ All URIs are relative to *http://localhost*
 
 ## apiItemsGet
 
-> apiItemsGet()
+> Array&lt;Item&gt; apiItemsGet()
 
 
 
@@ -46,7 +46,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-`void` (Empty response body)
+[**Array&lt;Item&gt;**](Item.md)
 
 ### Authorization
 
@@ -55,7 +55,7 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
 
 
 ### HTTP response details
@@ -68,7 +68,7 @@ No authorization required
 
 ## apiItemsPost
 
-> apiItemsPost(createItemRequest)
+> Item apiItemsPost(createItemRequest)
 
 
 
@@ -111,7 +111,7 @@ example().catch(console.error);
 
 ### Return type
 
-`void` (Empty response body)
+[**Item**](Item.md)
 
 ### Authorization
 
@@ -120,7 +120,7 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: `application/json`, `text/json`, `application/*+json`
-- **Accept**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
 
 
 ### HTTP response details

@@ -16,6 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   CreateItemRequest,
+  Item,
 } from '../models/index';
 
 export interface ApiItemsPostRequest {
@@ -42,11 +43,19 @@ export interface ItemsApiInterface {
      * @throws {RequiredError}
      * @memberof ItemsApiInterface
      */
-    apiItemsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    apiItemsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Item>>>;
 
     /**
      */
-    apiItemsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    apiItemsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Item>>;
+
+    /**
+     * Creates request options for apiItemsPost without sending the request
+     * @param {CreateItemRequest} createItemRequest 
+     * @throws {RequiredError}
+     * @memberof ItemsApiInterface
+     */
+    apiItemsPostRequestOpts(requestParameters: ApiItemsPostRequest): Promise<runtime.RequestOpts>;
 
     /**
      * Creates request options for apiItemsPost without sending the request
@@ -63,11 +72,11 @@ export interface ItemsApiInterface {
      * @throws {RequiredError}
      * @memberof ItemsApiInterface
      */
-    apiItemsPostRaw(requestParameters: ApiItemsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    apiItemsPostRaw(requestParameters: ApiItemsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Item>>;
 
     /**
      */
-    apiItemsPost(requestParameters: ApiItemsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    apiItemsPost(requestParameters: ApiItemsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Item>;
 
 }
 
@@ -97,17 +106,19 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
 
     /**
      */
-    async apiItemsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiItemsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Item>>> {
         const requestOptions = await this.apiItemsGetRequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
+     * Creates request options for apiItemsPost without sending the request
      */
-    async apiItemsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiItemsGetRaw(initOverrides);
+    async apiItemsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Item>> {
+        const response = await this.apiItemsGetRaw(initOverrides);
+        return await response.value();
     }
 
     /**
@@ -141,17 +152,18 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
 
     /**
      */
-    async apiItemsPostRaw(requestParameters: ApiItemsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiItemsPostRaw(requestParameters: ApiItemsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Item>> {
         const requestOptions = await this.apiItemsPostRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response);
     }
 
     /**
      */
-    async apiItemsPost(requestParameters: ApiItemsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiItemsPostRaw(requestParameters, initOverrides);
+    async apiItemsPost(requestParameters: ApiItemsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Item> {
+        const response = await this.apiItemsPostRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

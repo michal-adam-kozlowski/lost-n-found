@@ -47,40 +47,51 @@ export interface CreateItemRequestLatitude {
 /**
  * 
  * @export
- * @interface LoginUserRequest
+ * @interface Item
  */
-export interface LoginUserRequest {
+export interface Item {
     /**
      * 
      * @type {string}
-     * @memberof LoginUserRequest
+     * @memberof Item
      */
-    email: string;
+    id?: string;
+    /**
+     * "lost" | "found"
+     * @type {string}
+     * @memberof Item
+     */
+    title: string;
     /**
      * 
      * @type {string}
-     * @memberof LoginUserRequest
+     * @memberof Item
      */
-    password: string;
-}
-/**
- * 
- * @export
- * @interface LoginUserResponse
- */
-export interface LoginUserResponse {
+    type: string;
     /**
      * 
      * @type {string}
-     * @memberof LoginUserResponse
+     * @memberof Item
      */
-    id: string;
+    description?: string | null;
+    /**
+     * 
+     * @type {CreateItemRequestLatitude}
+     * @memberof Item
+     */
+    latitude?: CreateItemRequestLatitude | null;
+    /**
+     * 
+     * @type {CreateItemRequestLatitude}
+     * @memberof Item
+     */
+    longitude?: CreateItemRequestLatitude | null;
     /**
      * 
      * @type {string}
-     * @memberof LoginUserResponse
+     * @memberof Item
      */
-    email: string;
+    createdAt?: string;
 }
 /**
  * 

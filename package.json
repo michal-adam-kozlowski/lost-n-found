@@ -7,7 +7,7 @@
     "build": "pnpm --filter web build",
     "start": "pnpm --filter web start",
     "lint": "pnpm --filter web lint",
-    "generate:api-client": "pnpm --filter @lost-n-found/api-client generate"
+    "generate:api-client": "cd packages/api-client && pnpm run generate"
   },
   "engines": {
     "node": ">=24",

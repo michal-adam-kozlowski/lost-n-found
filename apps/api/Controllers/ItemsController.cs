@@ -12,11 +12,11 @@ public class ItemsController(AppDbContext db) : ControllerBase
     private static readonly HashSet<string> ValidTypes = ["lost", "found"];
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await db.Items.OrderByDescending(i => i.CreatedAt).ToListAsync());
+    public async Task<ActionResult<List<Item>>> GetAll() =>
+        await db.Items.OrderByDescending(i => i.CreatedAt).ToListAsync();
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateItemRequest req)
+    public async Task<ActionResult<Item>> Create([FromBody] CreateItemRequest req)
     {
         if (!ValidTypes.Contains(req.Type))
             return BadRequest(new { error = "type must be 'lost' or 'found'" });
