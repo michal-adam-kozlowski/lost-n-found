@@ -12,6 +12,9 @@ namespace LostNFound.Api.Controllers;
 [Route("api/auth")]
 public class AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenService jwtTokenService) : ControllerBase
 {
+    /// <summary>
+    /// Registers a new user.
+    /// </summary>
     [HttpPost("register")]
     [ProducesResponseType<RegisterUserResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -37,6 +40,9 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
         return Created("/api/auth/register", new RegisterUserResponse(user.Id, req.Email));
     }
 
+    /// <summary>
+    /// Logs in a user and returns a JWT access token.
+    /// </summary>
     [HttpPost("login")]
     [ProducesResponseType<LoginUserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
@@ -56,7 +62,10 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
 
         return Ok(new LoginUserResponse(token.AccessToken, token.ExpiresAtUtc, user.Id, user.Email!));
     }
-    //for testing 
+
+    /// <summary>
+    /// Test endpoint that verifies the bearer token and returns the current user.
+    /// </summary>
     [HttpGet("me")]
     [Authorize]
     [ProducesResponseType<CurrentUserResponse>(StatusCodes.Status200OK)]

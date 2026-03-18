@@ -4,9 +4,9 @@ All URIs are relative to *http://localhost*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**apiAuthLoginPost**](AuthApi.md#apiauthloginpost) | **POST** /api/auth/login |  |
-| [**apiAuthMeGet**](AuthApi.md#apiauthmeget) | **GET** /api/auth/me |  |
-| [**apiAuthRegisterPost**](AuthApi.md#apiauthregisterpost) | **POST** /api/auth/register |  |
+| [**apiAuthLoginPost**](AuthApi.md#apiauthloginpost) | **POST** /api/auth/login | Logs in a user and returns a JWT access token. |
+| [**apiAuthMeGet**](AuthApi.md#apiauthmeget) | **GET** /api/auth/me | Test endpoint that verifies the bearer token and returns the current user. |
+| [**apiAuthRegisterPost**](AuthApi.md#apiauthregisterpost) | **POST** /api/auth/register | Registers a new user. |
 
 
 
@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 
 > LoginUserResponse apiAuthLoginPost(loginUserRequest)
 
-
+Logs in a user and returns a JWT access token.
 
 ### Example
 
@@ -80,7 +80,7 @@ No authorization required
 
 > CurrentUserResponse apiAuthMeGet()
 
-
+Test endpoint that verifies the bearer token and returns the current user.
 
 ### Example
 
@@ -142,7 +142,7 @@ This endpoint does not need any parameter.
 
 > RegisterUserResponse apiAuthRegisterPost(registerUserRequest)
 
-
+Registers a new user.
 
 ### Example
 

@@ -94,6 +94,9 @@ Frontend: **http://localhost:3000**
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/health` | Returns `{ status, timestamp }` |
+| `POST` | `/api/auth/register` | Registers a new user |
+| `POST` | `/api/auth/login` | Validates credentials and returns a JWT access token |
+| `GET` | `/api/auth/me` | Checks that the bearer token works and returns the current user |
 | `GET` | `/api/items` | Returns all items, newest first |
 | `POST` | `/api/items` | Creates a new item |
 
