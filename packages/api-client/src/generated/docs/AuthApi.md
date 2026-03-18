@@ -93,7 +93,11 @@ import type { ApiAuthMeGetRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const api = new AuthApi();
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new AuthApi(config);
 
   try {
     const data = await api.apiAuthMeGet();
@@ -117,7 +121,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-No authorization required
+[Bearer](../README.md#Bearer)
 
 ### HTTP request headers
 

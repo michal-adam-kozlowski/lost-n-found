@@ -3,10 +3,15 @@ using LostNFound.Api.Configuration;
 using LostNFound.Api.Data;
 using LostNFound.Api.Models;
 using LostNFound.Api.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using System.Reflection;
 using System.Text;
 
@@ -147,7 +152,19 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Built-in OpenAPI document — used by Microsoft.Extensions.ApiDescription.Server
 // to generate openapi/v1.json at build time.
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddOperationTransformer((operation, context, cancellationToken) =>
+    {
+        if (context.Description.ActionDescriptor.EndpointMetadata.OfType<IAuthorizeData>().Any())
+        {
+            var schemeReference = new OpenApiSecuritySchemeReference("Bearer", context.Document);
+            operation.Security = [new OpenApiSecurityRequirement { [schemeReference] = [] }];
+        }
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
@@ -239,3 +256,30 @@ static string ConvertDatabaseUrl(string databaseUrl)
            $"Username={username};Password={password};" +
            "Ssl Mode=Require;Trust Server Certificate=true";
 }
+
+internal sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvider authenticationSchemeProvider) : IOpenApiDocumentTransformer
+{
+    public async Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
+    {
+        var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
+
+        if (authenticationSchemes.Any(authScheme => authScheme.Name == "Bearer"))
+        {
+            // Add the security scheme at the document level
+            var securitySchemes = new Dictionary<string, IOpenApiSecurityScheme>
+            {
+                ["Bearer"] = new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer", 
+                    In = ParameterLocation.Header,
+                    BearerFormat = "JWT"
+                }
+            };
+            document.Components ??= new OpenApiComponents();
+            document.Components.SecuritySchemes = securitySchemes;
+            
+        }
+    }
+}
+    
