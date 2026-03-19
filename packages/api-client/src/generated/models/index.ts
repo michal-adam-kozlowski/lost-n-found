@@ -260,25 +260,6 @@ export interface RegisterUserRequest {
 /**
  * 
  * @export
- * @interface RegisterUserResponse
- */
-export interface RegisterUserResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof RegisterUserResponse
-     */
-    id: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RegisterUserResponse
-     */
-    email: string;
-}
-/**
- * 
- * @export
  * @interface ValidationProblemDetails
  */
 export interface ValidationProblemDetails {

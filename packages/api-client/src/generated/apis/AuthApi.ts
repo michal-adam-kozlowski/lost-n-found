@@ -20,7 +20,6 @@ import type {
   LoginUserResponse,
   ProblemDetails,
   RegisterUserRequest,
-  RegisterUserResponse,
   ValidationProblemDetails,
 } from '../models/index';
 
@@ -93,18 +92,18 @@ export interface AuthApiInterface {
 
     /**
      * 
-     * @summary Registers a new user.
+     * @summary Registers a new user and returns a JWT access token.
      * @param {RegisterUserRequest} registerUserRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    apiAuthRegisterPostRaw(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterUserResponse>>;
+    apiAuthRegisterPostRaw(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginUserResponse>>;
 
     /**
-     * Registers a new user.
+     * Registers a new user and returns a JWT access token.
      */
-    apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterUserResponse>;
+    apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginUserResponse>;
 
 }
 
@@ -235,9 +234,9 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
     }
 
     /**
-     * Registers a new user.
+     * Registers a new user and returns a JWT access token.
      */
-    async apiAuthRegisterPostRaw(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterUserResponse>> {
+    async apiAuthRegisterPostRaw(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginUserResponse>> {
         const requestOptions = await this.apiAuthRegisterPostRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
@@ -245,9 +244,9 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
     }
 
     /**
-     * Registers a new user.
+     * Registers a new user and returns a JWT access token.
      */
-    async apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterUserResponse> {
+    async apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginUserResponse> {
         const response = await this.apiAuthRegisterPostRaw(requestParameters, initOverrides);
         return await response.value();
     }

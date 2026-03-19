@@ -13,12 +13,12 @@ namespace LostNFound.Api.Controllers;
 public class AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenService jwtTokenService) : ControllerBase
 {
     /// <summary>
-    /// Registers a new user.
+    /// Registers a new user and returns a JWT access token.
     /// </summary>
     [HttpPost("register")]
-    [ProducesResponseType<RegisterUserResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<LoginUserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<RegisterUserResponse>> Register([FromBody] RegisterUserRequest req)
+    public async Task<ActionResult<LoginUserResponse>> Register([FromBody] RegisterUserRequest req)
     {
         var user = new ApplicationUser
         {
@@ -37,7 +37,9 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
             return ValidationProblem(ModelState);
         }
 
-        return Created("/api/auth/register", new RegisterUserResponse(user.Id, req.Email));
+        var token = jwtTokenService.CreateToken(user);
+
+        return Ok(new LoginUserResponse(token.AccessToken, token.ExpiresAtUtc, user.Id, user.Email!));
     }
 
     /// <summary>
@@ -97,7 +99,6 @@ public record RegisterUserRequest(
     [Required, EmailAddress] string Email,
     [Required, MinLength(6)] string Password
 );
-public record RegisterUserResponse(Guid Id, string Email);
 
 public record LoginUserRequest(
     [Required, EmailAddress] string Email,

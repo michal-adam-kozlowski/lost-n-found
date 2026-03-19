@@ -6,7 +6,7 @@ All URIs are relative to *http://localhost*
 |------------- | ------------- | -------------|
 | [**apiAuthLoginPost**](AuthApi.md#apiauthloginpost) | **POST** /api/auth/login | Logs in a user and returns a JWT access token. |
 | [**apiAuthMeGet**](AuthApi.md#apiauthmeget) | **GET** /api/auth/me | Test endpoint that verifies the bearer token and returns the current user. |
-| [**apiAuthRegisterPost**](AuthApi.md#apiauthregisterpost) | **POST** /api/auth/register | Registers a new user. |
+| [**apiAuthRegisterPost**](AuthApi.md#apiauthregisterpost) | **POST** /api/auth/register | Registers a new user and returns a JWT access token. |
 
 
 
@@ -140,9 +140,9 @@ This endpoint does not need any parameter.
 
 ## apiAuthRegisterPost
 
-> RegisterUserResponse apiAuthRegisterPost(registerUserRequest)
+> LoginUserResponse apiAuthRegisterPost(registerUserRequest)
 
-Registers a new user.
+Registers a new user and returns a JWT access token.
 
 ### Example
 
@@ -183,7 +183,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**RegisterUserResponse**](RegisterUserResponse.md)
+[**LoginUserResponse**](LoginUserResponse.md)
 
 ### Authorization
 
@@ -198,7 +198,7 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **201** | Created |  -  |
+| **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
