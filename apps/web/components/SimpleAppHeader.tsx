@@ -7,14 +7,14 @@ export function SimpleAppHeader() {
   return (
     <Container size="lg" h="100%" px="0">
       <Group h="100%" justify="space-between">
-        <Link href="/">
+        <Link href="/" prefetch={true}>
           <Logo />
         </Link>
         <Group gap="sm">
-          <Link href="/login">
+          <Link href="/login" prefetch={true}>
             <Button variant="outline">Zaloguj się</Button>
           </Link>
-          <Link href="/register">
+          <Link href="/register" prefetch={true}>
             <Button>Zarejestruj się</Button>
           </Link>
         </Group>

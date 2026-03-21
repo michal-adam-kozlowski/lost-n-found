@@ -1,4 +1,4 @@
-import { AuthApi, Configuration, ErrorContext, ItemsApi } from "@lost-n-found/api-client";
+import { AuthApi, Configuration, ItemsApi } from "@lost-n-found/api-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 

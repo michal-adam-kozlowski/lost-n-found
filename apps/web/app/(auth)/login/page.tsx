@@ -3,10 +3,11 @@
 import { Anchor, Container, Title, Text, TextInput, PasswordInput, Button, Card, Alert, List } from "@mantine/core";
 import Link from "next/link";
 import { isEmail, useForm, isNotEmpty } from "@mantine/form";
-import { ApiError } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { redirect, usePathname } from "next/navigation";
+import { redirect, usePathname, useRouter, useSearchParams } from "next/navigation";
+import { login } from "@/actions/auth";
+import { notifications } from "@mantine/notifications";
 
 interface FormValues {
   email: string;
@@ -31,6 +32,21 @@ export default function Page() {
   });
   const [errors, setErrors] = useState<string[]>([]);
   const pathname = usePathname();
+  const params = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (params.has("loggedOut")) {
+      notifications.show({
+        title: "Wylogowano pomyślnie",
+        message: "",
+        color: "green",
+      });
+      const newParams = new URLSearchParams(params.toString());
+      newParams.delete("loggedOut");
+      router.replace(`${pathname}?${newParams.toString()}`);
+    }
+  }, [params]);
 
   useEffect(() => {
     form.reset();
@@ -38,26 +54,24 @@ export default function Page() {
 
   const handleSubmit = async (values: FormValues) => {
     setErrors([]);
-    console.log("FORM VALUES", values);
-
-    try {
-      // TODO: implement
+    const res = await login(values.email, values.password);
+    if (res.success) {
+      notifications.show({
+        title: "Zalogowano pomyślnie",
+        message: "",
+        color: "green",
+      });
       redirect("/");
-    } catch (e) {
-      const error = (e as ApiError).data;
-      if (!error) {
-        throw e;
-      }
-      if (Array.isArray(error.errors)) {
-        setErrors(error.errors);
-        return;
-      }
-      if (error.errors.Password) {
-        form.setFieldError("password", error.errors.Password[0]);
-      }
-      if (error.errors.Email) {
-        form.setFieldError("email", error.errors.Email[0]);
-      }
+    }
+    if (Array.isArray(res.errors)) {
+      setErrors(res.errors);
+      return;
+    }
+    if (res.errors.Password) {
+      form.setFieldError("password", res.errors.Password[0]);
+    }
+    if (res.errors.Email) {
+      form.setFieldError("email", res.errors.Email[0]);
     }
   };
 
@@ -81,7 +95,7 @@ export default function Page() {
               <Alert
                 variant="transparent"
                 color="red"
-                title="Rejestracja nie powiodła się"
+                title="Logowanie nie powiodło się"
                 p={0}
                 mb="xs"
                 icon={<IconAlertTriangle />}

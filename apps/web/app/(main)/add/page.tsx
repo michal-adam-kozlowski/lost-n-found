@@ -34,14 +34,13 @@ export default function Page() {
   const handleSubmit = async (values: FormValues) => {
     console.log("FORM VALUES", values);
 
-    const item: Parameters<typeof addItem>[0] = {
+    await addItem({
       title: values.title,
       type: values.type,
       description: values.description,
       latitude: values.location?.latitude ?? 0,
       longitude: values.location?.longitude ?? 0,
-    };
-    await addItem(item);
+    });
   };
 
   return (

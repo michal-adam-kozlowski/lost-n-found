@@ -1,20 +1,18 @@
-"use client";
-
-import { AppShell, Container } from "@mantine/core";
+import { AppShell, Container, AppShellHeader, AppShellMain } from "@mantine/core";
 import React from "react";
 import { AppHeader } from "@components/AppHeader";
 
-export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <AppShell header={{ height: 60 }} padding="md">
-      <AppShell.Header px="md">
+      <AppShellHeader px="md">
         <AppHeader />
-      </AppShell.Header>
-      <AppShell.Main>
+      </AppShellHeader>
+      <AppShellMain>
         <Container size="lg" px="0">
           {children}
         </Container>
-      </AppShell.Main>
+      </AppShellMain>
     </AppShell>
   );
 }

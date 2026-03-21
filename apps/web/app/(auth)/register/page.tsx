@@ -3,10 +3,11 @@
 import { Anchor, Container, Title, Text, TextInput, PasswordInput, Button, Card, Alert, List } from "@mantine/core";
 import Link from "next/link";
 import { isEmail, useForm, matchesField, isNotEmpty } from "@mantine/form";
-import { authApi, ApiError } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { redirect, usePathname } from "next/navigation";
+import { register } from "@/actions/auth";
+import { notifications } from "@mantine/notifications";
 
 interface FormValues {
   email: string;
@@ -41,29 +42,27 @@ export default function Page() {
 
   const handleSubmit = async (values: FormValues) => {
     setErrors([]);
-    try {
-      await authApi.apiAuthRegisterPost({
-        registerUserRequest: {
-          email: values.email,
-          password: values.password,
-        },
+    const res = await register(values.email, values.password);
+    if (res.success) {
+      notifications.show({
+        title: "Zarejestrowano pomyślnie",
+        message: "",
+        color: "green",
       });
       redirect("/");
-    } catch (e) {
-      const error = (e as ApiError).data;
-      if (!error) {
-        throw e;
-      }
-      if (Array.isArray(error.errors)) {
-        setErrors(error.errors);
-        return;
-      }
-      if (error.errors.Password) {
-        form.setFieldError("password", error.errors.Password[0]);
-      }
-      if (error.errors.Email) {
-        form.setFieldError("email", error.errors.Email[0]);
-      }
+    }
+    if (Array.isArray(res.errors)) {
+      setErrors(res.errors);
+      return;
+    }
+    if (res.errors.Password) {
+      form.setFieldError("password", res.errors.Password[0]);
+    }
+    if (res.errors.Email) {
+      form.setFieldError("email", res.errors.Email[0]);
+    }
+    if (res.errors.DuplicateEmail) {
+      form.setFieldError("email", res.errors.DuplicateEmail[0]);
     }
   };
 

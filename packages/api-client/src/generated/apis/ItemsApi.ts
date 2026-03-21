@@ -58,14 +58,6 @@ export interface ItemsApiInterface {
     apiItemsPostRequestOpts(requestParameters: ApiItemsPostRequest): Promise<runtime.RequestOpts>;
 
     /**
-     * Creates request options for apiItemsPost without sending the request
-     * @param {CreateItemRequest} createItemRequest 
-     * @throws {RequiredError}
-     * @memberof ItemsApiInterface
-     */
-    apiItemsPostRequestOpts(requestParameters: ApiItemsPostRequest): Promise<runtime.RequestOpts>;
-
-    /**
      * 
      * @param {CreateItemRequest} createItemRequest 
      * @param {*} [options] Override http request option.
@@ -114,7 +106,6 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
     }
 
     /**
-     * Creates request options for apiItemsPost without sending the request
      */
     async apiItemsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Item>> {
         const response = await this.apiItemsGetRaw(initOverrides);
