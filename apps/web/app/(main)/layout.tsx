@@ -9,7 +9,7 @@ export default async function Layout({ children }: Readonly<{ children: React.Re
         <AppHeader />
       </AppShellHeader>
       <AppShellMain>
-        <Container size="lg" px="0">
+        <Container size="lg" px="0" pt="md">
           {children}
         </Container>
       </AppShellMain>

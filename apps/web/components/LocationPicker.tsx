@@ -29,7 +29,7 @@ export default function LocationPicker({
   }, [value, onChange]);
 
   return (
-    <Input.Wrapper label="Lokalizacja">
+    <Input.Wrapper style={{ height: 500 }}>
       <CustomMap
         markers={markers}
         onClick={(ev) => setValue({ longitude: ev.lngLat.lng, latitude: ev.lngLat.lat })}

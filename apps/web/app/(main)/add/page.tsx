@@ -1,95 +1,37 @@
 "use client";
 
-import { Button, Card, Center, Container, Group, Select, Textarea, TextInput, Title } from "@mantine/core";
-import React from "react";
-import TypePicker from "@components/TypePicker";
-import { useForm } from "@mantine/form";
-import { DatePickerInput } from "@mantine/dates";
-import LocationPicker from "@components/LocationPicker";
-import { MarkerLocation } from "@components/CustomMap";
-import { addItem } from "@/actions/items";
-
-interface FormValues {
-  type: "found" | "lost";
-  title: string;
-  category: string;
-  description: string;
-  foundLostDate: Date;
-  location: MarkerLocation | null;
-}
+import { Card, Flex, List, ListItem, Stack, Title } from "@mantine/core";
+import React, { useState } from "react";
+import AddItemForm, { AddItemFormValues } from "@/app/(main)/add/AddItemForm";
 
 export default function Page() {
-  const form = useForm<FormValues>({
-    mode: "uncontrolled",
-    initialValues: {
-      type: "found",
-      title: "",
-      category: "",
-      description: "",
-      foundLostDate: new Date(),
-      location: null,
-    },
-  });
-
-  const handleSubmit = async (values: FormValues) => {
-    console.log("FORM VALUES", values);
-
-    await addItem({
-      title: values.title,
-      type: values.type,
-      description: values.description,
-      latitude: values.location?.latitude ?? 0,
-      longitude: values.location?.longitude ?? 0,
-    });
-  };
+  const [formValues, setFormValues] = useState<AddItemFormValues | null>(null);
 
   return (
-    <Container size="md" px="md">
-      <Card withBorder>
-        <form onSubmit={form.onSubmit(handleSubmit)}>
-          <Card.Section p="lg" withBorder>
-            <Center>
-              <Title order={2}>Dodaj nowe ogłoszenie</Title>
-            </Center>
-          </Card.Section>
-          <Card.Section p="lg" withBorder className="flex! flex-col gap-3">
-            <Container size="xs" px="xl">
-              <TypePicker size="md" value={form.values.type} onChange={(value) => form.setFieldValue("type", value)} />
-            </Container>
-            <TextInput withAsterisk label="Tytuł" placeholder="Tytuł ogłoszenia" {...form.getInputProps("title")} />
-            <Select
-              withAsterisk
-              label="Kategoria"
-              placeholder="Wybierz kategorię"
-              data={["Dokumenty", "Elektronika", "Inne"]}
-              searchable
-              allowDeselect={false}
-              {...form.getInputProps("category")}
-            />
-            <Textarea
-              label="Opis"
-              placeholder="Opis ogłoszenia"
-              resize="vertical"
-              rows={8}
-              minRows={4}
-              maxRows={12}
-              {...form.getInputProps("description")}
-            />
-            <DatePickerInput
-              label={form.values.type === "found" ? "Data znalezienia" : "Data zagubienia"}
-              placeholder="Wybierz datę"
-              locale="pl"
-              {...form.getInputProps("foundLostDate")}
-            />
-            <LocationPicker {...form.getInputProps("location")} />
-          </Card.Section>
-          <Card.Section p="lg" withBorder>
-            <Group justify="flex-end">
-              <Button type="submit">Dodaj</Button>
-            </Group>
-          </Card.Section>
-        </form>
-      </Card>
-    </Container>
+    <Flex direction="row" columnGap="xl" wrap="wrap" align="flex-start" mb="xl">
+      <AddItemForm onChange={(values) => setFormValues(values)} />
+      <Stack className="flex-1 basis-xs sticky!" top={92} gap="lg">
+        <Card shadow="xs" p="lg">
+          <Title order={3} size="md" mb="xs">
+            Wskazówki
+          </Title>
+          <List className="list-disc" size="sm" fw={500} c="gray.6">
+            <ListItem className="mb-2">Dodaj konkretny tytuł ogłoszenia. </ListItem>
+            <ListItem className="mb-2">Opisz cechy charakterystyczne przedmiotu.</ListItem>
+            <ListItem className="mb-2">Wskaż dokładne miejsce na mapie.</ListItem>
+            <ListItem className="mb-2">Dodaj zdjęcie, jeśli je posiadasz.</ListItem>
+            <ListItem className="mb-2">Uzupełnij dane kontaktowe, aby ułatwić odnalezienie właściciela</ListItem>
+          </List>
+        </Card>
+        <div>
+          <Title order={3} size="md" mb="xs">
+            Podgląd ogłoszenia
+          </Title>
+          <Card shadow="xs" p="lg">
+            {JSON.stringify(formValues, null, 2)}
+          </Card>
+        </div>
+      </Stack>
+    </Flex>
   );
 }

@@ -18,5 +18,9 @@ export default function MapList({ markers }: Readonly<{ markers: InteractiveMark
     [pathname],
   );
 
-  return <CustomMap markers={markers}></CustomMap>;
+  return (
+    <div style={{ height: 600 }}>
+      <CustomMap markers={markers}></CustomMap>
+    </div>
+  );
 }

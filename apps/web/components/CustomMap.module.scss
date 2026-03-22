@@ -17,7 +17,7 @@
   border: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-gray-4);
   border-radius: var(--mantine-radius-default);
   overflow: hidden;
-  height: 600px;
+  height: 100%;
   z-index: 1;
 
   &:after {
