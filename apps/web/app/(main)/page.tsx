@@ -1,4 +1,4 @@
-import Logo from "@components/Logo";
+import Logo from "@components/layout/Logo";
 import { Center } from "@mantine/core";
 
 export default function Page() {

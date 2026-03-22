@@ -1,6 +1,6 @@
 import { AppShell, Container, AppShellHeader, AppShellMain } from "@mantine/core";
 import React from "react";
-import { AppHeader } from "@components/AppHeader";
+import { AppHeader } from "@components/layout/AppHeader";
 
 export default async function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
