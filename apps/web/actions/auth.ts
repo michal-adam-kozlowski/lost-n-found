@@ -25,7 +25,6 @@ export async function getCurrentUser() {
   }
   const expires = data.exp;
   if (expires && expires * 1000 < Date.now()) {
-    cookieStore.delete("token");
     return null;
   }
   return {
