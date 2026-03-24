@@ -31,7 +31,7 @@ builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 var connectionString = ResolveConnectionString(builder.Configuration, isDesignTime);
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString, o => o.UseNetTopologySuite()));
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
       {
