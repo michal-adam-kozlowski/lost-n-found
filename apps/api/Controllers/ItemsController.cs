@@ -67,8 +67,6 @@ public class ItemsController(AppDbContext db) : ControllerBase
     }
 }
 
-//TODO: add GET /categories
-
 
 public record CreateItemRequest(
     Guid CategoryId,
