@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import CustomMapPlaceholder from "@components/CustomMapPlaceholder";
+import CustomMapPlaceholder from "@components/maps/CustomMapPlaceholder";
 import { useMemo } from "react";
 import { usePathname } from "next/navigation";
-import { MarkerLocation } from "@components/CustomMap";
+import { MarkerLocation } from "@components/maps/CustomMap";
 
 export type InteractiveMarker = MarkerLocation & {
   key: string | number;
@@ -14,7 +14,7 @@ export type InteractiveMarker = MarkerLocation & {
 export default function MapList({ markers }: Readonly<{ markers: InteractiveMarker[] }>) {
   const pathname = usePathname();
   const CustomMap = useMemo(
-    () => dynamic(() => import("@components/CustomMap"), { ssr: false, loading: CustomMapPlaceholder }),
+    () => dynamic(() => import("@components/maps/CustomMap"), { ssr: false, loading: CustomMapPlaceholder }),
     [pathname],
   );
 

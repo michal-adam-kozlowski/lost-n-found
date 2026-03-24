@@ -1,0 +1,7 @@
+@reference "../../app/globals.css";
+
+.maplibregl-map {
+  .maplibregl-ctrl {
+    @apply shadow-md border-none;
+  }
+}

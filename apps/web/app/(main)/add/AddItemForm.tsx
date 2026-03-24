@@ -2,12 +2,12 @@
 
 import { Button, Divider, Group, Select, Stack, Text, Textarea, TextInput, Title } from "@mantine/core";
 import React, { useEffect } from "react";
-import { MarkerLocation } from "@components/CustomMap";
+import { MarkerLocation } from "@components/maps/CustomMap";
 import { addItem } from "@/actions/items";
 import { useForm } from "@mantine/form";
 import TypeRadioGroup from "@/app/(main)/add/TypeRadioGroup";
 import { DatePickerInput } from "@mantine/dates";
-import LocationPicker from "@components/LocationPicker";
+import LocationPicker from "@components/maps/LocationPicker";
 import { Dropzone, DropzoneAccept, DropzoneIdle, DropzoneReject, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 

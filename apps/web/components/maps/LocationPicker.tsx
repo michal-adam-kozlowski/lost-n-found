@@ -1,11 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import CustomMapPlaceholder from "@components/CustomMapPlaceholder";
+import CustomMapPlaceholder from "@components/maps/CustomMapPlaceholder";
 import { Input } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import { MarkerLocation } from "@components/CustomMap";
+import { MarkerLocation } from "@components/maps/CustomMap";
 
 export default function LocationPicker({
   defaultValue,
@@ -16,7 +16,7 @@ export default function LocationPicker({
 }>) {
   const pathname = usePathname();
   const CustomMap = useMemo(
-    () => dynamic(() => import("@components/CustomMap"), { ssr: false, loading: CustomMapPlaceholder }),
+    () => dynamic(() => import("@components/maps/CustomMap"), { ssr: false, loading: CustomMapPlaceholder }),
     [pathname],
   );
 

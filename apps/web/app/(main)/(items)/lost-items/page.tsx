@@ -1,4 +1,4 @@
-import MapList from "@components/MapList";
+import MapList from "@components/maps/MapList";
 import { itemsApi } from "@/lib/api";
 import { cacheLife, cacheTag } from "next/cache";
 
