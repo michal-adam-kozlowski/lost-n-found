@@ -3,6 +3,7 @@ using LostNFound.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace LostNFound.Api.Controllers;
@@ -13,6 +14,9 @@ public class ItemsController(AppDbContext db) : ControllerBase
 {
     private static readonly HashSet<string> ValidTypes = ["lost", "found"];
 
+    /// <summary>
+    /// Returns all items ordered from newest to oldest.
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<List<ItemResponse>>> GetAll()
     {
@@ -20,32 +24,51 @@ public class ItemsController(AppDbContext db) : ControllerBase
         return items.Select(ToResponse).ToList();
     }
 
-
+    /// <summary>
+    /// Returns the item from id.
+    /// </summary>
     [HttpGet("{id:guid}")]
+    [ProducesResponseType<ItemResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ItemResponse>> GetById(Guid id)
     {
         var item = await db.Items.FindAsync(id);
         if (item is null)
-            return NotFound();
+        {
+            return Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                title: "Not Found",
+                detail: $"No item found with id {id}");
+        }
 
         return ToResponse(item);
     }
 
+    /// <summary>
+    /// Creates a new item.
+    /// </summary>
     [HttpPost]
+    [ProducesResponseType<ItemResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ItemResponse>> Create([FromBody] CreateItemRequest req)
     {
         if (!ValidTypes.Contains(req.Type))
-            return BadRequest(new { error = "type must be 'lost' or 'found'" });
-
+        {
+            ModelState.AddModelError(nameof(req.Type), "type must be 'lost' or 'found'");
+            return ValidationProblem(ModelState);
+        }
+            
         var categoryExists = await db.Categories.AnyAsync(c => c.Id == req.CategoryId);
         if (!categoryExists)
-            return BadRequest(new { error = "invalid categoryId" });
-
+        {
+            ModelState.AddModelError(nameof(req.CategoryId), "invalid categoryId");
+            return ValidationProblem(ModelState);
+        }
+            
         Point? location = null;
         if (req.Latitude.HasValue && req.Longitude.HasValue)
             location = new Point(req.Longitude.Value, req.Latitude.Value) { SRID = 4326 }; //WGS84
        
-
 
         var item = new Item
         {
@@ -83,11 +106,11 @@ public class ItemsController(AppDbContext db) : ControllerBase
 
 public record CreateItemRequest(
     Guid CategoryId,
-    string Title,
-    string Type,
+    [Required] string Title,
+    [Required] string Type,
     string? Description,    
-    double? Longitude,
-    double? Latitude,
+    [Range(-180, 180)] double? Longitude,
+    [Range(-90, 90)] double? Latitude,
     string? LocationLabel,
     DateTime OccurredAt
 );

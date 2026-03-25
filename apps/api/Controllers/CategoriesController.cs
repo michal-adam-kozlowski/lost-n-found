@@ -8,6 +8,9 @@ namespace LostNFound.Api.Controllers;
 [Route("api/[controller]")]
 public class CategoriesController(AppDbContext db) : ControllerBase
 {
+    /// <summary>
+    /// Returns all available item categories.
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<List<CategoryResponse>>> GetAll() =>
         await db.Categories.Select(c => new CategoryResponse(c.Id, c.Name)).ToListAsync();
