@@ -12,7 +12,7 @@ lost-n-found/
 ├── packages/
 │   └── api-client/   # Generated TypeScript client from OpenAPI schema
 ├── infra/
-│   └── docker-compose.yml   # PostgreSQL 16 + API container
+│   └── docker-compose.yml   # postgis/postgis:17-3.5 + API container
 ├── .github/
 │   └── workflows/ci.yml     # Lint + build on PR and push to main
 ├── pnpm-workspace.yaml
