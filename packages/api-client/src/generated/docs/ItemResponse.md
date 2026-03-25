@@ -1,5 +1,5 @@
 
-# Item
+# ItemResponse
 
 
 ## Properties
@@ -7,11 +7,14 @@
 Name | Type
 ------------ | -------------
 `id` | string
+`categoryId` | string
 `title` | string
 `type` | string
 `description` | string
-`latitude` | [CreateItemRequestLatitude](CreateItemRequestLatitude.md)
-`longitude` | [CreateItemRequestLatitude](CreateItemRequestLatitude.md)
+`longitude` | [CreateItemRequestLongitude](CreateItemRequestLongitude.md)
+`latitude` | [CreateItemRequestLongitude](CreateItemRequestLongitude.md)
+`locationLabel` | string
+`occurredAt` | string
 `createdAt` | string
 
 

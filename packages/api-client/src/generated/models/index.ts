@@ -3,9 +3,34 @@
 /**
  * 
  * @export
+ * @interface CategoryResponse
+ */
+export interface CategoryResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof CategoryResponse
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CategoryResponse
+     */
+    name: string;
+}
+/**
+ * 
+ * @export
  * @interface CreateItemRequest
  */
 export interface CreateItemRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateItemRequest
+     */
+    categoryId: string;
     /**
      * 
      * @type {string}
@@ -26,23 +51,35 @@ export interface CreateItemRequest {
     description: string | null;
     /**
      * 
-     * @type {CreateItemRequestLatitude}
+     * @type {CreateItemRequestLongitude}
      * @memberof CreateItemRequest
      */
-    latitude: CreateItemRequestLatitude | null;
+    longitude: CreateItemRequestLongitude | null;
     /**
      * 
-     * @type {CreateItemRequestLatitude}
+     * @type {CreateItemRequestLongitude}
      * @memberof CreateItemRequest
      */
-    longitude: CreateItemRequestLatitude | null;
+    latitude: CreateItemRequestLongitude | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateItemRequest
+     */
+    locationLabel: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateItemRequest
+     */
+    occurredAt: string;
 }
 /**
  * 
  * @export
- * @interface CreateItemRequestLatitude
+ * @interface CreateItemRequestLongitude
  */
-export interface CreateItemRequestLatitude {
+export interface CreateItemRequestLongitude {
 }
 /**
  * 
@@ -66,51 +103,69 @@ export interface CurrentUserResponse {
 /**
  * 
  * @export
- * @interface Item
+ * @interface ItemResponse
  */
-export interface Item {
+export interface ItemResponse {
     /**
      * 
      * @type {string}
-     * @memberof Item
+     * @memberof ItemResponse
      */
-    id?: string;
+    id: string;
     /**
-     * "lost" | "found"
+     * 
      * @type {string}
-     * @memberof Item
+     * @memberof ItemResponse
+     */
+    categoryId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ItemResponse
      */
     title: string;
     /**
      * 
      * @type {string}
-     * @memberof Item
+     * @memberof ItemResponse
      */
     type: string;
     /**
      * 
      * @type {string}
-     * @memberof Item
+     * @memberof ItemResponse
      */
-    description?: string | null;
+    description: string | null;
     /**
      * 
-     * @type {CreateItemRequestLatitude}
-     * @memberof Item
+     * @type {CreateItemRequestLongitude}
+     * @memberof ItemResponse
      */
-    latitude?: CreateItemRequestLatitude | null;
+    longitude: CreateItemRequestLongitude | null;
     /**
      * 
-     * @type {CreateItemRequestLatitude}
-     * @memberof Item
+     * @type {CreateItemRequestLongitude}
+     * @memberof ItemResponse
      */
-    longitude?: CreateItemRequestLatitude | null;
+    latitude: CreateItemRequestLongitude | null;
     /**
      * 
      * @type {string}
-     * @memberof Item
+     * @memberof ItemResponse
      */
-    createdAt?: string;
+    locationLabel: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ItemResponse
+     */
+    occurredAt: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ItemResponse
+     */
+    createdAt: string;
 }
 /**
  * 

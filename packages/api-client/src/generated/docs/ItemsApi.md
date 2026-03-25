@@ -4,16 +4,17 @@ All URIs are relative to *http://localhost*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**apiItemsGet**](ItemsApi.md#apiitemsget) | **GET** /api/Items |  |
-| [**apiItemsPost**](ItemsApi.md#apiitemspost) | **POST** /api/Items |  |
+| [**apiItemsGet**](ItemsApi.md#apiitemsget) | **GET** /api/Items | Returns all items ordered from newest to oldest. |
+| [**apiItemsIdGet**](ItemsApi.md#apiitemsidget) | **GET** /api/Items/{id} | Returns the item from id. |
+| [**apiItemsPost**](ItemsApi.md#apiitemspost) | **POST** /api/Items | Creates a new item. |
 
 
 
 ## apiItemsGet
 
-> Array&lt;Item&gt; apiItemsGet()
+> Array&lt;ItemResponse&gt; apiItemsGet()
 
-
+Returns all items ordered from newest to oldest.
 
 ### Example
 
@@ -46,7 +47,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**Array&lt;Item&gt;**](Item.md)
+[**Array&lt;ItemResponse&gt;**](ItemResponse.md)
 
 ### Authorization
 
@@ -66,11 +67,77 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
+## apiItemsIdGet
+
+> ItemResponse apiItemsIdGet(id)
+
+Returns the item from id.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ItemsApi,
+} from '';
+import type { ApiItemsIdGetRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ItemsApi();
+
+  const body = {
+    // string
+    id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies ApiItemsIdGetRequest;
+
+  try {
+    const data = await api.apiItemsIdGet(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+[**ItemResponse**](ItemResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
 ## apiItemsPost
 
-> Item apiItemsPost(createItemRequest)
+> ItemResponse apiItemsPost(createItemRequest)
 
-
+Creates a new item.
 
 ### Example
 
@@ -111,7 +178,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**Item**](Item.md)
+[**ItemResponse**](ItemResponse.md)
 
 ### Authorization
 
@@ -126,7 +193,8 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **200** | OK |  -  |
+| **201** | Created |  -  |
+| **400** | Bad Request |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
