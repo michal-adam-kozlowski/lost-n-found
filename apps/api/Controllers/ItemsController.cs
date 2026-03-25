@@ -14,25 +14,25 @@ public class ItemsController(AppDbContext db) : ControllerBase
     private static readonly HashSet<string> ValidTypes = ["lost", "found"];
 
     [HttpGet]
-    public async Task<ActionResult<List<ItemResponse>>> GetAll() =>
-        await db.Items.OrderByDescending(i => i.CreatedAt).Select(i => new ItemResponse(
-            i.Id,
-            i.CategoryId,
-            i.Title,
-            i.Type,
-            i.Description,
-            i.Location != null ? i.Location.X : null, // Longitude
-            i.Location != null ? i.Location.Y : null, // Latitude            
-            i.LocationLabel,
-            i.OccurredAt,
-            i.CreatedAt
-            )
-        {
-            
-        }).ToListAsync();
+    public async Task<ActionResult<List<ItemResponse>>> GetAll()
+    {
+        var items = await db.Items.OrderByDescending(i => i.CreatedAt).ToListAsync();
+        return items.Select(ToResponse).ToList();
+    }
+
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<ItemResponse>> GetById(Guid id)
+    {
+        var item = await db.Items.FindAsync(id);
+        if (item is null)
+            return NotFound();
+
+        return ToResponse(item);
+    }
 
     [HttpPost]
-    public async Task<ActionResult<Item>> Create([FromBody] CreateItemRequest req)
+    public async Task<ActionResult<ItemResponse>> Create([FromBody] CreateItemRequest req)
     {
         if (!ValidTypes.Contains(req.Type))
             return BadRequest(new { error = "type must be 'lost' or 'found'" });
@@ -63,8 +63,21 @@ public class ItemsController(AppDbContext db) : ControllerBase
         await db.SaveChangesAsync();
 
    
-        return CreatedAtAction(nameof(GetAll), new { id = item.Id }, item);
+        return CreatedAtAction(nameof(GetById), new { id = item.Id }, ToResponse(item));
     }
+
+    private static ItemResponse ToResponse (Item item) => new ItemResponse(
+        item.Id,
+        item.CategoryId,
+        item.Title,
+        item.Type,
+        item.Description,
+        item.Location != null ? item.Location.X : null, // Longitude
+        item.Location != null ? item.Location.Y : null, // Latitude            
+        item.LocationLabel,
+        item.OccurredAt,
+        item.CreatedAt
+    );
 }
 
 
