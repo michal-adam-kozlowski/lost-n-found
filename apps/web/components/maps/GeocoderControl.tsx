@@ -42,9 +42,15 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
     setSearchCompleted(false);
 
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&countrycodes=pl&accept-language=pl&addressdetails=1`,
-      );
+      let apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&countrycodes=pl&accept-language=pl&addressdetails=1`;
+
+      if (map) {
+        const bounds = map.getBounds();
+        const viewbox = `${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()},${bounds.getSouth()}`;
+        apiUrl += `&viewbox=${viewbox}`;
+      }
+
+      const response = await fetch(apiUrl);
       const data: NominatimResult[] = await response.json();
 
       const sortedData = data.sort((a, b) => {
@@ -144,9 +150,9 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
                   <ActionIcon
                     onClick={handleClear}
                     onMouseDown={(e) => e.preventDefault()}
-                    variant="subtle"
+                    variant="white"
                     size="lg"
-                    color="gray.8"
+                    color="gray.6"
                   >
                     <IconX size={20} />
                   </ActionIcon>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMap } from "react-map-gl/maplibre";
-import { ActionIcon, Paper, Stack } from "@mantine/core";
+import { ActionIcon, ActionIconGroup } from "@mantine/core";
 import { IconPlus, IconMinus, IconCompass, IconMaximize, IconCurrentLocation, IconMinimize } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
@@ -52,33 +52,48 @@ export default function CustomMapControls() {
 
   return (
     <div className="absolute top-3 right-3 z-10 flex flex-col gap-3">
-      <Paper shadow="md" radius="md" className="overflow-hidden bg-white">
-        <ActionIcon variant="subtle" color="gray.8" size="lg" radius={0} onClick={handleFullscreen}>
-          {isFullscreen ? <IconMinimize size={20} /> : <IconMaximize size={20} />}
-        </ActionIcon>
-      </Paper>
+      <ActionIcon
+        variant="white"
+        color="gray.6"
+        size="lg"
+        radius="md"
+        style={{ boxShadow: "var(--mantine-shadow-md)" }}
+        onClick={handleFullscreen}
+      >
+        {isFullscreen ? <IconMinimize size={20} /> : <IconMaximize size={20} />}
+      </ActionIcon>
 
-      <Paper shadow="md" radius="md" className="overflow-hidden bg-white">
-        <ActionIcon variant="subtle" color="gray.8" size="lg" radius={0} onClick={handleGeolocate}>
-          <IconCurrentLocation size={20} />
-        </ActionIcon>
-      </Paper>
+      <ActionIcon
+        variant="white"
+        color="gray.6"
+        size="lg"
+        radius="md"
+        style={{ boxShadow: "var(--mantine-shadow-md)" }}
+        onClick={handleGeolocate}
+      >
+        <IconCurrentLocation size={20} />
+      </ActionIcon>
 
-      <Paper shadow="md" radius="md" className="overflow-hidden bg-white">
-        <Stack gap={0}>
-          <ActionIcon variant="subtle" color="gray.8" size="lg" radius={0} onClick={handleZoomIn} aria-label="Przybliż">
-            <IconPlus size={20} />
-          </ActionIcon>
-          <div className="h-px w-full bg-gray-100" />
-          <ActionIcon variant="subtle" color="gray.8" size="lg" radius={0} onClick={handleZoomOut} aria-label="Oddal">
-            <IconMinus size={20} />
-          </ActionIcon>
-          <div className="h-px w-full bg-gray-100" />
-          <ActionIcon variant="subtle" color="gray.8" size="lg" radius={0} onClick={handleResetNorth}>
-            <IconCompass size={20} className="-rotate-45" />
-          </ActionIcon>
-        </Stack>
-      </Paper>
+      <ActionIconGroup
+        orientation="vertical"
+        styles={{
+          group: {
+            boxShadow: "var(--mantine-shadow-md)",
+            borderRadius: "var(--mantine-radius-md)",
+            background: "var(--mantine-color-white)",
+          },
+        }}
+      >
+        <ActionIcon variant="white" color="gray.6" size="lg" radius="md" onClick={handleZoomIn}>
+          <IconPlus size={20} />
+        </ActionIcon>
+        <ActionIcon variant="white" color="gray.6" size="lg" radius="md" onClick={handleZoomOut}>
+          <IconMinus size={20} />
+        </ActionIcon>
+        <ActionIcon variant="white" color="gray.6" size="lg" radius="md" onClick={handleResetNorth}>
+          <IconCompass size={20} className="-rotate-45" />
+        </ActionIcon>
+      </ActionIconGroup>
     </div>
   );
 }
