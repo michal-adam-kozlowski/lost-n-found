@@ -4,7 +4,7 @@ namespace LostNFound.Api.Models;
 public class Item
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public Guid? CreatedByUserId { get; set; }
+    public Guid CreatedByUserId { get; set; }
     public Guid CategoryId { get; set; }
     public required string Title { get; set; }
 
@@ -17,6 +17,6 @@ public class Item
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 
-    public ApplicationUser? CreatedByUser { get; set; } = null!;
+    public ApplicationUser CreatedByUser { get; set; } = null!;
     public Category Category { get; set; } = null!;
 }

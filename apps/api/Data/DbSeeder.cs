@@ -1,12 +1,33 @@
 using LostNFound.Api.Models;
+using Microsoft.AspNetCore.Identity;
 using NetTopologySuite.Geometries;
 
 namespace LostNFound.Api.Data;
 
 public static class DbSeeder
 {
-    public static async Task SeedAsync(AppDbContext db)
+    public static async Task SeedAsync(AppDbContext db, UserManager<ApplicationUser> userManager)
     {
+        string seedEmail = "qwe@qw.pl";
+        string seedPassword = "qwerty";
+
+        var seedUser = await userManager.FindByEmailAsync(seedEmail);
+        if (seedUser is null)
+        {
+            seedUser = new ApplicationUser
+            {
+                Id = new Guid("10000000-0000-0000-0000-000000000000"),
+                Email = seedEmail,
+                UserName = seedEmail
+            };
+            var result = await userManager.CreateAsync(seedUser, seedPassword);
+            if (!result.Succeeded)
+            {
+                throw new Exception("Failed to create seed user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+        }
+
+
         if (db.Categories.Any()) return;
 
         var electronics = new Category { Name = "electronics" };
@@ -31,6 +52,7 @@ public static class DbSeeder
         db.Items.AddRange(
             new Item
             {
+                CreatedByUser = seedUser,
                 Title = "Blue Backpack",
                 Category = bags,
                 Type = "lost",
@@ -42,6 +64,7 @@ public static class DbSeeder
             },
             new Item
             {
+                CreatedByUser = seedUser,
                 Title = "House Keys",
                 Category = keys,
                 Type = "found",
@@ -52,6 +75,7 @@ public static class DbSeeder
             },
             new Item
             {
+                CreatedByUser = seedUser,
                 Title = "Red Umbrella",
                 Category = clothingAndAccessories,
                 Type = "lost",

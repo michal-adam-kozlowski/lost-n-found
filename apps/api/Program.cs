@@ -174,6 +174,7 @@ if (!isDesignTime)
     using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
         var pending = (await db.Database.GetPendingMigrationsAsync()).ToList();
         app.Logger.LogInformation("Pending EF migrations: {Count} ({Names})",
@@ -181,7 +182,7 @@ if (!isDesignTime)
             pending.Count == 0 ? "none" : string.Join(", ", pending));
 
         await db.Database.MigrateAsync();
-        await DbSeeder.SeedAsync(db);
+        await DbSeeder.SeedAsync(db, userManager);
     }
 }
 
