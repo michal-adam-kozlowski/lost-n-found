@@ -36,6 +36,11 @@ export default function CustomMap<T>({
   return (
     <div className={styles.Container}>
       <Map
+        initialViewState={{
+          longitude: 19.9449,
+          latitude: 50.0646,
+          zoom: 12,
+        }}
         reuseMaps={true}
         style={{ width: "100%" }}
         mapStyle="https://tiles.openfreemap.org/styles/bright"
@@ -43,13 +48,6 @@ export default function CustomMap<T>({
         minPitch={0}
         onLoad={onMapLoad}
         {...props}
-        initialViewState={
-          props.initialViewState || {
-            longitude: 19.9449,
-            latitude: 50.0646,
-            zoom: 12,
-          }
-        }
         onClick={(e) => {
           const clickedMarker = (e.originalEvent.target as HTMLElement).closest(".maplibregl-marker");
           if (!clickedMarker) {
