@@ -1,6 +1,7 @@
 import MapList from "@components/maps/MapList";
 import { itemsApi } from "@/lib/api";
 import { cacheLife, cacheTag } from "next/cache";
+import ItemsList from "@components/items/ItemsList";
 
 export default async function ItemsPage() {
   "use cache";
@@ -20,6 +21,7 @@ export default async function ItemsPage() {
     <>
       <h1>Zgubione</h1>
       <MapList markers={markers} />
+      <ItemsList items={items} />
       <div>{JSON.stringify(items)}</div>
     </>
   );
