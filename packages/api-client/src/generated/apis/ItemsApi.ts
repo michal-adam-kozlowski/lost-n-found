@@ -209,6 +209,14 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
 
         let urlPath = `/api/Items`;
 

@@ -1,5 +1,6 @@
 using LostNFound.Api.Data;
 using LostNFound.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
@@ -48,10 +49,22 @@ public class ItemsController(AppDbContext db) : ControllerBase
     /// Creates a new item.
     /// </summary>
     [HttpPost]
+    [Authorize]
     [ProducesResponseType<ItemResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ItemResponse>> Create([FromBody] CreateItemRequest req)
     {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                title: "Unauthorized",
+                detail: "UserId claim is invalid");
+        }
+
         if (!ValidTypes.Contains(req.Type))
         {
             ModelState.AddModelError(nameof(req.Type), "type must be 'lost' or 'found'");
@@ -72,7 +85,7 @@ public class ItemsController(AppDbContext db) : ControllerBase
 
         var item = new Item
         {
-            //CreatedByUserId  // TODO: auth and get user id from token
+            CreatedByUserId = userId,
             CategoryId = req.CategoryId,
             Title = req.Title,
             Type = req.Type,

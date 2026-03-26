@@ -150,7 +150,11 @@ import type { ApiItemsPostRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const api = new ItemsApi();
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new ItemsApi(config);
 
   const body = {
     // CreateItemRequest
@@ -182,7 +186,7 @@ example().catch(console.error);
 
 ### Authorization
 
-No authorization required
+[Bearer](../README.md#Bearer)
 
 ### HTTP request headers
 
@@ -195,6 +199,7 @@ No authorization required
 |-------------|-------------|------------------|
 | **201** | Created |  -  |
 | **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
