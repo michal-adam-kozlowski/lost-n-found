@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LostNFound.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260326143551_RequireCreatedByUserOnItem")]
+    [Migration("20260326202444_RequireCreatedByUserOnItem")]
     partial class RequireCreatedByUserOnItem
     {
         /// <inheritdoc />

@@ -11,12 +11,18 @@ namespace LostNFound.Api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("""
+                
+                DELETE FROM "Items";
+                DELETE FROM "Categories";
+                
+                """);
+
             migrationBuilder.AlterColumn<Guid>(
                 name: "CreatedByUserId",
                 table: "Items",
                 type: "uuid",
                 nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"),
                 oldClrType: typeof(Guid),
                 oldType: "uuid",
                 oldNullable: true);
