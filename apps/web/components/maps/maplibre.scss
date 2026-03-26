@@ -5,3 +5,21 @@
     @apply shadow-md border-none;
   }
 }
+
+.maplibregl-popup {
+  max-width: none !important;
+
+  .maplibregl-popup-tip {
+    display: none !important;
+  }
+  .maplibregl-popup-close-button {
+    display: none !important;
+  }
+
+  .maplibregl-popup-content {
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+}

@@ -2,7 +2,6 @@
 
 import { Button, Divider, Group, Select, Stack, Text, Textarea, TextInput, Title } from "@mantine/core";
 import React, { useEffect } from "react";
-import { MarkerLocation } from "@components/maps/CustomMap";
 import { addItem } from "@/actions/items";
 import { useForm } from "@mantine/form";
 import TypeRadioGroup from "@/app/(main)/add/TypeRadioGroup";
@@ -15,6 +14,7 @@ import dayjs from "dayjs";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { useCategories } from "@/lib/context/CategoriesContext";
 import { redirect } from "next/navigation";
+import { Location } from "@/lib/utils/types";
 
 export interface AddItemFormValues {
   type: "found" | "lost";
@@ -22,7 +22,7 @@ export interface AddItemFormValues {
   categoryId: string;
   description: string;
   occurredAt: Date;
-  location: MarkerLocation | null;
+  location: Location | null;
   locationLabel: string;
 }
 

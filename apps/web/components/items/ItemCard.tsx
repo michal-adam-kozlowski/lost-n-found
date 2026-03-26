@@ -1,17 +1,21 @@
 import { ItemResponse } from "@lost-n-found/api-client";
 import { Optional } from "@/lib/utils/types";
-import { Card, CardSection, Text, Badge } from "@mantine/core";
+import { Card, CardSection, Text, Badge, CardProps } from "@mantine/core";
 import React from "react";
 import ImagesViewer from "@components/ImagesViewer";
 import Link from "next/link";
 
-export default function ItemCard({ item }: Readonly<{ item: Optional<ItemResponse, "id" | "createdAt"> }>) {
+export default function ItemCard({
+  item,
+  small,
+  cardProps,
+}: Readonly<{ item: Optional<ItemResponse, "id" | "createdAt">; small?: boolean; cardProps?: CardProps }>) {
   const images: string[] = [];
 
   return (
-    <Card p="md" shadow="xs" className="min-w-xs max-w-xs">
+    <Card p="md" shadow="xs" className={small ? "min-w-2xs max-w-2xs" : "min-w-xs max-w-xs"} {...cardProps}>
       <CardSection p="md" pb="sm">
-        <ImagesViewer images={images} height={200} emptyPlaceholder="Zdjęcie przedmiotu" />
+        <ImagesViewer images={images} height={small ? 160 : 190} emptyPlaceholder="Zdjęcie przedmiotu" />
       </CardSection>
 
       <Link
