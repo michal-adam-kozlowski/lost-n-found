@@ -16,7 +16,7 @@ public static class DbSeeder
         {
             seedUser = new ApplicationUser
             {
-                Id = new Guid("00000000-0000-0000-0000-000000000000"),
+                Id = new Guid("10000000-0000-0000-0000-000000000000"),
                 Email = seedEmail,
                 UserName = seedEmail
             };
