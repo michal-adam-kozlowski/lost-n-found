@@ -5,14 +5,14 @@ import CustomMapPlaceholder from "@components/maps/CustomMapPlaceholder";
 import { Input } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import { MarkerLocation } from "@components/maps/CustomMap";
+import { Location } from "@/lib/utils/types";
 
 export default function LocationPicker({
   defaultValue,
   onChange,
 }: Readonly<{
-  defaultValue?: MarkerLocation | null;
-  onChange?: (value: MarkerLocation | null) => void;
+  defaultValue?: Location | null;
+  onChange?: (value: Location | null) => void;
 }>) {
   const pathname = usePathname();
   const CustomMap = useMemo(
@@ -20,9 +20,9 @@ export default function LocationPicker({
     [pathname],
   );
 
-  const [value, setValue] = useState<MarkerLocation | null>(defaultValue || null);
+  const [value, setValue] = useState<Location | null>(defaultValue || null);
 
-  const markers = value ? [{ ...value, key: "selected-location" }] : [];
+  const markers = value ? [{ ...value, key: "selected-location", data: null }] : [];
 
   useEffect(() => {
     onChange?.(value);

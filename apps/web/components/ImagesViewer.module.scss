@@ -1,0 +1,48 @@
+.EmptyContainer {
+  border-radius: var(--mantine-radius-default);
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mantine-spacing-sm);
+  background: var(--mantine-color-gray-4);
+  * {
+    color: var(--mantine-color-gray-6);
+  }
+}
+
+.SingleImage {
+  border-radius: var(--mantine-radius-default);
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.Carousel {
+  border-radius: var(--mantine-radius-default);
+  overflow: hidden;
+  &:hover {
+    .CarouselControls {
+      opacity: 1;
+    }
+  }
+}
+
+.CarouselControls {
+  transition: opacity 150ms ease;
+  opacity: 0;
+}
+
+.CarouselIndicator {
+  width: 4px;
+  height: 4px;
+  transition: width 250ms ease;
+
+  &[data-active] {
+    width: 16px;
+  }
+}

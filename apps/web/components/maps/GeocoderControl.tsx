@@ -69,7 +69,7 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
       combobox.openDropdown();
       combobox.resetSelectedOption();
     } catch (error) {
-      console.error("Błąd podczas pobierania lokalizacji:", error);
+      console.error("Failed to fetch geocoding results:", error);
     } finally {
       setIsLoading(false);
     }
