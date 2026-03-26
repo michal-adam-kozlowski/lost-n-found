@@ -44,7 +44,7 @@ export default function CustomMapControls() {
           });
         },
         (error) => {
-          console.error("Błąd geolokalizacji:", error);
+          console.error("Geolocation error:", error);
         },
       );
     }

@@ -2,7 +2,6 @@
 
 import { Button, Divider, Group, Select, Stack, Text, Textarea, TextInput, Title } from "@mantine/core";
 import React, { useEffect } from "react";
-import { MarkerLocation } from "@components/maps/CustomMap";
 import { addItem } from "@/actions/items";
 import { useForm } from "@mantine/form";
 import TypeRadioGroup from "@/app/(main)/add/TypeRadioGroup";
@@ -10,29 +9,40 @@ import { DatePickerInput } from "@mantine/dates";
 import LocationPicker from "@components/maps/LocationPicker";
 import { Dropzone, DropzoneAccept, DropzoneIdle, DropzoneReject, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
+import { notifications } from "@mantine/notifications";
+import dayjs from "dayjs";
+import { useDebouncedCallback } from "@mantine/hooks";
+import { useCategories } from "@/lib/context/CategoriesContext";
+import { redirect } from "next/navigation";
+import { Location } from "@/lib/utils/types";
 
 export interface AddItemFormValues {
   type: "found" | "lost";
   title: string;
-  category: string;
+  categoryId: string;
   description: string;
-  foundLostDate: Date;
-  location: MarkerLocation | null;
+  occurredAt: Date;
+  location: Location | null;
+  locationLabel: string;
 }
 
 export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values: AddItemFormValues) => void }>) {
+  const { categories, loading: categoriesLoading } = useCategories();
+  const debouncedOnChange = useDebouncedCallback(onChange ?? (() => {}), 500);
+
   const form = useForm<AddItemFormValues>({
     mode: "uncontrolled",
     initialValues: {
       type: "lost",
       title: "",
-      category: "",
+      categoryId: "",
       description: "",
-      foundLostDate: new Date(),
+      occurredAt: new Date(),
       location: null,
+      locationLabel: "",
     },
     onValuesChange: (values) => {
-      onChange?.(values);
+      debouncedOnChange?.(values);
     },
   });
 
@@ -43,13 +53,32 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
   const handleSubmit = async (values: AddItemFormValues) => {
     console.log("FORM VALUES", values);
 
-    await addItem({
+    const occurredAt = dayjs(values.occurredAt).toISOString();
+
+    const res = await addItem({
       title: values.title,
       type: values.type,
       description: values.description,
       latitude: values.location?.latitude ?? 0,
       longitude: values.location?.longitude ?? 0,
+      categoryId: values.categoryId,
+      locationLabel: values.locationLabel,
+      occurredAt: occurredAt.toString(),
     });
+    if (res.success) {
+      notifications.show({
+        title: "Dodano ogłoszenie",
+        message: "",
+        color: "green",
+      });
+      redirect(`/items/${res.item.id}`);
+    } else {
+      notifications.show({
+        title: "Błąd",
+        message: "Nie udało się dodać ogłoszenia. Spróbuj ponownie później.",
+        color: "red",
+      });
+    }
   };
 
   return (
@@ -95,12 +124,13 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
             withAsterisk
             label="Kategoria"
             placeholder="Wybierz kategorię"
-            data={["Dokumenty", "Elektronika", "Inne"]}
+            data={categories.map((c) => ({ label: c.name, value: c.id }))}
+            disabled={categoriesLoading}
             searchable
             miw={240}
             flex={10}
             allowDeselect={false}
-            {...form.getInputProps("category")}
+            {...form.getInputProps("categoryId")}
           />
           <DatePickerInput
             label={form.values.type === "found" ? "Data znalezienia" : "Data zagubienia"}
@@ -112,7 +142,7 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
             popoverProps={{
               position: "bottom",
             }}
-            {...form.getInputProps("foundLostDate")}
+            {...form.getInputProps("occurredAt")}
           />
         </Group>
         <Textarea
@@ -133,6 +163,12 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
         <Title order={3} size="lg" mb="md">
           3. Lokalizacja
         </Title>
+        <TextInput
+          label="Miejsce"
+          placeholder="Np. Warszawa, Dworzec Centralny"
+          mb="lg"
+          {...form.getInputProps("locationLabel")}
+        />
         <LocationPicker {...form.getInputProps("location")} />
       </div>
       <div>

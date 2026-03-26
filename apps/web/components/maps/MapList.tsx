@@ -2,16 +2,17 @@
 
 import dynamic from "next/dynamic";
 import CustomMapPlaceholder from "@components/maps/CustomMapPlaceholder";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { usePathname } from "next/navigation";
-import { MarkerLocation } from "@components/maps/CustomMap";
+import { InteractiveMarker } from "@components/maps/CustomMap";
 
-export type InteractiveMarker = MarkerLocation & {
-  key: string | number;
-  onClick?: () => void;
-};
-
-export default function MapList({ markers }: Readonly<{ markers: InteractiveMarker[] }>) {
+export default function MapList<T>({
+  markers,
+  renderPopup,
+}: Readonly<{
+  markers: InteractiveMarker<T>[];
+  renderPopup?: (data: T) => React.ReactNode;
+}>) {
   const pathname = usePathname();
   const CustomMap = useMemo(
     () => dynamic(() => import("@components/maps/CustomMap"), { ssr: false, loading: CustomMapPlaceholder }),
@@ -20,7 +21,7 @@ export default function MapList({ markers }: Readonly<{ markers: InteractiveMark
 
   return (
     <div style={{ height: 600 }}>
-      <CustomMap markers={markers}></CustomMap>
+      <CustomMap markers={markers} renderPopup={(data) => renderPopup?.(data as T)} />
     </div>
   );
 }
