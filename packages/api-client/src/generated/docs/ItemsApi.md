@@ -7,7 +7,7 @@ All URIs are relative to *http://localhost*
 | [**apiItemsGet**](ItemsApi.md#apiitemsget) | **GET** /api/Items | Returns all items ordered from newest to oldest. |
 | [**apiItemsIdDelete**](ItemsApi.md#apiitemsiddelete) | **DELETE** /api/Items/{id} | Deletes item and connected images. Only user who created the item can delete it. |
 | [**apiItemsIdGet**](ItemsApi.md#apiitemsidget) | **GET** /api/Items/{id} | Returns the item from id. |
-| [**apiItemsIdPut**](ItemsApi.md#apiitemsidput) | **PUT** /api/Items/{id} | Updates an item. Only user who created the item can update it. All fields are optional, only provided fields will be updated. To clear description or location label set ClearDescription or ClearLocationLabel to true. |
+| [**apiItemsIdPut**](ItemsApi.md#apiitemsidput) | **PUT** /api/Items/{id} | Updates an item. Only user who created the item can update it. |
 | [**apiItemsPost**](ItemsApi.md#apiitemspost) | **POST** /api/Items | Creates a new item. |
 
 
@@ -208,9 +208,9 @@ No authorization required
 
 ## apiItemsIdPut
 
-> ItemResponse apiItemsIdPut(id, updateItemRequest)
+> ItemResponse apiItemsIdPut(id, createItemRequest)
 
-Updates an item. Only user who created the item can update it. All fields are optional, only provided fields will be updated. To clear description or location label set ClearDescription or ClearLocationLabel to true.
+Updates an item. Only user who created the item can update it.
 
 ### Example
 
@@ -232,8 +232,8 @@ async function example() {
   const body = {
     // string
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
-    // UpdateItemRequest
-    updateItemRequest: ...,
+    // CreateItemRequest
+    createItemRequest: ...,
   } satisfies ApiItemsIdPutRequest;
 
   try {
@@ -254,7 +254,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `string` |  | [Defaults to `undefined`] |
-| **updateItemRequest** | [UpdateItemRequest](UpdateItemRequest.md) |  | |
+| **createItemRequest** | [CreateItemRequest](CreateItemRequest.md) |  | |
 
 ### Return type
 
@@ -273,7 +273,7 @@ example().catch(console.error);
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **201** | Created |  -  |
+| **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 | **401** | Unauthorized |  -  |
 | **404** | Not Found |  -  |

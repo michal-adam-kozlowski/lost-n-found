@@ -169,15 +169,15 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
     }
 
     /// <summary>
-    /// Updates an item. Only user who created the item can update it. All fields are optional, only provided fields will be updated. To clear description or location label set ClearDescription or ClearLocationLabel to true.
+    /// Updates an item. Only user who created the item can update it.
     /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize]
-    [ProducesResponseType<ItemResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ItemResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ItemResponse>> Update([FromBody] UpdateItemRequest req, Guid id)
+    public async Task<ActionResult<ItemResponse>> Update([FromBody] CreateItemRequest req, Guid id)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
@@ -205,66 +205,37 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
                 detail: "Item can only be modified by its owner");
         }
 
-        
-        if (req.CategoryId != null)
+        if (!await db.Categories.AnyAsync(c => c.Id == req.CategoryId))
         {
-            if (!await db.Categories.AnyAsync(c => c.Id == req.CategoryId.Value))
-            {
-                ModelState.AddModelError(nameof(req.CategoryId), "invalid categoryId");
-                return ValidationProblem(ModelState);
-            }
-            item.CategoryId = req.CategoryId.Value;
-        }
-        
-        if (req.Title != null)
-            item.Title = req.Title;
-        
-        if (req.Type != null)
-        {
-            if (!ValidTypes.Contains(req.Type))
-            {
-                ModelState.AddModelError(nameof(req.Type), "type must be 'lost' or 'found'");
-                return ValidationProblem(ModelState);
-            }
-            item.Type = req.Type;
+            ModelState.AddModelError(nameof(req.CategoryId), "invalid categoryId");
+            return ValidationProblem(ModelState);
         }
 
-        if (req.ClearDescription)
+        if (!ValidTypes.Contains(req.Type))
         {
-            item.Description = null;
-        }
-        else if (req.Description != null)
-        {
-            item.Description = req.Description;
+            ModelState.AddModelError(nameof(req.Type), "type must be 'lost' or 'found'");
+            return ValidationProblem(ModelState);
         }
 
-        // from map we always get both 
-        if (req.Longitude != null && req.Latitude != null)
-        {
-            item.Location = new Point(req.Longitude.Value, req.Latitude.Value) { SRID = 4326 };
-        }
-
-        if (req.ClearLocationLabel)
-        {
-            item.LocationLabel = null;
-        }
-        else if (req.LocationLabel != null)
-        {
-            item.LocationLabel = req.LocationLabel;
-        }
+        Point? location = null;
+        if (req.Latitude.HasValue && req.Longitude.HasValue)
+            location = new Point(req.Longitude.Value, req.Latitude.Value) { SRID = 4326 };
 
 
-        if (req.OccurredAt != null)
-            item.OccurredAt = req.OccurredAt.Value;
-
-
+        item.CategoryId = req.CategoryId;
+        item.Title = req.Title;
+        item.Type = req.Type;
+        item.Description = req.Description;
+        item.Location = location;
+        item.LocationLabel = req.LocationLabel;
+        item.OccurredAt = req.OccurredAt;
 
         await db.SaveChangesAsync();
-        
-        return CreatedAtAction(nameof(GetById), new { id = item.Id }, ToResponse(item));
+
+        return ToResponse(item);
     }
 
-
+    
     private static ItemResponse ToResponse (Item item) => new ItemResponse(
         item.Id,
         item.CategoryId,
@@ -302,18 +273,4 @@ public record ItemResponse(
     string? LocationLabel,
     DateTime OccurredAt,
     DateTime CreatedAt
-);
-//no clear for location for now. For circular area both point and radius will be required.
-//If we allow storing location in a diffrent way we might need to clear it as a point
-public record UpdateItemRequest(
-    Guid? CategoryId,
-    string? Title,
-    string? Type,
-    string? Description,
-    [Range(-180, 180)] double? Longitude,
-    [Range(-90, 90)] double? Latitude,      
-    string? LocationLabel,
-    DateTime? OccurredAt,
-    bool ClearLocationLabel = false, //if on update the previous value should be cleared send true, otherwise omit 
-    bool ClearDescription = false
 );

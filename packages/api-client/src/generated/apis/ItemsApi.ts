@@ -18,7 +18,6 @@ import type {
   CreateItemRequest,
   ItemResponse,
   ProblemDetails,
-  UpdateItemRequest,
   ValidationProblemDetails,
 } from '../models/index';
 
@@ -32,7 +31,7 @@ export interface ApiItemsIdGetRequest {
 
 export interface ApiItemsIdPutRequest {
     id: string;
-    updateItemRequest: UpdateItemRequest;
+    createItemRequest: CreateItemRequest;
 }
 
 export interface ApiItemsPostRequest {
@@ -116,7 +115,7 @@ export interface ItemsApiInterface {
     /**
      * Creates request options for apiItemsIdPut without sending the request
      * @param {string} id 
-     * @param {UpdateItemRequest} updateItemRequest 
+     * @param {CreateItemRequest} createItemRequest 
      * @throws {RequiredError}
      * @memberof ItemsApiInterface
      */
@@ -124,9 +123,9 @@ export interface ItemsApiInterface {
 
     /**
      * 
-     * @summary Updates an item. Only user who created the item can update it. All fields are optional, only provided fields will be updated. To clear description or location label set ClearDescription or ClearLocationLabel to true.
+     * @summary Updates an item. Only user who created the item can update it.
      * @param {string} id 
-     * @param {UpdateItemRequest} updateItemRequest 
+     * @param {CreateItemRequest} createItemRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ItemsApiInterface
@@ -134,7 +133,7 @@ export interface ItemsApiInterface {
     apiItemsIdPutRaw(requestParameters: ApiItemsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ItemResponse>>;
 
     /**
-     * Updates an item. Only user who created the item can update it. All fields are optional, only provided fields will be updated. To clear description or location label set ClearDescription or ClearLocationLabel to true.
+     * Updates an item. Only user who created the item can update it.
      */
     apiItemsIdPut(requestParameters: ApiItemsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ItemResponse>;
 
@@ -313,10 +312,10 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
             );
         }
 
-        if (requestParameters['updateItemRequest'] == null) {
+        if (requestParameters['createItemRequest'] == null) {
             throw new runtime.RequiredError(
-                'updateItemRequest',
-                'Required parameter "updateItemRequest" was null or undefined when calling apiItemsIdPut().'
+                'createItemRequest',
+                'Required parameter "createItemRequest" was null or undefined when calling apiItemsIdPut().'
             );
         }
 
@@ -343,12 +342,12 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters['updateItemRequest'],
+            body: requestParameters['createItemRequest'],
         };
     }
 
     /**
-     * Updates an item. Only user who created the item can update it. All fields are optional, only provided fields will be updated. To clear description or location label set ClearDescription or ClearLocationLabel to true.
+     * Updates an item. Only user who created the item can update it.
      */
     async apiItemsIdPutRaw(requestParameters: ApiItemsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ItemResponse>> {
         const requestOptions = await this.apiItemsIdPutRequestOpts(requestParameters);
@@ -358,7 +357,7 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
     }
 
     /**
-     * Updates an item. Only user who created the item can update it. All fields are optional, only provided fields will be updated. To clear description or location label set ClearDescription or ClearLocationLabel to true.
+     * Updates an item. Only user who created the item can update it.
      */
     async apiItemsIdPut(requestParameters: ApiItemsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ItemResponse> {
         const response = await this.apiItemsIdPutRaw(requestParameters, initOverrides);

@@ -21,7 +21,6 @@ docs/PresignImageRequestSizeBytes.md
 docs/ProblemDetails.md
 docs/ProblemDetailsStatus.md
 docs/RegisterUserRequest.md
-docs/UpdateItemRequest.md
 docs/ValidationProblemDetails.md
 index.ts
 models/index.ts
