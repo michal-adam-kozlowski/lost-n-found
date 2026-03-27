@@ -7,6 +7,7 @@ All URIs are relative to *http://localhost*
 | [**apiItemsGet**](ItemsApi.md#apiitemsget) | **GET** /api/Items | Returns all items ordered from newest to oldest. |
 | [**apiItemsIdDelete**](ItemsApi.md#apiitemsiddelete) | **DELETE** /api/Items/{id} | Deletes item and connected images. Only user who created the item can delete it. |
 | [**apiItemsIdGet**](ItemsApi.md#apiitemsidget) | **GET** /api/Items/{id} | Returns the item from id. |
+| [**apiItemsIdPut**](ItemsApi.md#apiitemsidput) | **PUT** /api/Items/{id} | Updates an item. Only user who created the item can update it. All fields are optional, only provided fields will be updated. To clear description or location label set ClearDescription or ClearLocationLabel to true. |
 | [**apiItemsPost**](ItemsApi.md#apiitemspost) | **POST** /api/Items | Creates a new item. |
 
 
@@ -200,6 +201,81 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | OK |  -  |
+| **404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## apiItemsIdPut
+
+> ItemResponse apiItemsIdPut(id, updateItemRequest)
+
+Updates an item. Only user who created the item can update it. All fields are optional, only provided fields will be updated. To clear description or location label set ClearDescription or ClearLocationLabel to true.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ItemsApi,
+} from '';
+import type { ApiItemsIdPutRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new ItemsApi(config);
+
+  const body = {
+    // string
+    id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    // UpdateItemRequest
+    updateItemRequest: ...,
+  } satisfies ApiItemsIdPutRequest;
+
+  try {
+    const data = await api.apiItemsIdPut(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
+| **updateItemRequest** | [UpdateItemRequest](UpdateItemRequest.md) |  | |
+
+### Return type
+
+[**ItemResponse**](ItemResponse.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`, `text/json`, `application/*+json`
+- **Accept**: `text/plain`, `application/json`, `text/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **201** | Created |  -  |
+| **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
 | **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
