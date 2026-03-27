@@ -1,5 +1,8 @@
+using Amazon.Runtime.Internal.Util;
+using Amazon.S3.Model;
 using LostNFound.Api.Data;
 using LostNFound.Api.Models;
+using LostNFound.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +14,7 @@ namespace LostNFound.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ItemsController(AppDbContext db) : ControllerBase
+public class ItemsController(AppDbContext db, IFileStorageService storage, ILogger<ItemsController> logger) : ControllerBase
 {
     private static readonly HashSet<string> ValidTypes = ["lost", "found"];
 
@@ -101,6 +104,70 @@ public class ItemsController(AppDbContext db) : ControllerBase
    
         return CreatedAtAction(nameof(GetById), new { id = item.Id }, ToResponse(item));
     }
+
+
+    /// <summary>
+    /// Deletes item and connected images. Only user who created the item can delete it.
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                title: "Unauthorized",
+                detail: "UserId claim is invalid");
+        }
+
+        var item = await db.Items.FindAsync(id);
+        if (item == null)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                title: "Not Found",
+                detail: $"No item found with id {id}");
+        }
+
+        if (userId != item.CreatedByUserId)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                title: "Unauthorized",
+                detail: "Item can only be deleted by its owner");
+        }
+
+        
+        var imageObjectKeys = await db.ItemImages
+            .Where(x => x.ItemId == id && x.UploadStatus != UploadStatus.Deleted)
+            .Select(x => x.ObjectKey)
+            .Distinct()
+            .ToListAsync();
+
+        //ItemImage rows will cascade delete with the item
+        db.Items.Remove(item);
+        await db.SaveChangesAsync();
+
+        foreach (var objectKey in imageObjectKeys)
+        {
+            try
+            {
+                await storage.DeleteObjectAsync(objectKey);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to delete ItemImage {ObjectKey} for item {ItemId}", objectKey, id);
+            }
+        }
+
+        return NoContent(); 
+    }
+
 
     private static ItemResponse ToResponse (Item item) => new ItemResponse(
         item.Id,
