@@ -85,6 +85,11 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
         if (req.Latitude.HasValue && req.Longitude.HasValue)
             location = new Point(req.Longitude.Value, req.Latitude.Value) { SRID = 4326 }; //WGS84
        
+        if (req.OccurredAt == default || req.OccurredAt > DateOnly.FromDateTime(DateTime.Now))
+        {
+            ModelState.AddModelError(nameof(req.OccurredAt), "OccurredAt in invalid");
+            return ValidationProblem(ModelState);
+        }
 
         var item = new Item
         {
@@ -221,6 +226,11 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
         if (req.Latitude.HasValue && req.Longitude.HasValue)
             location = new Point(req.Longitude.Value, req.Latitude.Value) { SRID = 4326 };
 
+        if (req.OccurredAt == default || req.OccurredAt > DateOnly.FromDateTime(DateTime.Now))
+        {
+            ModelState.AddModelError(nameof(req.OccurredAt), "OccurredAt in invalid");
+            return ValidationProblem(ModelState);
+        }
 
         item.CategoryId = req.CategoryId;
         item.Title = req.Title;
