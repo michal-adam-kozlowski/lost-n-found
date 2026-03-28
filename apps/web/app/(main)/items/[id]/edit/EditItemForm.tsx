@@ -35,7 +35,7 @@ export default function EditItemForm({
       title: item.title,
       categoryId: item.categoryId,
       description: item.description || "",
-      occurredAt: new Date(item.occurredAt),
+      occurredAt: dayjs(item.occurredAt).toDate(),
       location: { latitude: item.latitude as number, longitude: item.longitude as number },
       locationLabel: item.locationLabel || "",
     },
@@ -51,7 +51,7 @@ export default function EditItemForm({
   const handleSubmit = async (values: EditItemFormValues) => {
     console.log("FORM VALUES", values);
 
-    const occurredAt = dayjs(values.occurredAt).toISOString();
+    const occurredAt = dayjs(values.occurredAt).format("YYYY-MM-DD");
 
     const res = await editItem(item.id, {
       title: values.title,
@@ -61,7 +61,7 @@ export default function EditItemForm({
       longitude: values.location?.longitude ?? 0,
       categoryId: values.categoryId,
       locationLabel: values.locationLabel,
-      occurredAt: occurredAt.toString(),
+      occurredAt,
     });
     if (res.success) {
       notifications.show({

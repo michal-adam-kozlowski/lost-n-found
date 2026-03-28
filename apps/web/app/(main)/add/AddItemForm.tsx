@@ -47,7 +47,7 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
   const handleSubmit = async (values: AddItemFormValues) => {
     console.log("FORM VALUES", values);
 
-    const occurredAt = dayjs(values.occurredAt).toISOString();
+    const occurredAt = dayjs(values.occurredAt).format("YYYY-MM-DD");
 
     const res = await addItem({
       title: values.title,
@@ -57,7 +57,7 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
       longitude: values.location?.longitude ?? 0,
       categoryId: values.categoryId,
       locationLabel: values.locationLabel,
-      occurredAt: occurredAt.toString(),
+      occurredAt,
     });
     if (res.success) {
       notifications.show({
