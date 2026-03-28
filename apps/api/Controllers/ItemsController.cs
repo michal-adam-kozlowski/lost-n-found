@@ -246,7 +246,8 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
         item.Location != null ? item.Location.Y : null, // Latitude            
         item.LocationLabel,
         item.OccurredAt,
-        item.CreatedAt
+        item.CreatedAt,
+        item.CreatedByUserId
     );
 }
 
@@ -272,5 +273,6 @@ public record ItemResponse(
     double? Latitude,
     string? LocationLabel,
     DateTime OccurredAt,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    Guid? CreatedByUserId
 );
