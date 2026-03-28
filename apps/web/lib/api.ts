@@ -1,4 +1,4 @@
-import { AuthApi, CategoriesApi, Configuration, ItemsApi } from "@lost-n-found/api-client";
+import { AuthApi, CategoriesApi, Configuration, InitOverrideFunction, ItemsApi } from "@lost-n-found/api-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
@@ -6,6 +6,22 @@ export interface ApiError extends Error {
   status: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>;
+}
+
+export function addTokenToInit(token?: string | null) {
+  const fn: InitOverrideFunction = async ({ init }) => {
+    if (token) {
+      return {
+        ...init,
+        headers: {
+          ...init.headers,
+          Authorization: `Bearer ${token}`,
+        },
+      };
+    }
+    return init;
+  };
+  return fn;
 }
 
 const config = new Configuration({

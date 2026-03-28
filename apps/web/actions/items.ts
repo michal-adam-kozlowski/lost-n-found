@@ -1,13 +1,13 @@
 "use server";
 
 import { updateTag } from "next/cache";
-import { itemsApi } from "@/lib/api";
+import { addTokenToInit, itemsApi } from "@/lib/api";
+import { getToken } from "@/actions/auth";
 
 export async function addItem(item: Parameters<typeof itemsApi.apiItemsPost>[0]["createItemRequest"]) {
   try {
-    const itemRes = await itemsApi.apiItemsPost({
-      createItemRequest: item,
-    });
+    const token = await getToken();
+    const itemRes = await itemsApi.apiItemsPost({ createItemRequest: item }, addTokenToInit(token));
     updateTag("items");
     return { success: true, item: itemRes } as const;
   } catch (error) {

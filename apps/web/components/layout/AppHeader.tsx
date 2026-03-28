@@ -14,7 +14,7 @@ function HeaderLink({
     ? "w-full flex hover:bg-gray-100 items-center p-4"
     : "h-full flex hover:bg-gray-100 items-center px-4";
   return (
-    <Link href={href} className={classes}>
+    <Link href={href} className={classes} prefetch={false}>
       {children}
     </Link>
   );

@@ -31,8 +31,6 @@ export default function CustomMap<T>({
 
   const [selectedMarker, setSelectedMarker] = useState<InteractiveMarker<T> | null>(null);
 
-  console.log("Selected marker:", selectedMarker);
-
   return (
     <div className={styles.Container}>
       <Map

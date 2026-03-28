@@ -48,6 +48,8 @@ export default function Page() {
     }
   }, [params]);
 
+  const returnPath = params.get("return");
+
   useEffect(() => {
     form.reset();
   }, [pathname]);
@@ -61,7 +63,11 @@ export default function Page() {
         message: "",
         color: "green",
       });
-      redirect("/");
+      if (returnPath) {
+        redirect(returnPath);
+      } else {
+        redirect("/");
+      }
     }
     if (Array.isArray(res.errors)) {
       setErrors(res.errors);
@@ -90,6 +96,18 @@ export default function Page() {
 
       <Card withBorder shadow="md">
         <form onSubmit={form.onSubmit(handleSubmit)}>
+          {returnPath && (
+            <Card.Section p="lg" py="md" withBorder>
+              <Alert
+                variant="transparent"
+                color="yellow.9"
+                radius="md"
+                p={0}
+                title="Aby kontynuować, musisz się zalogować"
+                icon={<IconAlertTriangle />}
+              ></Alert>
+            </Card.Section>
+          )}
           {errors.length > 0 && (
             <Card.Section p="lg" pt="md" withBorder>
               <Alert
