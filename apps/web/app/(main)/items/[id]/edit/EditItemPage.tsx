@@ -1,20 +1,22 @@
 "use client";
 
-import { Card, Flex, List, ListItem, Title, useMantineTheme } from "@mantine/core";
 import React, { useState } from "react";
-import AddItemForm, { AddItemFormValues } from "@/app/(main)/add/AddItemForm";
+import { AddItemFormValues } from "@/app/(main)/add/AddItemForm";
+import { Card, Flex, List, ListItem, Title, useMantineTheme } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import ItemCard from "@components/items/ItemCard";
 import dayjs from "dayjs";
-import { useMediaQuery } from "@mantine/hooks";
+import { ItemResponse } from "@lost-n-found/api-client";
+import EditItemForm from "@/app/(main)/items/[id]/edit/EditItemForm";
 
-export default function Page() {
+export default function EditItemPage({ item }: Readonly<{ item: ItemResponse }>) {
   const [formValues, setFormValues] = useState<AddItemFormValues | null>(null);
   const theme = useMantineTheme();
   const media = useMediaQuery(`(min-width: ${theme.breakpoints.md})`);
 
   return (
     <Flex direction={media ? "row" : "column"} columnGap="xl" wrap="nowrap" align="stretch" mb="xl">
-      <AddItemForm onChange={(values) => setFormValues(values)} />
+      <EditItemForm item={item} onChange={(values) => setFormValues(values)} />
       <Flex
         className="flex-1"
         gap="lg"

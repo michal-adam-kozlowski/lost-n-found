@@ -166,6 +166,12 @@ export interface ItemResponse {
      * @memberof ItemResponse
      */
     createdAt: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ItemResponse
+     */
+    createdByUserId: string | null;
 }
 /**
  * 

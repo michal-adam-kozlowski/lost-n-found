@@ -24,7 +24,6 @@ export default function ImagesViewer({ images, height, emptyIcon, emptyPlacehold
     return <Image src={images[0]} height={height} alt="" h={height} className={styles.SingleImage} />;
   }
 
-  console.log("height", height);
   const slides = images.map((image) => (
     <CarouselSlide key={image}>
       <Image src={image} height={height} alt="" h={height} />

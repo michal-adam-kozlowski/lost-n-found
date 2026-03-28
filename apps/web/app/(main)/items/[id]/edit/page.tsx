@@ -1,14 +1,13 @@
 import { ApiError, itemsApi } from "@/lib/api";
 import { notFound } from "next/navigation";
-import ItemEditButton from "@/app/(main)/items/[id]/ItemEditButton";
+import { connection } from "next/server";
+import EditItemPage from "@/app/(main)/items/[id]/edit/EditItemPage";
+import { getCurrentUser } from "@/actions/auth";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  // "use cache";
+  await connection();
 
   const { id } = await params;
-  //
-  // cacheTag(`item_${id}`);
-  // runtimeCacheLife("hours");
 
   let item;
   try {
@@ -18,15 +17,15 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       notFound();
     }
   }
-
   if (!item) {
     notFound();
   }
 
-  return (
-    <div>
-      <ItemEditButton itemUserId={item.createdByUserId} itemId={item.id} />
-      {JSON.stringify(item, null, 2)}
-    </div>
-  );
+  const user = await getCurrentUser();
+
+  if (item.createdByUserId !== user?.id) {
+    notFound();
+  }
+
+  return <EditItemPage item={item} />;
 }

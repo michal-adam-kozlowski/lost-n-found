@@ -2,7 +2,7 @@
 
 import { Button, Divider, Stack, Text, Title } from "@mantine/core";
 import React, { useEffect } from "react";
-import { addItem } from "@/actions/items";
+import { editItem } from "@/actions/items";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
@@ -10,8 +10,9 @@ import { useDebouncedCallback } from "@mantine/hooks";
 import { redirect } from "next/navigation";
 import { Location } from "@/lib/utils/types";
 import ItemForm from "@components/items/ItemForm";
+import { ItemResponse } from "@lost-n-found/api-client";
 
-export interface AddItemFormValues {
+export interface EditItemFormValues {
   type: "found" | "lost";
   title: string;
   categoryId: string;
@@ -21,19 +22,22 @@ export interface AddItemFormValues {
   locationLabel: string;
 }
 
-export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values: AddItemFormValues) => void }>) {
+export default function EditItemForm({
+  item,
+  onChange,
+}: Readonly<{ item: ItemResponse; onChange?: (values: EditItemFormValues) => void }>) {
   const debouncedOnChange = useDebouncedCallback(onChange ?? (() => {}), 500);
 
-  const form = useForm<AddItemFormValues>({
+  const form = useForm<EditItemFormValues>({
     mode: "uncontrolled",
     initialValues: {
-      type: "lost",
-      title: "",
-      categoryId: "",
-      description: "",
-      occurredAt: new Date(),
-      location: null,
-      locationLabel: "",
+      type: item.type as "found" | "lost",
+      title: item.title,
+      categoryId: item.categoryId,
+      description: item.description || "",
+      occurredAt: new Date(item.occurredAt),
+      location: { latitude: item.latitude as number, longitude: item.longitude as number },
+      locationLabel: item.locationLabel || "",
     },
     onValuesChange: (values) => {
       debouncedOnChange?.(values);
@@ -44,12 +48,12 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
     onChange?.(form.values);
   }, []);
 
-  const handleSubmit = async (values: AddItemFormValues) => {
+  const handleSubmit = async (values: EditItemFormValues) => {
     console.log("FORM VALUES", values);
 
     const occurredAt = dayjs(values.occurredAt).toISOString();
 
-    const res = await addItem({
+    const res = await editItem(item.id, {
       title: values.title,
       type: values.type,
       description: values.description,
@@ -61,15 +65,15 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
     });
     if (res.success) {
       notifications.show({
-        title: "Dodano ogłoszenie",
-        message: "",
+        title: "Edytowano ogłoszenie",
+        message: "Twoje zmiany zostały zapisane.",
         color: "green",
       });
       redirect(`/items/${res.item.id}`);
     } else {
       notifications.show({
         title: "Błąd",
-        message: "Nie udało się dodać ogłoszenia. Spróbuj ponownie później.",
+        message: "Nie udało się edytować ogłoszenia. Spróbuj ponownie później.",
         color: "red",
       });
     }
@@ -86,17 +90,17 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
     >
       <div>
         <Title order={2} mb="sm">
-          Dodaj ogłoszenie
+          Edytuj ogłoszenie
         </Title>
         <Text size="md" c="gray.7" fw={500}>
-          Wypełnij formularz, aby opublikować informację o zgubionej lub znalezionej rzeczy.
+          Wypełnij formularz, aby zmienić treść ogłoszenia.
         </Text>
       </div>
       <ItemForm form={form} />
       <Divider />
       <div className="flex justify-end">
         <Button variant="primary" type="submit">
-          Dodaj ogłoszenie
+          Zapisz
         </Button>
       </div>
     </Stack>
