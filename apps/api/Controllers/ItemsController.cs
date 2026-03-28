@@ -260,7 +260,7 @@ public record CreateItemRequest(
     [Range(-180, 180)] double? Longitude,
     [Range(-90, 90)] double? Latitude,
     string? LocationLabel,
-    DateTime OccurredAt
+    DateOnly OccurredAt
 );
 
 public record ItemResponse(
@@ -272,7 +272,7 @@ public record ItemResponse(
     double? Longitude,
     double? Latitude,
     string? LocationLabel,
-    DateTime OccurredAt,
+    DateOnly OccurredAt,
     DateTime CreatedAt,
     Guid? CreatedByUserId
 );

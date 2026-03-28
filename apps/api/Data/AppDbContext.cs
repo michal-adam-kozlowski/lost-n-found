@@ -31,7 +31,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.Property(x => x.Title).IsRequired();
             e.Property(x => x.Type).IsRequired();
             e.Property(x => x.CreatedAt).HasColumnType("timestamptz");
-            e.Property(x => x.OccurredAt).HasColumnType("timestamptz");
+            e.Property(x => x.OccurredAt).HasColumnType("date");
             e.Property(x => x.Location).HasColumnType("geometry(Point, 4326)"); //using geometry as the data is geographically compact. TODO: Check if projection is needed 
 
             e.HasOne(x => x.CreatedByUser)

@@ -13,7 +13,7 @@ public class Item
     public string? Description { get; set; }
     public string? LocationLabel { get; set; }
     public Point? Location { get; set; }
-    public DateTime OccurredAt { get; set; } 
+    public DateOnly OccurredAt { get; set; } 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 
