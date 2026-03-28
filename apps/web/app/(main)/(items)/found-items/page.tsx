@@ -1,16 +1,17 @@
 import MapList from "@components/maps/MapList";
 import { itemsApi } from "@/lib/api";
-import { cacheLife, cacheTag } from "next/cache";
+import { cacheTag } from "next/cache";
 import ItemsList from "@components/items/ItemsList";
 import ItemPopup from "@components/items/ItemPopup";
+import { runtimeCacheLife, runtimeGet } from "@/lib/utils/data";
 
 export default async function ItemsPage() {
   "use cache";
 
   cacheTag("items");
-  cacheLife("hours");
+  runtimeCacheLife("hours");
 
-  const items = (await itemsApi.apiItemsGet()).filter((item) => item.type === "found");
+  const items = (await runtimeGet(() => itemsApi.apiItemsGet(), [])).filter((item) => item.type === "found");
 
   const markers = items.map((item, index) => ({
     key: index,
