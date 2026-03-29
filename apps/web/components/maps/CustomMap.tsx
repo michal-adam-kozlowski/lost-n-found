@@ -11,11 +11,13 @@ import { setMapLanguage } from "@components/maps/utils";
 import CustomMapControls from "@components/maps/CustomMapControls";
 import { Location } from "@/lib/utils/types";
 import { useClickOutside } from "@mantine/hooks";
+import Pin from "@components/maps/Pin";
 
 export type InteractiveMarker<T> = Location & {
   key: string | number;
   onClick?: () => void;
   data: T;
+  color?: string;
 };
 
 export default function CustomMap<T>({
@@ -71,7 +73,9 @@ export default function CustomMap<T>({
               setSelectedMarker(marker);
               marker.onClick?.();
             }}
-          />
+          >
+            <Pin color={marker.color || "var(--mantine-color-blue-9)"} />
+          </Marker>
         ))}
         {renderPopup && selectedMarker && (
           <Popup

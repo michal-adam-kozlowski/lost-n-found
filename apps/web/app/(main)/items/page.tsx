@@ -30,6 +30,7 @@ export default async function ItemsPage({
     latitude: (item.latitude as number) ?? 0,
     longitude: (item.longitude as number) ?? 0,
     data: item,
+    color: item.type === "found" ? "var(--mantine-color-green-9)" : "var(--mantine-color-red-9)",
   }));
 
   let view = typeof params.view === "string" ? params.view : "list";
