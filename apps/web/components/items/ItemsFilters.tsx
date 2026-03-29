@@ -7,6 +7,7 @@ import { useCategories } from "@/lib/context/CategoriesContext";
 import { useForm } from "@mantine/form";
 import { useRouter, useSearchParams } from "next/navigation";
 import TypePicker from "@components/TypePicker";
+import { useLoading } from "@/lib/context/LoadingContext";
 
 export interface ItemsFiltersValues {
   type: "found" | "lost";
@@ -15,10 +16,12 @@ export interface ItemsFiltersValues {
   occurredAtRange: [string | null, string | null];
 }
 
-export default function ItemsFilters() {
+export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { categories, loading: categoriesLoading } = useCategories();
+  const { setLoading } = useLoading();
+
   const form = useForm<ItemsFiltersValues>({
     mode: "controlled",
     initialValues: {
@@ -47,10 +50,12 @@ export default function ItemsFilters() {
       }
       if (params.toString() === searchParams.toString()) return;
       const queryString = params.toString();
+      setLoading("itemsFilters", true);
       router.replace(`?${queryString}`);
     },
   });
   useEffect(() => {
+    setLoading("itemsFilters", false);
     form.setValues({
       type: (searchParams.get("type") as "found" | "lost") || "found",
       categoryId: searchParams.get("categoryId") || "",
@@ -63,7 +68,7 @@ export default function ItemsFilters() {
 
   return (
     <>
-      <TypePicker value={form.values.type} onChange={(value) => form.setFieldValue("type", value)} />
+      {!hideType && <TypePicker value={form.values.type} onChange={(value) => form.setFieldValue("type", value)} />}
       <Select
         label="Kategoria"
         placeholder="Wybierz kategorię"

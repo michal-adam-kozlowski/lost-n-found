@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { Paper, Text, Title, Group } from "@mantine/core";
 import { pluralizePl } from "@/lib/utils/ui";
 import ViewControl from "@components/ViewControl";
+import LoadingContextOverlay from "@components/layout/LoadingContextOverlay";
 
 export default async function ItemsPage({
   searchParams,
@@ -60,8 +61,10 @@ export default async function ItemsPage({
         </div>
         <ViewControl />
       </Group>
-      {view === "map" && <MapList markers={markers} renderPopup={ItemPopup} />}
-      {view === "list" && <ItemsList items={items} />}
+      <LoadingContextOverlay loadingKey="itemsFilters">
+        {view === "map" && <MapList markers={markers} renderPopup={ItemPopup} />}
+        {view === "list" && <ItemsList items={items} />}
+      </LoadingContextOverlay>
     </>
   );
 }

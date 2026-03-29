@@ -29,9 +29,10 @@ export async function editItem(id: string, item: Parameters<typeof itemsApi.apiI
 }
 
 export async function getFilteredItems(
-  type: "found" | "lost",
+  type: "found" | "lost" | null,
   categoryId?: string,
   occurredAtRange?: [Date | null, Date | null],
+  createdByUserId?: string,
 ) {
   "use cache";
 
@@ -41,7 +42,8 @@ export async function getFilteredItems(
   try {
     const items = await itemsApi.apiItemsGet();
     return items.filter((item) => {
-      if (item.type !== type) return false;
+      if (createdByUserId && item.createdByUserId !== createdByUserId) return false;
+      if (type && item.type !== type) return false;
       if (categoryId && item.categoryId !== categoryId) return false;
       if (occurredAtRange) {
         const occurredAt = new Date(item.occurredAt);

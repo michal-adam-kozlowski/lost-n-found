@@ -57,7 +57,7 @@ export default async function Layout({ children }: Readonly<{ children: React.Re
                 <AccountNavLinks />
               </CardSection>
             </Card>
-            <div>{children}</div>
+            <div className="w-full">{children}</div>
           </Flex>
         </Container>
       </AppShellMain>
