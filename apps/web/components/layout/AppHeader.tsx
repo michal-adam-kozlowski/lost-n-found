@@ -30,8 +30,8 @@ export function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }
         </Link>
         {showLinks && (
           <Group gap="0" h="100%">
-            <HeaderLink href="/items?type=found&view=list">Znalezione</HeaderLink>
-            <HeaderLink href="/items?type=lost&view=list">Zgubione</HeaderLink>
+            <HeaderLink href="/items?type=found&view=list&page=1">Znalezione</HeaderLink>
+            <HeaderLink href="/items?type=lost&view=list&page=1">Zgubione</HeaderLink>
             <Link href="/add">
               <Button leftSection={<IconPlus />} variant="filled" color="blue" radius="sm" mx="sm">
                 Dodaj ogłoszenie
@@ -49,10 +49,10 @@ export function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }
           {showLinks && (
             <>
               <Group gap="0" mx="-md">
-                <HeaderLink href="/items?type=found&view=list" horizontal>
+                <HeaderLink href="/items?type=found&view=list&page=1" horizontal>
                   Znalezione
                 </HeaderLink>
-                <HeaderLink href="/items?type=lost&view=list" horizontal>
+                <HeaderLink href="/items?type=lost&view=list&page=1" horizontal>
                   Zgubione
                 </HeaderLink>
                 <Link href="/add" className="w-full mx-3 my-3">

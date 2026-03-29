@@ -28,20 +28,23 @@ export async function editItem(id: string, item: Parameters<typeof itemsApi.apiI
   }
 }
 
-export async function getFilteredItems(
+export async function getPaginatedFilteredItems(
   type: "found" | "lost" | null,
   categoryId?: string,
   occurredAtRange?: [Date | null, Date | null],
   createdByUserId?: string,
-) {
+  page?: number,
+): Promise<{ items: Awaited<ReturnType<typeof itemsApi.apiItemsGet>>; pageCount: number; totalCount: number }> {
   "use cache";
 
   cacheTag("items");
   runtimeCacheLife("hours");
 
+  const PAGE_SIZE = 20;
+
   try {
     const items = await itemsApi.apiItemsGet();
-    return items.filter((item) => {
+    const filteredItems = items.filter((item) => {
       if (createdByUserId && item.createdByUserId !== createdByUserId) return false;
       if (type && item.type !== type) return false;
       if (categoryId && item.categoryId !== categoryId) return false;
@@ -52,8 +55,14 @@ export async function getFilteredItems(
       }
       return true;
     });
+    if (page) {
+      const pageCount = Math.ceil(filteredItems.length / PAGE_SIZE);
+      const paginatedItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+      return { items: paginatedItems, pageCount, totalCount: filteredItems.length };
+    }
+    return { items: filteredItems, pageCount: 1, totalCount: filteredItems.length };
   } catch (error) {
     console.error("Error fetching items:", error);
-    return [];
+    return { items: [], pageCount: 0, totalCount: 0 };
   }
 }

@@ -32,6 +32,9 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
     },
     onValuesChange: (values) => {
       const params = new URLSearchParams(searchParams.toString());
+      const oldParams = new URLSearchParams(searchParams.toString());
+      oldParams.delete("page");
+      params.delete("page");
       params.set("type", values.type);
       if (values.categoryId) {
         params.set("categoryId", values.categoryId);
@@ -48,7 +51,10 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
       } else {
         params.delete("occurredAtTo");
       }
-      if (params.toString() === searchParams.toString()) return;
+      if (params.toString() === oldParams.toString()) return;
+      if (params.get("view") !== "map") {
+        params.set("page", "1");
+      }
       const queryString = params.toString();
       setLoading("itemsFilters", true);
       router.replace(`?${queryString}`);

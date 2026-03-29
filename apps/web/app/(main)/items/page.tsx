@@ -3,12 +3,13 @@ import ItemsList from "@components/items/ItemsList";
 import ItemPopup from "@components/items/ItemPopup";
 import { runtimeGet } from "@/lib/utils/data";
 import ItemsFilters from "@components/items/ItemsFilters";
-import { getFilteredItems } from "@/actions/items";
+import { getPaginatedFilteredItems } from "@/actions/items";
 import { redirect } from "next/navigation";
 import { Paper, Text, Title, Group } from "@mantine/core";
 import { pluralizePl } from "@/lib/utils/ui";
 import ViewControl from "@components/ViewControl";
 import LoadingContextOverlay from "@components/layout/LoadingContextOverlay";
+import ItemsPagination from "@components/items/ItemsPagination";
 
 export default async function ItemsPage({
   searchParams,
@@ -18,13 +19,35 @@ export default async function ItemsPage({
   const params = await searchParams;
   const type = typeof params.type === "string" ? params.type : "";
   if (!["found", "lost"].includes(type)) {
-    redirect("/items?type=found");
+    redirect("/items?type=found&view=list&page=1");
+  }
+  let view = typeof params.view === "string" ? params.view : "list";
+  if (!["list", "map"].includes(view)) {
+    view = "list";
+  }
+  const page = typeof params.page === "string" ? parseInt(params.page) : undefined;
+  if (!page && view !== "map") {
+    const redirectParams = new URLSearchParams();
+    redirectParams.set("type", type);
+    redirectParams.set("view", view);
+    redirectParams.set("page", "1");
+    redirect(`/items?${redirectParams.toString()}`);
   }
   const categoryId = typeof params.categoryId === "string" ? params.categoryId : undefined;
   const occurredAtFrom = typeof params.occurredAtFrom === "string" ? new Date(params.occurredAtFrom) : null;
   const occurredAtTo = typeof params.occurredAtTo === "string" ? new Date(params.occurredAtTo) : null;
   const occurredAtRange: [Date | null, Date | null] = [occurredAtFrom, occurredAtTo];
-  const items = await runtimeGet(() => getFilteredItems(type as "found" | "lost", categoryId, occurredAtRange), []);
+  const { items, pageCount, totalCount } = await runtimeGet(
+    () =>
+      getPaginatedFilteredItems(
+        type as "found" | "lost",
+        categoryId,
+        occurredAtRange,
+        undefined,
+        view === "map" ? undefined : page,
+      ),
+    { items: [], pageCount: 0, totalCount: 0 },
+  );
 
   const markers = items.map((item) => ({
     key: item.id,
@@ -33,11 +56,6 @@ export default async function ItemsPage({
     data: item,
     color: item.type === "found" ? "var(--mantine-color-green-9)" : "var(--mantine-color-red-9)",
   }));
-
-  let view = typeof params.view === "string" ? params.view : "list";
-  if (!["list", "map"].includes(view)) {
-    view = "list";
-  }
 
   return (
     <>
@@ -56,14 +74,19 @@ export default async function ItemsPage({
             Ogłoszenia
           </Title>
           <Text c={"gray.7"} fw={500}>
-            {items.length} {pluralizePl(items.length, "wynik", "wyniki", "wyników")}
+            {totalCount} {pluralizePl(items.length, "wynik", "wyniki", "wyników")}
           </Text>
         </div>
         <ViewControl />
       </Group>
       <LoadingContextOverlay loadingKey="itemsFilters">
         {view === "map" && <MapList markers={markers} renderPopup={ItemPopup} />}
-        {view === "list" && <ItemsList items={items} />}
+        {view === "list" && (
+          <>
+            <ItemsList items={items} />
+            <ItemsPagination pageCount={pageCount} page={page} />
+          </>
+        )}
       </LoadingContextOverlay>
     </>
   );

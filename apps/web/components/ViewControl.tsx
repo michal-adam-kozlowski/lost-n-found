@@ -18,6 +18,11 @@ export default function ViewControl() {
       onChange={(value) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set("view", value);
+        if (value === "map") {
+          params.delete("page");
+        } else if (!params.has("page")) {
+          params.set("page", "1");
+        }
         router.replace(`?${params.toString()}`);
       }}
       data={[
