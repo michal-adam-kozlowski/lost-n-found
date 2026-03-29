@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 import { Location } from "@/lib/utils/types";
 import ItemForm from "@components/items/ItemForm";
 import { ItemResponse } from "@lost-n-found/api-client";
+import { IconDeviceFloppy } from "@tabler/icons-react";
 
 export interface EditItemFormValues {
   type: "found" | "lost";
@@ -99,7 +100,7 @@ export default function EditItemForm({
       <ItemForm form={form} />
       <Divider />
       <div className="flex justify-end">
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" leftSection={<IconDeviceFloppy />}>
           Zapisz
         </Button>
       </div>

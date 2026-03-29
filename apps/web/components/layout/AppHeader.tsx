@@ -24,14 +24,14 @@ function HeaderLink({
 export function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }>) {
   return (
     <Container size="lg" h="100%" px="0">
-      <Group h="100%" justify="space-between" visibleFrom="sm">
+      <Group h="100%" justify="space-between" visibleFrom="md">
         <Link href="/" prefetch={true}>
           <Logo />
         </Link>
         {showLinks && (
           <Group gap="0" h="100%">
-            <HeaderLink href="/found-items">Znalezione</HeaderLink>
-            <HeaderLink href="/lost-items">Zgubione</HeaderLink>
+            <HeaderLink href="/items?type=found&view=list">Znalezione</HeaderLink>
+            <HeaderLink href="/items?type=lost&view=list">Zgubione</HeaderLink>
             <Link href="/add">
               <Button leftSection={<IconPlus />} variant="filled" color="blue" radius="sm" mx="sm">
                 Dodaj ogłoszenie
@@ -41,7 +41,7 @@ export function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }
         )}
         <AppHeaderAuth />
       </Group>
-      <Group h="100%" justify="space-between" hiddenFrom="sm">
+      <Group h="100%" justify="space-between" hiddenFrom="md">
         <Link href="/" prefetch={true}>
           <Logo />
         </Link>
@@ -49,10 +49,10 @@ export function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }
           {showLinks && (
             <>
               <Group gap="0" mx="-md">
-                <HeaderLink href="/found-items" horizontal>
+                <HeaderLink href="/items?type=found&view=list" horizontal>
                   Znalezione
                 </HeaderLink>
-                <HeaderLink href="/lost-items" horizontal>
+                <HeaderLink href="/items?type=lost&view=list" horizontal>
                   Zgubione
                 </HeaderLink>
                 <Link href="/add" className="w-full mx-3 my-3">

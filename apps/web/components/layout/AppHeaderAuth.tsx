@@ -10,7 +10,7 @@ export default async function AppHeaderAuth() {
   if (user) {
     return (
       <>
-        <Group gap="sm" h="100%" visibleFrom="sm">
+        <Group gap="sm" h="100%" visibleFrom="md">
           <Menu openDelay={0} closeDelay={100} trigger="hover" width={200} position="bottom-end" offset={5} shadow="md">
             <MenuTarget>
               <div className="h-full flex hover:bg-gray-100 items-center px-4 gap-2 cursor-default">
@@ -31,7 +31,13 @@ export default async function AppHeaderAuth() {
             </MenuDropdown>
           </Menu>
         </Group>
-        <Group hiddenFrom="sm">
+        <Group hiddenFrom="md">
+          <Button component="a" href="/account" variant="default" leftSection={<IconUser />} fullWidth>
+            Mój profil
+          </Button>
+          <Button component="a" href="/account/items" variant="default" leftSection={<IconListDetails />} fullWidth>
+            Moje ogłoszenia
+          </Button>
           <Button component="a" href="/logout" variant="default" leftSection={<IconLogout />} fullWidth c="red.8">
             Wyloguj się
           </Button>

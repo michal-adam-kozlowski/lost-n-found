@@ -10,6 +10,7 @@ import GeocoderControl from "@components/maps/GeocoderControl";
 import { setMapLanguage } from "@components/maps/utils";
 import CustomMapControls from "@components/maps/CustomMapControls";
 import { Location } from "@/lib/utils/types";
+import { useClickOutside } from "@mantine/hooks";
 
 export type InteractiveMarker<T> = Location & {
   key: string | number;
@@ -31,13 +32,17 @@ export default function CustomMap<T>({
 
   const [selectedMarker, setSelectedMarker] = useState<InteractiveMarker<T> | null>(null);
 
+  const clickOutsideRef = useClickOutside(() => {
+    setSelectedMarker(null);
+  });
+
   return (
-    <div className={styles.Container}>
+    <div className={styles.Container} ref={clickOutsideRef}>
       <Map
         initialViewState={{
-          longitude: 19.9449,
-          latitude: 50.0646,
-          zoom: 12,
+          longitude: 19.134422,
+          latitude: 52,
+          zoom: 5.2,
         }}
         reuseMaps={true}
         style={{ width: "100%" }}

@@ -67,6 +67,7 @@ export default function ItemForm({
             valueFormat={"DD MMMM YYYY"}
             miw={240}
             flex={1}
+            maxDate={new Date()}
             popoverProps={{
               position: "bottom",
             }}

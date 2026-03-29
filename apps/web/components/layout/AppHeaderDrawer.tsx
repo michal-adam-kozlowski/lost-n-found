@@ -22,7 +22,7 @@ export default function AppHeaderDrawer({ children }: Readonly<{ children?: Reac
         size="sm"
         padding="md"
         title="Menu"
-        hiddenFrom="sm"
+        hiddenFrom="md"
         zIndex={1000000}
       >
         <Divider mb="sm" mx="-md" />
