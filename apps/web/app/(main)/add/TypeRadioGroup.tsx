@@ -5,10 +5,10 @@ export default function TypeRadioGroup(props: Readonly<Omit<RadioGroupProps, "ch
   return (
     <RadioGroup {...props}>
       <Group gap="sm" dir="row">
-        <RadioCard value="lost" p="sm" c="blue.7" className={styles.Root}>
-          <RadioIndicator color="blue.7" />
+        <RadioCard value="lost" p="sm" c="red.7" className={styles.Root}>
+          <RadioIndicator color="red.7" />
           <div>
-            <Text c="blue.7" fw={600} mb={3}>
+            <Text c="red.7" fw={600} mb={3}>
               Zgubiłem rzecz
             </Text>
             <Text c="gray.7" size="sm">

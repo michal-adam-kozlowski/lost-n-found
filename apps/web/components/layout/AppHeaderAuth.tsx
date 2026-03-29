@@ -1,5 +1,5 @@
 import { Avatar, Button, Group, Menu, MenuDropdown, MenuItem, MenuTarget } from "@mantine/core";
-import { IconLogout } from "@tabler/icons-react";
+import { IconListDetails, IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import React from "react";
 import { getCurrentUser } from "@/actions/auth";
@@ -19,14 +19,20 @@ export default async function AppHeaderAuth() {
               </div>
             </MenuTarget>
             <MenuDropdown>
-              <MenuItem leftSection={<IconLogout />} component="a" href="/logout">
+              <MenuItem leftSection={<IconUser />} component="a" href="/account">
+                Mój profil
+              </MenuItem>
+              <MenuItem leftSection={<IconListDetails />} component="a" href="/account/items">
+                Moje ogłoszenia
+              </MenuItem>
+              <MenuItem leftSection={<IconLogout />} component="a" href="/logout" c="red.8">
                 Wyloguj się
               </MenuItem>
             </MenuDropdown>
           </Menu>
         </Group>
         <Group hiddenFrom="sm">
-          <Button component="a" href="/logout" variant="default" leftSection={<IconLogout />} fullWidth>
+          <Button component="a" href="/logout" variant="default" leftSection={<IconLogout />} fullWidth c="red.8">
             Wyloguj się
           </Button>
         </Group>

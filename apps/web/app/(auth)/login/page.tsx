@@ -38,6 +38,7 @@ export default function Page() {
   useEffect(() => {
     if (params.has("loggedOut")) {
       notifications.show({
+        id: "loggedOut",
         title: "Wylogowano pomyślnie",
         message: "",
         color: "green",
