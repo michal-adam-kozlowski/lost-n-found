@@ -21,6 +21,14 @@ import type {
   ValidationProblemDetails,
 } from '../models/index';
 
+export interface ApiItemsGetRequest {
+    mine?: boolean;
+    type?: string;
+    categoryIds?: Array<string>;
+    occurredAtFrom?: string;
+    occurredAtTo?: string;
+}
+
 export interface ApiItemsIdDeleteRequest {
     id: string;
 }
@@ -47,24 +55,34 @@ export interface ApiItemsPostRequest {
 export interface ItemsApiInterface {
     /**
      * Creates request options for apiItemsGet without sending the request
+     * @param {boolean} [mine] 
+     * @param {string} [type] 
+     * @param {Array<string>} [categoryIds] 
+     * @param {string} [occurredAtFrom] 
+     * @param {string} [occurredAtTo] 
      * @throws {RequiredError}
      * @memberof ItemsApiInterface
      */
-    apiItemsGetRequestOpts(): Promise<runtime.RequestOpts>;
+    apiItemsGetRequestOpts(requestParameters: ApiItemsGetRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
      * @summary Returns all items ordered from newest to oldest.
+     * @param {boolean} [mine] 
+     * @param {string} [type] 
+     * @param {Array<string>} [categoryIds] 
+     * @param {string} [occurredAtFrom] 
+     * @param {string} [occurredAtTo] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ItemsApiInterface
      */
-    apiItemsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ItemResponse>>>;
+    apiItemsGetRaw(requestParameters: ApiItemsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ItemResponse>>>;
 
     /**
      * Returns all items ordered from newest to oldest.
      */
-    apiItemsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ItemResponse>>;
+    apiItemsGet(requestParameters: ApiItemsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ItemResponse>>;
 
     /**
      * Creates request options for apiItemsIdDelete without sending the request
@@ -170,8 +188,28 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
     /**
      * Creates request options for apiItemsGet without sending the request
      */
-    async apiItemsGetRequestOpts(): Promise<runtime.RequestOpts> {
+    async apiItemsGetRequestOpts(requestParameters: ApiItemsGetRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
+
+        if (requestParameters['mine'] != null) {
+            queryParameters['mine'] = requestParameters['mine'];
+        }
+
+        if (requestParameters['type'] != null) {
+            queryParameters['type'] = requestParameters['type'];
+        }
+
+        if (requestParameters['categoryIds'] != null) {
+            queryParameters['categoryIds'] = requestParameters['categoryIds'];
+        }
+
+        if (requestParameters['occurredAtFrom'] != null) {
+            queryParameters['occurredAtFrom'] = requestParameters['occurredAtFrom'];
+        }
+
+        if (requestParameters['occurredAtTo'] != null) {
+            queryParameters['occurredAtTo'] = requestParameters['occurredAtTo'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -189,8 +227,8 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
     /**
      * Returns all items ordered from newest to oldest.
      */
-    async apiItemsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ItemResponse>>> {
-        const requestOptions = await this.apiItemsGetRequestOpts();
+    async apiItemsGetRaw(requestParameters: ApiItemsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ItemResponse>>> {
+        const requestOptions = await this.apiItemsGetRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response);
@@ -199,8 +237,8 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
     /**
      * Returns all items ordered from newest to oldest.
      */
-    async apiItemsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ItemResponse>> {
-        const response = await this.apiItemsGetRaw(initOverrides);
+    async apiItemsGet(requestParameters: ApiItemsGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ItemResponse>> {
+        const response = await this.apiItemsGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

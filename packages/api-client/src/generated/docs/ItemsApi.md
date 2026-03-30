@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 
 ## apiItemsGet
 
-> Array&lt;ItemResponse&gt; apiItemsGet()
+> Array&lt;ItemResponse&gt; apiItemsGet(mine, type, categoryIds, occurredAtFrom, occurredAtTo)
 
 Returns all items ordered from newest to oldest.
 
@@ -31,8 +31,21 @@ async function example() {
   console.log("🚀 Testing  SDK...");
   const api = new ItemsApi();
 
+  const body = {
+    // boolean (optional)
+    mine: true,
+    // string (optional)
+    type: type_example,
+    // Array<string> (optional)
+    categoryIds: ...,
+    // string (optional)
+    occurredAtFrom: 2013-10-20,
+    // string (optional)
+    occurredAtTo: 2013-10-20,
+  } satisfies ApiItemsGetRequest;
+
   try {
-    const data = await api.apiItemsGet();
+    const data = await api.apiItemsGet(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -45,7 +58,14 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **mine** | `boolean` |  | [Optional] [Defaults to `false`] |
+| **type** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **categoryIds** | `Array<string>` |  | [Optional] |
+| **occurredAtFrom** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **occurredAtTo** | `string` |  | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
@@ -65,6 +85,8 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | OK |  -  |
+| **401** | Unauthorized |  -  |
+| **400** | Bad Request |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

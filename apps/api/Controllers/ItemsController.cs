@@ -22,9 +22,63 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
     /// Returns all items ordered from newest to oldest.
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<List<ItemResponse>>> GetAll()
+    [ProducesResponseType<List<ItemResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<List<ItemResponse>>> GetAll(
+        [FromQuery] bool mine = false,
+        [FromQuery] string? type = null,
+        [FromQuery] List<Guid>? categoryIds = null,
+        [FromQuery] DateOnly? occurredAtFrom = null,
+        [FromQuery] DateOnly? occurredAtTo = null)
     {
-        var items = await db.Items.OrderByDescending(i => i.CreatedAt).ToListAsync();
+        IQueryable<Item> query = db.Items;
+
+        if (mine)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status401Unauthorized,
+                    title: "Unauthorized",
+                    detail: "mine filter requires login");
+            }
+            query = query.Where(i => i.CreatedByUserId == userId);
+        }
+
+        if (!string.IsNullOrEmpty(type))
+        {
+            if (!ValidTypes.Contains(type))
+            {
+                ModelState.AddModelError(nameof(type), "type filter must be 'lost' or 'found'");
+                return ValidationProblem(ModelState);
+            }
+            query = query.Where(i => i.Type == type);
+        }
+
+        if (categoryIds != null)
+        {
+            query = query.Where(i => categoryIds.Contains(i.CategoryId));
+        }
+
+        if (occurredAtFrom.HasValue && occurredAtTo.HasValue && occurredAtFrom.Value > occurredAtTo.Value)
+        {
+            ModelState.AddModelError(nameof(occurredAtFrom), "occurredAtFrom must be earlier than or equal to occurredAtTo");
+            return ValidationProblem(ModelState);
+        }
+
+        if (occurredAtFrom.HasValue)
+        {
+            query = query.Where(i => i.OccurredAt >= occurredAtFrom.Value);
+        }
+        if (occurredAtTo.HasValue)
+        {
+            query = query.Where(i => i.OccurredAt <= occurredAtTo.Value);
+        }
+
+
+        var items = await query.OrderByDescending(i => i.CreatedAt).ToListAsync();
         return items.Select(ToResponse).ToList();
     }
 
