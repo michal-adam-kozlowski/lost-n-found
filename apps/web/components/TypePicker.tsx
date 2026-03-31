@@ -1,8 +1,9 @@
 import { InputWrapper, SegmentedControl, SegmentedControlProps } from "@mantine/core";
 import React from "react";
+import { ItemType } from "@/lib/utils/types";
 
 export default function TypePicker(
-  props: { value: "found" | "lost"; onChange: (value: "found" | "lost") => void } & Omit<
+  props: { value: ItemType; onChange: (value: ItemType) => void } & Omit<
     SegmentedControlProps,
     "data" | "onChange" | "value"
   >,
@@ -20,7 +21,7 @@ export default function TypePicker(
         fullWidth
         color={props.value === "found" ? "green.8" : "red.8"}
         {...props}
-        onChange={(value) => props.onChange(value as "found" | "lost")}
+        onChange={(value) => props.onChange(value as ItemType)}
         styles={{
           root: {
             background: "var(--mantine-color-white)",

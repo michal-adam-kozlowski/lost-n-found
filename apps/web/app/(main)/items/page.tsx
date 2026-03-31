@@ -10,6 +10,7 @@ import { pluralizePl } from "@/lib/utils/ui";
 import ViewControl from "@components/ViewControl";
 import LoadingContextOverlay from "@components/layout/LoadingContextOverlay";
 import ItemsPagination from "@components/items/ItemsPagination";
+import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
 
 export default async function ItemsPage({
   searchParams,
@@ -17,36 +18,18 @@ export default async function ItemsPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams;
-  const type = typeof params.type === "string" ? params.type : "";
-  if (!["found", "lost"].includes(type)) {
-    redirect("/items?type=found&view=list&page=1");
+  const options = ItemsViewOptions.fromObject(params);
+  const validation = options.validate();
+  if (!validation.valid) {
+    redirect(validation.redirect);
   }
-  let view = typeof params.view === "string" ? params.view : "list";
-  if (!["list", "map"].includes(view)) {
-    view = "list";
-  }
-  const page = typeof params.page === "string" ? parseInt(params.page) : undefined;
-  if (!page && view !== "map") {
-    const redirectParams = new URLSearchParams();
-    redirectParams.set("type", type);
-    redirectParams.set("view", view);
-    redirectParams.set("page", "1");
-    redirect(`/items?${redirectParams.toString()}`);
-  }
-  const categoryId = typeof params.categoryId === "string" ? params.categoryId : undefined;
-  const occurredAtFrom = typeof params.occurredAtFrom === "string" ? new Date(params.occurredAtFrom) : null;
-  const occurredAtTo = typeof params.occurredAtTo === "string" ? new Date(params.occurredAtTo) : null;
-  const occurredAtRange: [Date | null, Date | null] = [occurredAtFrom, occurredAtTo];
   const { items, pageCount, totalCount } = await runtimeGet(
-    () =>
-      getPaginatedFilteredItems(
-        type as "found" | "lost",
-        categoryId,
-        occurredAtRange,
-        undefined,
-        view === "map" ? undefined : page,
-      ),
-    { items: [], pageCount: 0, totalCount: 0 },
+    () => getPaginatedFilteredItems(options.type, options.categoryIds, options.occurredAtRange, options.page),
+    {
+      items: [],
+      pageCount: 0,
+      totalCount: 0,
+    },
   );
 
   const markers = items.map((item) => ({
@@ -80,11 +63,11 @@ export default async function ItemsPage({
         <ViewControl />
       </Group>
       <LoadingContextOverlay loadingKey="itemsFilters">
-        {view === "map" && <MapList markers={markers} renderPopup={ItemPopup} />}
-        {view === "list" && (
+        {options.view === "map" && <MapList markers={markers} renderPopup={ItemPopup} />}
+        {options.view === "list" && (
           <>
             <ItemsList items={items} />
-            <ItemsPagination pageCount={pageCount} page={page} />
+            <ItemsPagination pageCount={pageCount} page={options.page} />
           </>
         )}
       </LoadingContextOverlay>

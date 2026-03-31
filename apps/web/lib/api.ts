@@ -32,6 +32,7 @@ const config = new Configuration({
         console.log(`Finished API request to ${context.url} with status ${context.response.status}`);
         if (context.response.status >= 400) {
           const text = await context.response.text();
+          console.log("Error response text:", text);
           const error = new Error(context.response.statusText) as ApiError;
           error.status = context.response.status;
           try {

@@ -45,7 +45,7 @@ export default function EditItemPage({ item }: Readonly<{ item: ItemResponse }>)
             item={{
               title: formValues?.title || "Tytuł ogłoszenia",
               description: formValues?.description || "Tutaj pojawi się krótki podgląd treści dodawanego ogłoszenia.",
-              type: formValues?.type || "lost",
+              type: formValues?.type || "found",
               categoryId: formValues?.categoryId || "",
               longitude: formValues?.location?.longitude || null,
               latitude: formValues?.location?.latitude || null,

@@ -4,6 +4,8 @@ import { cacheTag, updateTag } from "next/cache";
 import { addTokenToInit, itemsApi } from "@/lib/api";
 import { getToken } from "@/actions/auth";
 import { runtimeCacheLife } from "@/lib/utils/data";
+import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
+import dayjs from "dayjs";
 
 export async function addItem(item: Parameters<typeof itemsApi.apiItemsPost>[0]["createItemRequest"]) {
   try {
@@ -29,11 +31,11 @@ export async function editItem(id: string, item: Parameters<typeof itemsApi.apiI
 }
 
 export async function getPaginatedFilteredItems(
-  type: "found" | "lost" | null,
-  categoryId?: string,
-  occurredAtRange?: [Date | null, Date | null],
-  createdByUserId?: string,
-  page?: number,
+  type: ItemsViewOptions["type"],
+  categoryIds?: ItemsViewOptions["categoryIds"],
+  occurredAtRange?: ItemsViewOptions["occurredAtRange"],
+  page?: ItemsViewOptions["page"],
+  createdByCurrentUser?: boolean,
 ): Promise<{ items: Awaited<ReturnType<typeof itemsApi.apiItemsGet>>; pageCount: number; totalCount: number }> {
   "use cache";
 
@@ -43,24 +45,19 @@ export async function getPaginatedFilteredItems(
   const PAGE_SIZE = 20;
 
   try {
-    const items = await itemsApi.apiItemsGet();
-    const filteredItems = items.filter((item) => {
-      if (createdByUserId && item.createdByUserId !== createdByUserId) return false;
-      if (type && item.type !== type) return false;
-      if (categoryId && item.categoryId !== categoryId) return false;
-      if (occurredAtRange) {
-        const occurredAt = new Date(item.occurredAt);
-        if (occurredAtRange[0] && occurredAt < occurredAtRange[0]) return false;
-        if (occurredAtRange[1] && occurredAt > occurredAtRange[1]) return false;
-      }
-      return true;
+    const items = await itemsApi.apiItemsGet({
+      type: type,
+      categoryIds: categoryIds,
+      occurredAtFrom: occurredAtRange?.[0] ? dayjs(occurredAtRange[0]).startOf("day").format("YYYY-MM-DD") : undefined,
+      occurredAtTo: occurredAtRange?.[1] ? dayjs(occurredAtRange[1]).endOf("day").format("YYYY-MM-DD") : undefined,
+      mine: createdByCurrentUser,
     });
     if (page) {
-      const pageCount = Math.ceil(filteredItems.length / PAGE_SIZE);
-      const paginatedItems = filteredItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-      return { items: paginatedItems, pageCount, totalCount: filteredItems.length };
+      const pageCount = Math.ceil(items.length / PAGE_SIZE);
+      const paginatedItems = items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+      return { items: paginatedItems, pageCount, totalCount: items.length };
     }
-    return { items: filteredItems, pageCount: 1, totalCount: filteredItems.length };
+    return { items: items, pageCount: 1, totalCount: items.length };
   } catch (error) {
     console.error("Error fetching items:", error);
     return { items: [], pageCount: 0, totalCount: 0 };

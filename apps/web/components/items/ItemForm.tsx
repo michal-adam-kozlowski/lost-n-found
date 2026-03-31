@@ -6,11 +6,11 @@ import { DatePickerInput } from "@mantine/dates";
 import LocationPicker from "@components/maps/LocationPicker";
 import { Dropzone, DropzoneAccept, DropzoneIdle, DropzoneReject, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
-import { Location } from "@/lib/utils/types";
+import { ItemType, Location } from "@/lib/utils/types";
 import { UseFormReturnType } from "@mantine/form";
 
 export interface ItemFormValues {
-  type: "found" | "lost";
+  type: ItemType;
   title: string;
   categoryId: string;
   description: string;
@@ -98,7 +98,10 @@ export default function ItemForm({
           mb="lg"
           {...form.getInputProps("locationLabel")}
         />
-        <LocationPicker {...form.getInputProps("location")} />
+        <LocationPicker
+          {...form.getInputProps("location")}
+          color={form.values.type === "found" ? "var(--mantine-color-green-9)" : "var(--mantine-color-red-9)"}
+        />
       </div>
       <div>
         <Title order={3} size="lg" mb="md">

@@ -2,28 +2,21 @@
 
 import { SegmentedControl } from "@mantine/core";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
 
 export default function ViewControl() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  let view = typeof searchParams.get("view") === "string" ? searchParams.get("view") : "list";
-  if (!view || !["list", "map"].includes(view)) {
-    view = "list";
-  }
+  const { view } = ItemsViewOptions.fromQueryParams(searchParams);
 
   return (
     <SegmentedControl
       color="black"
       value={view}
       onChange={(value) => {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set("view", value);
-        if (value === "map") {
-          params.delete("page");
-        } else if (!params.has("page")) {
-          params.set("page", "1");
-        }
-        router.replace(`?${params.toString()}`);
+        const options = ItemsViewOptions.fromQueryParams(searchParams);
+        const newOptions = options.copyWith({ view: value as "list" | "map" });
+        router.push(`${newOptions.getRedirectUrl()}`);
       }}
       data={[
         { value: "list", label: "Lista" },

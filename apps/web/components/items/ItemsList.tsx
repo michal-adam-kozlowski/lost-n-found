@@ -5,7 +5,7 @@ import { Text } from "@mantine/core";
 
 export default function ItemsList({ items }: Readonly<{ items: ItemResponse[] }>) {
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-wrap gap-6 justify-center">
       {items.map((item) => (
         <ItemCard
           item={{ ...item, occurredAt: dayjs(item.occurredAt).locale("pl").format("DD MMMM YYYY") }}

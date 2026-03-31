@@ -8,11 +8,11 @@ import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { redirect } from "next/navigation";
-import { Location } from "@/lib/utils/types";
+import { ItemType, Location } from "@/lib/utils/types";
 import ItemForm from "@components/items/ItemForm";
 
 export interface AddItemFormValues {
-  type: "found" | "lost";
+  type: ItemType;
   title: string;
   categoryId: string;
   description: string;
@@ -27,7 +27,7 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
   const form = useForm<AddItemFormValues>({
     mode: "uncontrolled",
     initialValues: {
-      type: "lost",
+      type: "found",
       title: "",
       categoryId: "",
       description: "",

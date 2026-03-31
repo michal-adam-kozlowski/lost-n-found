@@ -8,9 +8,11 @@ import { useForm } from "@mantine/form";
 import { useRouter, useSearchParams } from "next/navigation";
 import TypePicker from "@components/TypePicker";
 import { useLoading } from "@/lib/context/LoadingContext";
+import { ItemType } from "@/lib/utils/types";
+import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
 
 export interface ItemsFiltersValues {
-  type: "found" | "lost";
+  type: ItemType;
   categoryId: string;
   categorySearch: string;
   occurredAtRange: [string | null, string | null];
@@ -22,52 +24,39 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
   const { categories, loading: categoriesLoading } = useCategories();
   const { setLoading } = useLoading();
 
+  const initialOptions = ItemsViewOptions.fromQueryParams(searchParams);
+
   const form = useForm<ItemsFiltersValues>({
     mode: "controlled",
     initialValues: {
-      type: (searchParams.get("type") as "found" | "lost") || "found",
-      categoryId: searchParams.get("categoryId") || "",
+      type: initialOptions.type || "found",
+      categoryId: initialOptions.categoryIds ? initialOptions.categoryIds[0] : "",
       categorySearch: "",
-      occurredAtRange: [searchParams.get("occurredAtFrom") || null, searchParams.get("occurredAtTo") || null],
+      occurredAtRange: ItemsViewOptions.formatDateRange(initialOptions.occurredAtRange || [null, null]),
     },
     onValuesChange: (values) => {
-      const params = new URLSearchParams(searchParams.toString());
-      const oldParams = new URLSearchParams(searchParams.toString());
-      oldParams.delete("page");
-      params.delete("page");
-      params.set("type", values.type);
-      if (values.categoryId) {
-        params.set("categoryId", values.categoryId);
-      } else {
-        params.delete("categoryId");
+      const oldOptions = ItemsViewOptions.fromQueryParams(searchParams);
+      const newOptions = oldOptions.copyWith({
+        type: values.type,
+        categoryIds: values.categoryId ? [values.categoryId] : undefined,
+        occurredAtRange: ItemsViewOptions.parseDateRange(values.occurredAtRange),
+      });
+      if (oldOptions.toQueryString() === newOptions.toQueryString()) {
+        return;
       }
-      if (values.occurredAtRange[0]) {
-        params.set("occurredAtFrom", values.occurredAtRange[0]);
-      } else {
-        params.delete("occurredAtFrom");
-      }
-      if (values.occurredAtRange[1]) {
-        params.set("occurredAtTo", values.occurredAtRange[1]);
-      } else {
-        params.delete("occurredAtTo");
-      }
-      if (params.toString() === oldParams.toString()) return;
-      if (params.get("view") !== "map") {
-        params.set("page", "1");
-      }
-      const queryString = params.toString();
-      setLoading("itemsFilters", true);
-      router.replace(`?${queryString}`);
+      newOptions.page = 1;
+      router.replace(`${newOptions.getRedirectUrl()}`);
     },
   });
   useEffect(() => {
     setLoading("itemsFilters", false);
+    const options = ItemsViewOptions.fromQueryParams(searchParams);
     form.setValues({
-      type: (searchParams.get("type") as "found" | "lost") || "found",
-      categoryId: searchParams.get("categoryId") || "",
-      occurredAtRange: [searchParams.get("occurredAtFrom") || null, searchParams.get("occurredAtTo") || null],
+      type: options.type || "found",
+      categoryId: options.categoryIds ? options.categoryIds[0] : "",
+      occurredAtRange: ItemsViewOptions.formatDateRange(options.occurredAtRange || [null, null]),
     });
-    if (searchParams.get("categoryId") === null) {
+    if (!options.categoryIds || options.categoryIds.length === 0) {
       form.setFieldValue("categorySearch", "");
     }
   }, [searchParams]);

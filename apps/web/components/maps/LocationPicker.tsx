@@ -10,9 +10,11 @@ import { Location } from "@/lib/utils/types";
 export default function LocationPicker({
   defaultValue,
   onChange,
+  color,
 }: Readonly<{
   defaultValue?: Location | null;
   onChange?: (value: Location | null) => void;
+  color?: string;
 }>) {
   const pathname = usePathname();
   const CustomMap = useMemo(
@@ -22,7 +24,7 @@ export default function LocationPicker({
 
   const [value, setValue] = useState<Location | null>(defaultValue || null);
 
-  const markers = value ? [{ ...value, key: "selected-location", data: null }] : [];
+  const markers = value ? [{ ...value, key: "selected-location", data: null, color: color }] : [];
 
   useEffect(() => {
     onChange?.(value);

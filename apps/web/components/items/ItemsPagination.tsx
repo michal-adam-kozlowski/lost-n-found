@@ -1,10 +1,12 @@
 "use client";
 
-import { redirect, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Center, Pagination } from "@mantine/core";
+import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
 
 export default function ItemsPagination({ pageCount, page }: { pageCount: number; page?: number }) {
   const params = useSearchParams();
+  const router = useRouter();
 
   return (
     <Center>
@@ -12,9 +14,10 @@ export default function ItemsPagination({ pageCount, page }: { pageCount: number
         total={pageCount}
         value={page}
         onChange={(page) => {
-          const newParams = new URLSearchParams(params);
-          newParams.set("page", page.toString());
-          redirect(`/items?${newParams.toString()}`);
+          const options = ItemsViewOptions.fromQueryParams(params);
+          const newOptions = options.copyWith({ page });
+          const paramsStr = newOptions.toQueryString();
+          router.push(`?${paramsStr}`);
         }}
         mt="xl"
         mb="xl"

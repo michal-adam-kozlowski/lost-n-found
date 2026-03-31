@@ -4,3 +4,7 @@ export type Location = {
   latitude: number;
   longitude: number;
 };
+
+export type ItemType = "found" | "lost";
+
+export type ViewType = "list" | "map";

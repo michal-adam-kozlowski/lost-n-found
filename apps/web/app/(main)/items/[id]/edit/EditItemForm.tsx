@@ -8,13 +8,13 @@ import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { redirect } from "next/navigation";
-import { Location } from "@/lib/utils/types";
+import { ItemType, Location } from "@/lib/utils/types";
 import ItemForm from "@components/items/ItemForm";
 import { ItemResponse } from "@lost-n-found/api-client";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 
 export interface EditItemFormValues {
-  type: "found" | "lost";
+  type: ItemType;
   title: string;
   categoryId: string;
   description: string;
@@ -32,7 +32,7 @@ export default function EditItemForm({
   const form = useForm<EditItemFormValues>({
     mode: "uncontrolled",
     initialValues: {
-      type: item.type as "found" | "lost",
+      type: item.type as ItemType,
       title: item.title,
       categoryId: item.categoryId,
       description: item.description || "",
