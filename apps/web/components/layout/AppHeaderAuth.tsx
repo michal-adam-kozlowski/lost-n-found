@@ -22,7 +22,7 @@ export default async function AppHeaderAuth() {
               <MenuItem leftSection={<IconUser />} component="a" href="/account">
                 Mój profil
               </MenuItem>
-              <MenuItem leftSection={<IconListDetails />} component="a" href="/account/items">
+              <MenuItem leftSection={<IconListDetails />} component="a" href="/account/items?view=list&page=1">
                 Moje ogłoszenia
               </MenuItem>
               <MenuItem leftSection={<IconLogout />} component="a" href="/logout" c="red.8">
@@ -35,7 +35,13 @@ export default async function AppHeaderAuth() {
           <Button component="a" href="/account" variant="default" leftSection={<IconUser />} fullWidth>
             Mój profil
           </Button>
-          <Button component="a" href="/account/items" variant="default" leftSection={<IconListDetails />} fullWidth>
+          <Button
+            component="a"
+            href="/account/items?view=list&page=1"
+            variant="default"
+            leftSection={<IconListDetails />}
+            fullWidth
+          >
             Moje ogłoszenia
           </Button>
           <Button component="a" href="/logout" variant="default" leftSection={<IconLogout />} fullWidth c="red.8">

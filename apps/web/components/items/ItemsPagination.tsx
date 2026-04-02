@@ -16,8 +16,7 @@ export default function ItemsPagination({ pageCount, page }: { pageCount: number
         onChange={(page) => {
           const options = ItemsViewOptions.fromQueryParams(params);
           const newOptions = options.copyWith({ page });
-          const paramsStr = newOptions.toQueryString();
-          router.push(`?${paramsStr}`);
+          router.push(`${newOptions.getRedirectUrl()}`);
         }}
         mt="xl"
         mb="xl"

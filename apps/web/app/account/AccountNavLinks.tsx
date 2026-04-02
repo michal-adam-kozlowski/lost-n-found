@@ -21,7 +21,7 @@ export default function AccountNavLinks() {
           className="rounded-xl"
         />
       </Link>
-      <Link href="/account/items" prefetch={false}>
+      <Link href="/account/items?view=list&page=1" prefetch={false}>
         <NavLink
           variant="filled"
           active={pathname === "/account/items"}

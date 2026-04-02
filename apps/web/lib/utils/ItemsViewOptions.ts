@@ -103,7 +103,7 @@ export class ItemsViewOptions {
     let valid = true;
     if (this.type && !["found", "lost"].includes(this.type)) {
       valid = false;
-    } else if (this.view && !["list", "map"].includes(this.view)) {
+    } else if (!this.view || !["list", "map"].includes(this.view)) {
       valid = false;
     } else if (this.view === "map" && typeof this.page !== "undefined") {
       valid = false;
@@ -113,10 +113,12 @@ export class ItemsViewOptions {
     if (valid) {
       return { valid: true };
     }
-    const validType = this.type && ["found", "lost"].includes(this.type) ? this.type : "found";
+    const validType = !this.type || ["found", "lost"].includes(this.type) ? this.type : "found";
     const validView = this.view && ["list", "map"].includes(this.view) ? this.view : "list";
     const redirectParams = this.toQueryParams();
-    redirectParams.set("type", validType);
+    if (validType) {
+      redirectParams.set("type", validType);
+    }
     redirectParams.set("view", validView);
     if (validView === "list") {
       redirectParams.set("page", this.page ? this.page.toString() : "1");

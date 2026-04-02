@@ -12,7 +12,7 @@ import { ItemType } from "@/lib/utils/types";
 import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
 
 export interface ItemsFiltersValues {
-  type: ItemType;
+  type?: ItemType;
   categoryId: string;
   categorySearch: string;
   occurredAtRange: [string | null, string | null];
@@ -29,7 +29,7 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
   const form = useForm<ItemsFiltersValues>({
     mode: "controlled",
     initialValues: {
-      type: initialOptions.type || "found",
+      type: initialOptions.type || (hideType ? undefined : "found"),
       categoryId: initialOptions.categoryIds ? initialOptions.categoryIds[0] : "",
       categorySearch: "",
       occurredAtRange: ItemsViewOptions.formatDateRange(initialOptions.occurredAtRange || [null, null]),
@@ -52,7 +52,7 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
     setLoading("itemsFilters", false);
     const options = ItemsViewOptions.fromQueryParams(searchParams);
     form.setValues({
-      type: options.type || "found",
+      type: options.type || (hideType ? undefined : "found"),
       categoryId: options.categoryIds ? options.categoryIds[0] : "",
       occurredAtRange: ItemsViewOptions.formatDateRange(options.occurredAtRange || [null, null]),
     });
@@ -63,7 +63,7 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
 
   return (
     <>
-      {!hideType && <TypePicker value={form.values.type} onChange={(value) => form.setFieldValue("type", value)} />}
+      {!hideType && <TypePicker value={form.values.type!} onChange={(value) => form.setFieldValue("type", value)} />}
       <Select
         label="Kategoria"
         placeholder="Wybierz kategorię"
