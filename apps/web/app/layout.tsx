@@ -11,6 +11,7 @@ import React from "react";
 import { Inter } from "next/font/google";
 import ClientProviders from "@/app/ClientProviders";
 import { Notifications } from "@mantine/notifications";
+import { ModalsProvider } from "@mantine/modals";
 
 const inter = Inter({ weight: "variable", subsets: ["latin", "latin-ext"] });
 
@@ -33,8 +34,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         <MantineProvider theme={theme}>
-          <Notifications />
-          <ClientProviders>{children}</ClientProviders>
+          <ModalsProvider>
+            <Notifications />
+            <ClientProviders>{children}</ClientProviders>
+          </ModalsProvider>
         </MantineProvider>
       </body>
     </html>

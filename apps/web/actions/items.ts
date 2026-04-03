@@ -29,6 +29,18 @@ export async function editItem(id: string, item: Parameters<typeof itemsApi.apiI
   }
 }
 
+export async function deleteItem(id: string) {
+  try {
+    const token = await getToken();
+    await itemsApi.apiItemsIdDelete({ id }, addTokenToInit(token));
+    updateTag("items");
+    updateTag(`item_${id}`);
+    return { success: true } as const;
+  } catch (error) {
+    return { success: false, error } as const;
+  }
+}
+
 type PaginatedResult = {
   items: Awaited<ReturnType<typeof itemsApi.apiItemsGet>>;
   pageCount: number;

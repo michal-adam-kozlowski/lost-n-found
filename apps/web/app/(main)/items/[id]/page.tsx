@@ -1,32 +1,10 @@
-import { ApiError, itemsApi } from "@/lib/api";
-import { notFound } from "next/navigation";
-import ItemEditButton from "@/app/(main)/items/[id]/ItemEditButton";
+import ItemPage from "@/app/(main)/items/[id]/ItemPage";
+import { getCurrentUser } from "@/actions/auth";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  // "use cache";
-
   const { id } = await params;
-  //
-  // cacheTag(`item_${id}`);
-  // runtimeCacheLife("hours");
 
-  let item;
-  try {
-    item = await itemsApi.apiItemsIdGet({ id });
-  } catch (error) {
-    if ((error as ApiError).status === 404) {
-      notFound();
-    }
-  }
+  const user = await getCurrentUser();
 
-  if (!item) {
-    notFound();
-  }
-
-  return (
-    <div>
-      <ItemEditButton itemUserId={item.createdByUserId} itemId={item.id} />
-      {JSON.stringify(item, null, 2)}
-    </div>
-  );
+  return <ItemPage itemId={id} currentUserId={user?.id} />;
 }

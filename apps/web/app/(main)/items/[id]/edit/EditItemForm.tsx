@@ -12,6 +12,7 @@ import { ItemType, Location } from "@/lib/utils/types";
 import ItemForm from "@components/items/ItemForm";
 import { ItemResponse } from "@lost-n-found/api-client";
 import { IconDeviceFloppy } from "@tabler/icons-react";
+import Link from "next/link";
 
 export interface EditItemFormValues {
   type: ItemType;
@@ -99,7 +100,12 @@ export default function EditItemForm({
       </div>
       <ItemForm form={form} />
       <Divider />
-      <div className="flex justify-end">
+      <div className="flex justify-between gap-4">
+        <Link href={`/items/${item.id}`}>
+          <Button variant="default" type="button">
+            Anuluj
+          </Button>
+        </Link>
         <Button variant="primary" type="submit" leftSection={<IconDeviceFloppy />}>
           Zapisz
         </Button>
