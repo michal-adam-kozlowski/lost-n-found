@@ -25,7 +25,10 @@ const theme = createTheme({
   primaryColor: "blue",
 });
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+  modal,
+}: Readonly<{ children: React.ReactNode; modal?: React.ReactNode }>) {
   return (
     <html lang="en" className={inter.className} {...mantineHtmlProps}>
       <head>
@@ -34,9 +37,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         <MantineProvider theme={theme}>
-          <ModalsProvider>
+          <ModalsProvider modalProps={{ removeScrollProps: { enabled: false }, className: "maplibre-modal-ignore" }}>
             <Notifications />
-            <ClientProviders>{children}</ClientProviders>
+            <ClientProviders>
+              {children}
+              {modal}
+            </ClientProviders>
           </ModalsProvider>
         </MantineProvider>
       </body>

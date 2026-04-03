@@ -33,13 +33,15 @@ export default async function Page({
     },
   );
 
-  const markers = items.map((item) => ({
-    key: item.id,
-    latitude: (item.latitude as number) ?? 0,
-    longitude: (item.longitude as number) ?? 0,
-    data: item,
-    color: item.type === "found" ? "var(--mantine-color-green-9)" : "var(--mantine-color-red-9)",
-  }));
+  const markers = items
+    .filter((item) => item.longitude && item.latitude)
+    .map((item) => ({
+      key: item.id,
+      latitude: (item.latitude as number) ?? 0,
+      longitude: (item.longitude as number) ?? 0,
+      data: item,
+      color: item.type === "found" ? "var(--mantine-color-green-9)" : "var(--mantine-color-red-9)",
+    }));
 
   return (
     <>

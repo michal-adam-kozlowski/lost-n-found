@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import CustomMapPlaceholder from "@components/maps/CustomMapPlaceholder";
 import React, { useMemo } from "react";
-import { usePathname } from "next/navigation";
 import { InteractiveMarker } from "@components/maps/CustomMap";
 
 export default function MapList<T>({
@@ -13,10 +12,9 @@ export default function MapList<T>({
   markers: InteractiveMarker<T>[];
   renderPopup?: (data: T) => React.ReactNode;
 }>) {
-  const pathname = usePathname();
   const CustomMap = useMemo(
     () => dynamic(() => import("@components/maps/CustomMap"), { ssr: false, loading: CustomMapPlaceholder }),
-    [pathname],
+    [],
   );
 
   return (

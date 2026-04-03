@@ -2,15 +2,15 @@ import MapList from "@components/maps/MapList";
 import ItemsList from "@components/items/ItemsList";
 import ItemPopup from "@components/items/ItemPopup";
 import { runtimeGet } from "@/lib/utils/data";
-import ItemsFilters from "@components/items/ItemsFilters";
 import { getPaginatedFilteredItems } from "@/actions/items";
 import { redirect } from "next/navigation";
 import { Paper, Text, Title, Group } from "@mantine/core";
 import { pluralizePl } from "@/lib/utils/ui";
-import ViewControl from "@components/ViewControl";
 import LoadingContextOverlay from "@components/layout/LoadingContextOverlay";
-import ItemsPagination from "@components/items/ItemsPagination";
 import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
+import ItemsFilters from "@components/items/ItemsFilters";
+import ViewControl from "@components/ViewControl";
+import ItemsPagination from "@components/items/ItemsPagination";
 
 export default async function ItemsPage({
   searchParams,
@@ -32,13 +32,15 @@ export default async function ItemsPage({
     },
   );
 
-  const markers = items.map((item) => ({
-    key: item.id,
-    latitude: (item.latitude as number) ?? 0,
-    longitude: (item.longitude as number) ?? 0,
-    data: item,
-    color: item.type === "found" ? "var(--mantine-color-green-9)" : "var(--mantine-color-red-9)",
-  }));
+  const markers = items
+    .filter((item) => item.longitude && item.latitude)
+    .map((item) => ({
+      key: item.id,
+      latitude: (item.latitude as number) ?? 0,
+      longitude: (item.longitude as number) ?? 0,
+      data: item,
+      color: item.type === "found" ? "var(--mantine-color-green-9)" : "var(--mantine-color-red-9)",
+    }));
 
   return (
     <>

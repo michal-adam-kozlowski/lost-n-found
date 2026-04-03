@@ -5,7 +5,7 @@ import { DatePickerInput } from "@mantine/dates";
 import React, { useEffect } from "react";
 import { useCategories } from "@/lib/context/CategoriesContext";
 import { useForm } from "@mantine/form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import TypePicker from "@components/TypePicker";
 import { useLoading } from "@/lib/context/LoadingContext";
 import { ItemType } from "@/lib/utils/types";
@@ -21,6 +21,7 @@ export interface ItemsFiltersValues {
 export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const { categories, loading: categoriesLoading } = useCategories();
   const { setLoading } = useLoading();
 
@@ -49,6 +50,9 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
     },
   });
   useEffect(() => {
+    if (!["/items", "/account/items"].includes(pathname)) {
+      return;
+    }
     setLoading("itemsFilters", false);
     const options = ItemsViewOptions.fromQueryParams(searchParams);
     form.setValues({

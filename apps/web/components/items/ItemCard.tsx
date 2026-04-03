@@ -22,6 +22,7 @@ export default function ItemCard({
         href={item.id ? `/items/${item.id}` : "#"}
         className={item.id ? "cursor-pointer" : "cursor-default"}
         prefetch={false}
+        scroll={false}
       >
         <Badge color={item.type === "lost" ? "red" : "green"} variant="light" mb={6}>
           {item.type === "lost" ? "Zgubione" : "Znalezione"}

@@ -34,8 +34,11 @@ export default function CustomMap<T>({
 
   const [selectedMarker, setSelectedMarker] = useState<InteractiveMarker<T> | null>(null);
 
-  const clickOutsideRef = useClickOutside(() => {
-    setSelectedMarker(null);
+  const clickOutsideRef = useClickOutside((e) => {
+    const clickedModal = (e.target as HTMLElement).closest(".maplibre-modal-ignore");
+    if (!clickedModal) {
+      setSelectedMarker(null);
+    }
   });
 
   return (

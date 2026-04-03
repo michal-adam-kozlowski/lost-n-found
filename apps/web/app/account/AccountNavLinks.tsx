@@ -24,7 +24,7 @@ export default function AccountNavLinks() {
       <Link href="/account/items?view=list&page=1" prefetch={false}>
         <NavLink
           variant="filled"
-          active={pathname === "/account/items"}
+          active={pathname === "/account/items" || pathname.startsWith("/items")}
           leftSection={<IconListDetails />}
           label="Moje ogłoszenia"
           component="span"

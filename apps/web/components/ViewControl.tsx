@@ -1,13 +1,27 @@
 "use client";
 
 import { SegmentedControl } from "@mantine/core";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
+import { useEffect, useState } from "react";
 
 export default function ViewControl() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { view } = ItemsViewOptions.fromQueryParams(searchParams);
+  const pathname = usePathname();
+  const [view, setView] = useState<"list" | "map">(() => {
+    const options = ItemsViewOptions.fromQueryParams(searchParams);
+    return options.view || "list";
+  });
+
+  useEffect(() => {
+    if (!["/items", "/account/items"].includes(pathname)) {
+      return;
+    }
+    const options = ItemsViewOptions.fromQueryParams(searchParams);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setView(options.view || "list");
+  }, [searchParams]);
 
   return (
     <SegmentedControl
