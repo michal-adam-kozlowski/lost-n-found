@@ -79,7 +79,23 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
 
 
         var items = await query.OrderByDescending(i => i.CreatedAt).ToListAsync();
-        return items.Select(ToResponse).ToList();
+
+        
+        var itemIds = items.Select(i => i.Id).ToList();
+        
+        //Load uploaded image IDs for all items at once and group them by itemId 
+        var uploadedImages = await db.ItemImages
+            .Where(i => itemIds.Contains(i.ItemId) && i.UploadStatus == UploadStatus.Uploaded)
+            .OrderBy(i => i.CreatedAt).ThenBy(i => i.Id)
+            .Select(i => new { i.ItemId, i.Id })
+            .ToListAsync();
+
+        var imageIdsByItemId = uploadedImages
+            .GroupBy(x => x.ItemId)
+            .ToDictionary( g => g.Key, g => g.Select(x => x.Id).ToArray()
+);
+
+        return items.Select(item => ToResponse(item, imageIdsByItemId.TryGetValue(item.Id, out var imageIds) ? imageIds : [])).ToList();
     }
 
     /// <summary>
@@ -98,8 +114,13 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
                 title: "Not Found",
                 detail: $"No item found with id {id}");
         }
+        var imageIds = await db.ItemImages
+            .Where(i => i.ItemId == id && i.UploadStatus == UploadStatus.Uploaded)
+            .OrderBy(i => i.CreatedAt).ThenBy(i => i.Id) 
+            .Select(i => i.Id)
+            .ToArrayAsync();
 
-        return ToResponse(item);
+        return ToResponse(item, imageIds);
     }
 
     /// <summary>
@@ -160,8 +181,8 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
         db.Items.Add(item);
         await db.SaveChangesAsync();
 
-   
-        return CreatedAtAction(nameof(GetById), new { id = item.Id }, ToResponse(item));
+        //TODO: check how to return img at creation, for now return empty
+        return CreatedAtAction(nameof(GetById), new { id = item.Id }, ToResponse(item, []));
     }
 
 
@@ -296,11 +317,17 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
 
         await db.SaveChangesAsync();
 
-        return ToResponse(item);
+        var imageIds = await db.ItemImages
+           .Where(i => i.ItemId == id && i.UploadStatus == UploadStatus.Uploaded)
+           .OrderBy(i => i.CreatedAt).ThenBy(i => i.Id)
+           .Select(i => i.Id)
+           .ToArrayAsync();
+
+        return ToResponse(item, imageIds);
     }
 
     
-    private static ItemResponse ToResponse (Item item) => new ItemResponse(
+    private static ItemResponse ToResponse (Item item, Guid[] imageIds) => new ItemResponse(
         item.Id,
         item.CategoryId,
         item.Title,
@@ -311,7 +338,8 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
         item.LocationLabel,
         item.OccurredAt,
         item.CreatedAt,
-        item.CreatedByUserId
+        item.CreatedByUserId,
+        imageIds
     );
 }
 
@@ -338,5 +366,6 @@ public record ItemResponse(
     string? LocationLabel,
     DateOnly OccurredAt,
     DateTime CreatedAt,
-    Guid? CreatedByUserId
+    Guid? CreatedByUserId,
+    Guid[] ImageIds
 );

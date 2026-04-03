@@ -50,7 +50,9 @@ public class ItemImagesController(IItemImageService imageService) : ControllerBa
     /// <summary>
     /// Returns a time-limited presigned download URL for the specified image.
     /// </summary>
+    
     [HttpGet("{imageId:guid}/download-url")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetDownloadUrl(Guid itemId, Guid imageId, CancellationToken ct)
     {
         try
@@ -77,9 +79,6 @@ public class ItemImagesController(IItemImageService imageService) : ControllerBa
         catch (Services.ValidationException e) { return BadRequest(new { error = e.Message }); }
     }
 
-    // TODO: Once authentication middleware is configured, extract the real user ID:
-    //   return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-    // Until then, returns null — authorization checks in the service layer are skipped.
     private Guid GetUserId()
     {
         var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);

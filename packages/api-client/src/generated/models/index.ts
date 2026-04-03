@@ -172,6 +172,12 @@ export interface ItemResponse {
      * @memberof ItemResponse
      */
     createdByUserId: string | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ItemResponse
+     */
+    imageIds: Array<string>;
 }
 /**
  * 

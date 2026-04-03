@@ -28,7 +28,11 @@ import type { ApiItemsItemIdImagesImageIdConfirmPostRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const api = new ItemImagesApi();
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new ItemImagesApi(config);
 
   const body = {
     // string
@@ -63,7 +67,7 @@ example().catch(console.error);
 
 ### Authorization
 
-No authorization required
+[Bearer](../README.md#Bearer)
 
 ### HTTP request headers
 
@@ -96,7 +100,11 @@ import type { ApiItemsItemIdImagesImageIdDeleteRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const api = new ItemImagesApi();
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new ItemImagesApi(config);
 
   const body = {
     // string
@@ -131,7 +139,7 @@ example().catch(console.error);
 
 ### Authorization
 
-No authorization required
+[Bearer](../README.md#Bearer)
 
 ### HTTP request headers
 
@@ -164,7 +172,11 @@ import type { ApiItemsItemIdImagesImageIdDownloadUrlGetRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const api = new ItemImagesApi();
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new ItemImagesApi(config);
 
   const body = {
     // string
@@ -199,7 +211,7 @@ example().catch(console.error);
 
 ### Authorization
 
-No authorization required
+[Bearer](../README.md#Bearer)
 
 ### HTTP request headers
 
@@ -232,7 +244,11 @@ import type { ApiItemsItemIdImagesPresignPostRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const api = new ItemImagesApi();
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new ItemImagesApi(config);
 
   const body = {
     // string
@@ -267,7 +283,7 @@ example().catch(console.error);
 
 ### Authorization
 
-No authorization required
+[Bearer](../README.md#Bearer)
 
 ### HTTP request headers
 

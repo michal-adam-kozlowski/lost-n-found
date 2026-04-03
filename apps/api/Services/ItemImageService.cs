@@ -31,10 +31,8 @@ public class ItemImageService(
         var item = await db.Items.FindAsync([itemId], ct)
             ?? throw new KeyNotFoundException("Item not found.");
 
-        // TODO: Once authentication and item ownership are implemented, verify that the
-        // authenticated user has permission to upload images for this item. Example:
-        //   if (item.UserId != userId)
-        //       throw new UnauthorizedAccessException("You do not have permission to modify this item.");
+        if (item.CreatedByUserId != userId)
+            throw new UnauthorizedAccessException("You do not have permission to modify this item.");
 
         if (!upload.AllowedMimeTypes.Contains(request.ContentType))
             throw new ValidationException($"Content type '{request.ContentType}' is not allowed.");
@@ -85,9 +83,8 @@ public class ItemImageService(
             .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId, ct)
             ?? throw new KeyNotFoundException("Image not found.");
 
-        // TODO: Once authentication is implemented, verify the caller owns this upload:
-        //   if (image.UploadedByUserId != userId)
-        //       throw new UnauthorizedAccessException("You do not have permission to confirm this upload.");
+        if (image.UploadedByUserId != userId)
+            throw new UnauthorizedAccessException("You do not have permission to confirm this upload.");
 
         if (image.UploadStatus != UploadStatus.Pending)
             throw new ValidationException($"Image is in '{image.UploadStatus}' state and cannot be confirmed.");
@@ -122,9 +119,8 @@ public class ItemImageService(
             .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId, ct)
             ?? throw new KeyNotFoundException("Image not found.");
 
-        // TODO: Once authentication is implemented, verify the caller owns this image:
-        //   if (image.UploadedByUserId != userId)
-        //       throw new UnauthorizedAccessException("You do not have permission to delete this image.");
+        if (image.UploadedByUserId != userId)
+            throw new UnauthorizedAccessException("You do not have permission to delete this image.");
 
         if (image.UploadStatus == UploadStatus.Deleted)
             throw new ValidationException("Image is already deleted.");
