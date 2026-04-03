@@ -24,7 +24,7 @@ public class ItemImageService(
     /// The frontend uploads the file directly to storage, then calls ConfirmUploadAsync.
     /// </summary>
     public async Task<PresignResult> CreatePresignedUploadAsync(
-        Guid itemId, PresignRequest request, Guid? userId = null, CancellationToken ct = default)
+        Guid itemId, PresignRequest request, Guid userId, CancellationToken ct = default)
     {
         var upload = uploadOptions.Value;
 
@@ -79,7 +79,7 @@ public class ItemImageService(
     }
 
     public async Task<ItemImage> ConfirmUploadAsync(
-        Guid itemId, Guid imageId, Guid? userId = null, CancellationToken ct = default)
+        Guid itemId, Guid imageId, Guid userId, CancellationToken ct = default)
     {
         var image = await db.ItemImages
             .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId, ct)
@@ -116,7 +116,7 @@ public class ItemImageService(
     /// Structured so soft-delete vs hard-delete behavior can be changed later.
     /// </summary>
     public async Task DeleteAsync(
-        Guid itemId, Guid imageId, Guid? userId = null, CancellationToken ct = default)
+        Guid itemId, Guid imageId, Guid userId, CancellationToken ct = default)
     {
         var image = await db.ItemImages
             .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId, ct)

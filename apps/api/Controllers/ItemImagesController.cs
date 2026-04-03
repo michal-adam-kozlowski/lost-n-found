@@ -1,13 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using LostNFound.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LostNFound.Api.Controllers;
 
-// TODO: Add [Authorize] once authentication middleware is configured.
+
 [ApiController]
 [Route("api/items/{itemId:guid}/images")]
+[Authorize]
 public class ItemImagesController(IItemImageService imageService) : ControllerBase
 {
     /// <summary>
@@ -78,10 +80,12 @@ public class ItemImagesController(IItemImageService imageService) : ControllerBa
     // TODO: Once authentication middleware is configured, extract the real user ID:
     //   return Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
     // Until then, returns null — authorization checks in the service layer are skipped.
-    private Guid? GetUserId()
+    private Guid GetUserId()
     {
         var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return Guid.TryParse(claim, out var id) ? id : null;
+        if (!Guid.TryParse(claim, out var id))
+            throw new UnauthorizedAccessException("UserId claim is invalid");
+        return id;
     }
 }
 

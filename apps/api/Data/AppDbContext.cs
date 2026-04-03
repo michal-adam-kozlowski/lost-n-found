@@ -70,7 +70,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.HasOne(x => x.UploadedBy)
                 .WithMany()
                 .HasForeignKey(x => x.UploadedByUserId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
 
             e.HasIndex(x => new { x.ItemId, x.UploadStatus });
             e.HasIndex(x => x.UploadedByUserId);

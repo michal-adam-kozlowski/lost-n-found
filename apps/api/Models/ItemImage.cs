@@ -16,20 +16,11 @@ public class ItemImage
 
     public long SizeBytes { get; set; }
 
-    public int? Width { get; set; }
-
-    public int? Height { get; set; }
-
-    public int SortOrder { get; set; }
-
-    public bool IsPrimary { get; set; }
-
     public UploadStatus UploadStatus { get; set; } = UploadStatus.Pending;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // TODO: Make non-nullable once authentication is implemented and user identity is always available.
-    public Guid? UploadedByUserId { get; set; }
+    public Guid UploadedByUserId { get; set; }
 
     // Navigation properties
     public Item Item { get; set; } = null!;
