@@ -5,6 +5,7 @@ import { addTokenToInit, itemsApi } from "@/lib/api";
 import { getToken } from "@/actions/auth";
 import { runtimeCacheLife } from "@/lib/utils/data";
 import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
+import { EMPTY_ITEMS_RESULT, PaginatedItemsResult, paginateItems } from "@/lib/utils/items";
 
 export async function addItem(item: Parameters<typeof itemsApi.apiItemsPost>[0]["createItemRequest"]) {
   try {
@@ -41,27 +42,12 @@ export async function deleteItem(id: string) {
   }
 }
 
-type PaginatedResult = {
-  items: Awaited<ReturnType<typeof itemsApi.apiItemsGet>>;
-  pageCount: number;
-  totalCount: number;
-};
-
-const EMPTY_RESULT: PaginatedResult = { items: [], pageCount: 0, totalCount: 0 };
-const PAGE_SIZE = 20;
-
-function paginate<T>(items: T[], page?: number): { items: T[]; pageCount: number; totalCount: number } {
-  if (!page) return { items, pageCount: 1, totalCount: items.length };
-  const pageCount = Math.ceil(items.length / PAGE_SIZE);
-  return { items: items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), pageCount, totalCount: items.length };
-}
-
-export async function getPaginatedFilteredItems(
+export async function getItems(
   type?: ItemsViewOptions["type"],
   categoryIds?: ItemsViewOptions["categoryIds"],
   occurredAtRange?: ItemsViewOptions["occurredAtRange"],
   page?: ItemsViewOptions["page"],
-): Promise<PaginatedResult> {
+): Promise<PaginatedItemsResult> {
   "use cache";
   cacheTag("items");
   runtimeCacheLife("hours");
@@ -76,19 +62,19 @@ export async function getPaginatedFilteredItems(
       occurredAtTo: occurredAtRangeFormatted?.[1] ?? undefined,
       mine: false,
     });
-    return paginate(items, page);
+    return paginateItems(items, page);
   } catch (error) {
     console.error("Error fetching items:", error);
-    return EMPTY_RESULT;
+    return EMPTY_ITEMS_RESULT;
   }
 }
 
-export async function getPaginatedFilteredItemsForCurrentUser(
+export async function getItemsForCurrentUser(
   type?: ItemsViewOptions["type"],
   categoryIds?: ItemsViewOptions["categoryIds"],
   occurredAtRange?: ItemsViewOptions["occurredAtRange"],
   page?: ItemsViewOptions["page"],
-): Promise<PaginatedResult> {
+): Promise<PaginatedItemsResult> {
   try {
     const token = await getToken();
     const occurredAtRangeFormatted = occurredAtRange ? ItemsViewOptions.formatDateRange(occurredAtRange) : null;
@@ -102,9 +88,9 @@ export async function getPaginatedFilteredItemsForCurrentUser(
       },
       addTokenToInit(token),
     );
-    return paginate(items, page);
+    return paginateItems(items, page);
   } catch (error) {
     console.error("Error fetching items:", error);
-    return EMPTY_RESULT;
+    return EMPTY_ITEMS_RESULT;
   }
 }

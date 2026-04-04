@@ -1,5 +1,5 @@
 import { runtimeGet } from "@/lib/utils/data";
-import { getPaginatedFilteredItemsForCurrentUser } from "@/actions/items";
+import { getItemsForCurrentUser } from "@/actions/items";
 import { redirect } from "next/navigation";
 import { Paper, Text, Title, Group } from "@mantine/core";
 import { pluralizePl } from "@/lib/utils/ui";
@@ -11,6 +11,7 @@ import MapList from "@components/maps/MapList";
 import ItemPopup from "@components/items/ItemPopup";
 import ItemsList from "@components/items/ItemsList";
 import ItemsPagination from "@components/items/ItemsPagination";
+import { EMPTY_ITEMS_RESULT, getMarkersForItems } from "@/lib/utils/items";
 
 export default async function Page({
   searchParams,
@@ -23,25 +24,13 @@ export default async function Page({
   if (!validation.valid) {
     redirect(validation.redirect);
   }
+
   const { items, pageCount, totalCount } = await runtimeGet(
-    () =>
-      getPaginatedFilteredItemsForCurrentUser(undefined, options.categoryIds, options.occurredAtRange, options.page),
-    {
-      items: [],
-      pageCount: 0,
-      totalCount: 0,
-    },
+    () => getItemsForCurrentUser(undefined, options.categoryIds, options.occurredAtRange, options.page),
+    EMPTY_ITEMS_RESULT,
   );
 
-  const markers = items
-    .filter((item) => item.longitude && item.latitude)
-    .map((item) => ({
-      key: item.id,
-      latitude: (item.latitude as number) ?? 0,
-      longitude: (item.longitude as number) ?? 0,
-      data: item,
-      color: item.type === "found" ? "var(--mantine-color-green-9)" : "var(--mantine-color-red-9)",
-    }));
+  const markers = getMarkersForItems(items);
 
   return (
     <>

@@ -6,7 +6,7 @@ import { IconPhoto } from "@tabler/icons-react";
 
 interface ImagesViewerProps {
   images: string[];
-  height: number;
+  height: number | string;
   emptyIcon?: React.ReactNode;
   emptyPlaceholder?: string;
 }
@@ -25,21 +25,25 @@ export default function ImagesViewer({ images, height, emptyIcon, emptyPlacehold
   }
 
   const slides = images.map((image) => (
-    <CarouselSlide key={image}>
-      <Image src={image} height={height} alt="" h={height} fit="contain" bg="gray.6" />
+    <CarouselSlide key={image} h={height}>
+      <Image src={image} height={height} alt="" h={height} fit="contain" bg="gray.6" style={{ height: height }} />
     </CarouselSlide>
   ));
 
   return (
     <Carousel
       withIndicators
-      emblaOptions={{ loop: true }}
+      emblaOptions={{ loop: true, duration: 10 }}
       classNames={{
         root: styles.Carousel,
         controls: styles.CarouselControls,
         indicator: styles.CarouselIndicator,
       }}
       h={height}
+      styles={{
+        viewport: { height: height, maxHeight: height },
+        container: { height: height, maxHeight: height },
+      }}
     >
       {slides}
     </Carousel>
