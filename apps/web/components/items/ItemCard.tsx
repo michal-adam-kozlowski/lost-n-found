@@ -1,16 +1,28 @@
+"use client";
+
 import { ItemResponse } from "@lost-n-found/api-client";
 import { Optional } from "@/lib/utils/types";
 import { Card, CardSection, Text, Badge, CardProps } from "@mantine/core";
 import React from "react";
 import ImagesViewer from "@components/ImagesViewer";
 import Link from "next/link";
+import { useItemImageUrls } from "@/lib/hooks/useItemImageUrls";
 
 export default function ItemCard({
   item,
   small,
   cardProps,
-}: Readonly<{ item: Optional<ItemResponse, "id" | "createdAt">; small?: boolean; cardProps?: CardProps }>) {
-  const images: string[] = [];
+  imageUrls,
+}: Readonly<{
+  item: Optional<ItemResponse, "id" | "createdAt">;
+  small?: boolean;
+  cardProps?: CardProps;
+  imageUrls?: string[];
+}>) {
+  let images = useItemImageUrls(item.id, item.imageIds ?? []);
+  if (imageUrls) {
+    images = imageUrls;
+  }
 
   return (
     <Card p="md" shadow="xs" className={small ? "min-w-2xs max-w-2xs" : "min-w-xs max-w-xs"} {...cardProps}>
@@ -19,7 +31,7 @@ export default function ItemCard({
       </CardSection>
 
       <Link
-        href={item.id ? `/items/${item.id}` : "#"}
+        href={item.id ? `/items/${item.id}/preview` : "#"}
         className={item.id ? "cursor-pointer" : "cursor-default"}
         prefetch={false}
         scroll={false}

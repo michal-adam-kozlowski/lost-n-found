@@ -1,4 +1,11 @@
-import { AuthApi, CategoriesApi, Configuration, InitOverrideFunction, ItemsApi } from "@lost-n-found/api-client";
+import {
+  AuthApi,
+  CategoriesApi,
+  Configuration,
+  InitOverrideFunction,
+  ItemImagesApi,
+  ItemsApi,
+} from "@lost-n-found/api-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
@@ -48,6 +55,8 @@ const config = new Configuration({
 });
 
 export const itemsApi = new ItemsApi(config);
+
+export const itemImagesApi = new ItemImagesApi(config);
 
 export const authApi = new AuthApi(config);
 

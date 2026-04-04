@@ -9,12 +9,15 @@ import { useMediaQuery } from "@mantine/hooks";
 
 export default function Page() {
   const [formValues, setFormValues] = useState<AddItemFormValues | null>(null);
+  const [formImages, setFormImages] = useState<File[]>([]);
   const theme = useMantineTheme();
   const media = useMediaQuery(`(min-width: ${theme.breakpoints.md})`);
 
+  const imageUrls = formImages.map((file) => URL.createObjectURL(file));
+
   return (
     <Flex direction={media ? "row" : "column"} columnGap="xl" wrap="nowrap" align="stretch" mb="xl">
-      <AddItemForm onChange={(values) => setFormValues(values)} />
+      <AddItemForm onChange={(values) => setFormValues(values)} onImagesChange={(files) => setFormImages(files)} />
       <Flex
         className="flex-1"
         gap="lg"
@@ -50,7 +53,9 @@ export default function Page() {
               locationLabel: formValues?.locationLabel || "",
               occurredAt: dayjs(formValues?.occurredAt).locale("pl").format("DD MMMM YYYY") || "Data",
               createdByUserId: "",
+              imageIds: [],
             }}
+            imageUrls={imageUrls}
           />
         </div>
       </Flex>

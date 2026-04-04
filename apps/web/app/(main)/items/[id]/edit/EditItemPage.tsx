@@ -8,15 +8,25 @@ import ItemCard from "@components/items/ItemCard";
 import dayjs from "dayjs";
 import { ItemResponse } from "@lost-n-found/api-client";
 import EditItemForm from "@/app/(main)/items/[id]/edit/EditItemForm";
+import { ExistingImage } from "@components/items/ImageUploader";
 
 export default function EditItemPage({ item }: Readonly<{ item: ItemResponse }>) {
   const [formValues, setFormValues] = useState<AddItemFormValues | null>(null);
+  const [formImages, setFormImages] = useState<File[]>([]);
+  const [formExistingImages, setFormExistingImages] = useState<ExistingImage[]>([]);
   const theme = useMantineTheme();
   const media = useMediaQuery(`(min-width: ${theme.breakpoints.md})`);
 
+  const imageUrls = formImages.map((file) => URL.createObjectURL(file));
+
   return (
     <Flex direction={media ? "row" : "column"} columnGap="xl" wrap="nowrap" align="stretch" mb="xl">
-      <EditItemForm item={item} onChange={(values) => setFormValues(values)} />
+      <EditItemForm
+        item={item}
+        onChange={(values) => setFormValues(values)}
+        onImagesChange={(files) => setFormImages(files)}
+        onExistingImagesChange={(images) => setFormExistingImages(images)}
+      />
       <Flex
         className="flex-1"
         gap="lg"
@@ -52,7 +62,9 @@ export default function EditItemPage({ item }: Readonly<{ item: ItemResponse }>)
               locationLabel: formValues?.locationLabel || "",
               occurredAt: dayjs(formValues?.occurredAt).locale("pl").format("DD MMMM YYYY") || "Data",
               createdByUserId: "",
+              imageIds: [],
             }}
+            imageUrls={[...formExistingImages.map((i) => i.url), ...imageUrls]}
           />
         </div>
       </Flex>

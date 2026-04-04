@@ -1,15 +1,16 @@
 "use client";
 
 import { Button, Divider, Stack, Text, Title } from "@mantine/core";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { addItem } from "@/actions/items";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
 import { useDebouncedCallback } from "@mantine/hooks";
-import { redirect } from "next/navigation";
 import { ItemType, Location } from "@/lib/utils/types";
 import ItemForm from "@components/items/ItemForm";
+import { uploadImages } from "@/lib/utils/imageUpload";
+import { redirect, usePathname } from "next/navigation";
 
 export interface AddItemFormValues {
   type: ItemType;
@@ -21,8 +22,14 @@ export interface AddItemFormValues {
   locationLabel: string;
 }
 
-export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values: AddItemFormValues) => void }>) {
+export default function AddItemForm({
+  onChange,
+  onImagesChange,
+}: Readonly<{ onChange?: (values: AddItemFormValues) => void; onImagesChange?: (files: File[]) => void }>) {
   const debouncedOnChange = useDebouncedCallback(onChange ?? (() => {}), 500);
+  const [files, setFiles] = useState<File[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const pathname = usePathname();
 
   const form = useForm<AddItemFormValues>({
     mode: "uncontrolled",
@@ -40,38 +47,68 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
     },
   });
 
+  const clear = () => {
+    form.reset();
+    setFiles([]);
+  };
+
+  useEffect(() => {
+    clear();
+  }, [pathname]);
+
   useEffect(() => {
     onChange?.(form.values);
   }, []);
 
+  useEffect(() => {
+    onImagesChange?.(files);
+  }, [files]);
+
   const handleSubmit = async (values: AddItemFormValues) => {
     console.log("FORM VALUES", values);
+    setSubmitting(true);
 
     const occurredAt = dayjs(values.occurredAt).format("YYYY-MM-DD");
 
-    const res = await addItem({
-      title: values.title,
-      type: values.type,
-      description: values.description,
-      latitude: values.location?.latitude ?? 0,
-      longitude: values.location?.longitude ?? 0,
-      categoryId: values.categoryId,
-      locationLabel: values.locationLabel,
-      occurredAt,
-    });
-    if (res.success) {
+    try {
+      const res = await addItem({
+        title: values.title,
+        type: values.type,
+        description: values.description,
+        latitude: values.location?.latitude ?? 0,
+        longitude: values.location?.longitude ?? 0,
+        categoryId: values.categoryId,
+        locationLabel: values.locationLabel,
+        occurredAt,
+      });
+      if (!res.success) {
+        notifications.show({
+          title: "Błąd",
+          message: "Nie udało się dodać ogłoszenia. Spróbuj ponownie później.",
+          color: "red",
+        });
+        return;
+      }
+      if (files.length > 0) {
+        try {
+          await uploadImages(res.item.id, files);
+        } catch (err) {
+          console.error("Image upload error:", err);
+          notifications.show({
+            title: "Uwaga",
+            message: "Ogłoszenie dodane, ale nie udało się przesłać niektórych zdjęć.",
+            color: "orange",
+          });
+        }
+      }
       notifications.show({
         title: "Dodano ogłoszenie",
         message: "",
         color: "green",
       });
       redirect(`/items/${res.item.id}`);
-    } else {
-      notifications.show({
-        title: "Błąd",
-        message: "Nie udało się dodać ogłoszenia. Spróbuj ponownie później.",
-        color: "red",
-      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -92,10 +129,10 @@ export default function AddItemForm({ onChange }: Readonly<{ onChange?: (values:
           Wypełnij formularz, aby opublikować informację o zgubionej lub znalezionej rzeczy.
         </Text>
       </div>
-      <ItemForm form={form} />
+      <ItemForm form={form} files={files} onFilesChange={setFiles} />
       <Divider />
       <div className="flex justify-end">
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" loading={submitting}>
           Dodaj ogłoszenie
         </Button>
       </div>

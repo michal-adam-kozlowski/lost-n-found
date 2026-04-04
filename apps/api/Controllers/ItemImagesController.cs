@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using LostNFound.Api.Models;
 using LostNFound.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,7 @@ public class ItemImagesController(IItemImageService imageService) : ControllerBa
     /// The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
     /// </summary>
     [HttpPost("presign")]
-    public async Task<IActionResult> Presign(Guid itemId, [FromBody] PresignImageRequest req, CancellationToken ct)
+    public async Task<ActionResult<PresignResult>> Presign(Guid itemId, [FromBody] PresignImageRequest req, CancellationToken ct)
     {
         try
         {
@@ -35,7 +36,7 @@ public class ItemImagesController(IItemImageService imageService) : ControllerBa
     /// Transitions the image record from Pending to Uploaded.
     /// </summary>
     [HttpPost("{imageId:guid}/confirm")]
-    public async Task<IActionResult> Confirm(Guid itemId, Guid imageId, CancellationToken ct)
+    public async Task<ActionResult<ItemImage>> Confirm(Guid itemId, Guid imageId, CancellationToken ct)
     {
         try
         {
@@ -53,7 +54,7 @@ public class ItemImagesController(IItemImageService imageService) : ControllerBa
     
     [HttpGet("{imageId:guid}/download-url")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetDownloadUrl(Guid itemId, Guid imageId, CancellationToken ct)
+    public async Task<ActionResult<DownloadUrlResult>> GetDownloadUrl(Guid itemId, Guid imageId, CancellationToken ct)
     {
         try
         {
@@ -67,7 +68,7 @@ public class ItemImagesController(IItemImageService imageService) : ControllerBa
     /// Deletes the specified image. Marks the DB record as Deleted and removes the object from storage.
     /// </summary>
     [HttpDelete("{imageId:guid}")]
-    public async Task<IActionResult> Delete(Guid itemId, Guid imageId, CancellationToken ct)
+    public async Task<ActionResult> Delete(Guid itemId, Guid imageId, CancellationToken ct)
     {
         try
         {

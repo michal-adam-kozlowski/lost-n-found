@@ -1,18 +1,21 @@
 "use client";
 
 import { Button, Divider, Stack, Text, Title } from "@mantine/core";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { editItem } from "@/actions/items";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
 import { useDebouncedCallback } from "@mantine/hooks";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { ItemType, Location } from "@/lib/utils/types";
 import ItemForm from "@components/items/ItemForm";
 import { ItemResponse } from "@lost-n-found/api-client";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 import Link from "next/link";
+import { ExistingImage } from "@components/items/ImageUploader";
+import { deleteItemImage, getImageDownloadUrl } from "@/actions/images";
+import { uploadImages } from "@/lib/utils/imageUpload";
 
 export interface EditItemFormValues {
   type: ItemType;
@@ -27,8 +30,77 @@ export interface EditItemFormValues {
 export default function EditItemForm({
   item,
   onChange,
-}: Readonly<{ item: ItemResponse; onChange?: (values: EditItemFormValues) => void }>) {
+  onImagesChange,
+  onExistingImagesChange,
+}: Readonly<{
+  item: ItemResponse;
+  onChange?: (values: EditItemFormValues) => void;
+  onImagesChange?: (files: File[]) => void;
+  onExistingImagesChange?: (images: ExistingImage[]) => void;
+}>) {
   const debouncedOnChange = useDebouncedCallback(onChange ?? (() => {}), 500);
+  const [files, setFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadImages() {
+      const images: ExistingImage[] = [];
+      for (const imageId of item.imageIds) {
+        try {
+          const result = await getImageDownloadUrl(item.id, imageId);
+          if (!cancelled) {
+            images.push({ id: imageId, url: result.downloadUrl });
+          }
+        } catch (err) {
+          console.error(`Failed to load image ${imageId}:`, err);
+        }
+      }
+      if (!cancelled) {
+        setExistingImages(images);
+      }
+    }
+    void loadImages();
+    return () => {
+      cancelled = true;
+    };
+  }, [item.id, item.imageIds]);
+
+  const clear = () => {
+    form.reset();
+    setFiles([]);
+  };
+
+  useEffect(() => {
+    clear();
+  }, [pathname]);
+
+  const handleDeleteExistingImage = useCallback(
+    async (imageId: string) => {
+      try {
+        await deleteItemImage(item.id, imageId);
+        setExistingImages((prev) => prev.filter((img) => img.id !== imageId));
+      } catch (err) {
+        console.error("Failed to delete image:", err);
+        notifications.show({
+          title: "Błąd",
+          message: "Nie udało się usunąć zdjęcia.",
+          color: "red",
+        });
+      }
+    },
+    [item.id],
+  );
+
+  useEffect(() => {
+    onImagesChange?.(files);
+  }, [files]);
+
+  useEffect(() => {
+    onExistingImagesChange?.(existingImages);
+  }, [existingImages]);
 
   const form = useForm<EditItemFormValues>({
     mode: "uncontrolled",
@@ -52,32 +124,49 @@ export default function EditItemForm({
 
   const handleSubmit = async (values: EditItemFormValues) => {
     console.log("FORM VALUES", values);
+    setSubmitting(true);
 
     const occurredAt = dayjs(values.occurredAt).format("YYYY-MM-DD");
 
-    const res = await editItem(item.id, {
-      title: values.title,
-      type: values.type,
-      description: values.description,
-      latitude: values.location?.latitude ?? 0,
-      longitude: values.location?.longitude ?? 0,
-      categoryId: values.categoryId,
-      locationLabel: values.locationLabel,
-      occurredAt,
-    });
-    if (res.success) {
+    try {
+      const res = await editItem(item.id, {
+        title: values.title,
+        type: values.type,
+        description: values.description,
+        latitude: values.location?.latitude ?? 0,
+        longitude: values.location?.longitude ?? 0,
+        categoryId: values.categoryId,
+        locationLabel: values.locationLabel,
+        occurredAt,
+      });
+      if (!res.success) {
+        notifications.show({
+          title: "Błąd",
+          message: "Nie udało się edytować ogłoszenia. Spróbuj ponownie później.",
+          color: "red",
+        });
+        return;
+      }
+      if (files.length > 0) {
+        try {
+          await uploadImages(item.id, files);
+        } catch (err) {
+          console.error("Image upload error:", err);
+          notifications.show({
+            title: "Uwaga",
+            message: "Zmiany zapisane, ale nie udało się przesłać niektórych zdjęć.",
+            color: "orange",
+          });
+        }
+      }
       notifications.show({
         title: "Edytowano ogłoszenie",
         message: "Twoje zmiany zostały zapisane.",
         color: "green",
       });
       redirect(`/items/${res.item.id}`);
-    } else {
-      notifications.show({
-        title: "Błąd",
-        message: "Nie udało się edytować ogłoszenia. Spróbuj ponownie później.",
-        color: "red",
-      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -98,7 +187,13 @@ export default function EditItemForm({
           Wypełnij formularz, aby zmienić treść ogłoszenia.
         </Text>
       </div>
-      <ItemForm form={form} />
+      <ItemForm
+        form={form}
+        files={files}
+        onFilesChange={setFiles}
+        existingImages={existingImages}
+        onDeleteExistingImage={handleDeleteExistingImage}
+      />
       <Divider />
       <div className="flex justify-between gap-4">
         <Link href={`/items/${item.id}`}>
@@ -106,7 +201,7 @@ export default function EditItemForm({
             Anuluj
           </Button>
         </Link>
-        <Button variant="primary" type="submit" leftSection={<IconDeviceFloppy />}>
+        <Button variant="primary" type="submit" leftSection={<IconDeviceFloppy />} loading={submitting}>
           Zapisz
         </Button>
       </div>

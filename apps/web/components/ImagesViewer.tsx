@@ -26,7 +26,7 @@ export default function ImagesViewer({ images, height, emptyIcon, emptyPlacehold
 
   const slides = images.map((image) => (
     <CarouselSlide key={image}>
-      <Image src={image} height={height} alt="" h={height} />
+      <Image src={image} height={height} alt="" h={height} fit="contain" bg="gray.6" />
     </CarouselSlide>
   ));
 

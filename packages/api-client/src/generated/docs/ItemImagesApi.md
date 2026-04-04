@@ -13,7 +13,7 @@ All URIs are relative to *http://localhost*
 
 ## apiItemsItemIdImagesImageIdConfirmPost
 
-> apiItemsItemIdImagesImageIdConfirmPost(itemId, imageId)
+> ItemImage apiItemsItemIdImagesImageIdConfirmPost(itemId, imageId)
 
 Confirms that the frontend has successfully uploaded the file to storage.  Transitions the image record from Pending to Uploaded.
 
@@ -63,7 +63,7 @@ example().catch(console.error);
 
 ### Return type
 
-`void` (Empty response body)
+[**ItemImage**](ItemImage.md)
 
 ### Authorization
 
@@ -72,7 +72,7 @@ example().catch(console.error);
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
 
 
 ### HTTP response details
@@ -157,7 +157,7 @@ example().catch(console.error);
 
 ## apiItemsItemIdImagesImageIdDownloadUrlGet
 
-> apiItemsItemIdImagesImageIdDownloadUrlGet(itemId, imageId)
+> DownloadUrlResult apiItemsItemIdImagesImageIdDownloadUrlGet(itemId, imageId)
 
 Returns a time-limited presigned download URL for the specified image.
 
@@ -207,7 +207,7 @@ example().catch(console.error);
 
 ### Return type
 
-`void` (Empty response body)
+[**DownloadUrlResult**](DownloadUrlResult.md)
 
 ### Authorization
 
@@ -216,7 +216,7 @@ example().catch(console.error);
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
 
 
 ### HTTP response details
@@ -229,7 +229,7 @@ example().catch(console.error);
 
 ## apiItemsItemIdImagesPresignPost
 
-> apiItemsItemIdImagesPresignPost(itemId, presignImageRequest)
+> PresignResult apiItemsItemIdImagesPresignPost(itemId, presignImageRequest)
 
 Requests a presigned URL for uploading an image to the specified item.  The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
 
@@ -279,7 +279,7 @@ example().catch(console.error);
 
 ### Return type
 
-`void` (Empty response body)
+[**PresignResult**](PresignResult.md)
 
 ### Authorization
 
@@ -288,7 +288,7 @@ example().catch(console.error);
 ### HTTP request headers
 
 - **Content-Type**: `application/json`, `text/json`, `application/*+json`
-- **Accept**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
 
 
 ### HTTP response details

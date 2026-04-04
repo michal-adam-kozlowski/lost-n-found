@@ -1,13 +1,12 @@
-import { Group, Select, TextInput, Title, Text, Textarea, Stack } from "@mantine/core";
+import { Group, Select, TextInput, Title, Textarea } from "@mantine/core";
 import React from "react";
 import TypeRadioGroup from "@/app/(main)/add/TypeRadioGroup";
 import { useCategories } from "@/lib/context/CategoriesContext";
 import { DatePickerInput } from "@mantine/dates";
 import LocationPicker from "@components/maps/LocationPicker";
-import { Dropzone, DropzoneAccept, DropzoneIdle, DropzoneReject, IMAGE_MIME_TYPE } from "@mantine/dropzone";
-import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { ItemType, Location } from "@/lib/utils/types";
 import { UseFormReturnType } from "@mantine/form";
+import ImageUploader, { ExistingImage } from "@components/items/ImageUploader";
 
 export interface ItemFormValues {
   type: ItemType;
@@ -19,9 +18,21 @@ export interface ItemFormValues {
   locationLabel: string;
 }
 
+interface ItemFormProps {
+  form: UseFormReturnType<ItemFormValues, (values: ItemFormValues) => ItemFormValues>;
+  files: File[];
+  onFilesChange: (files: File[]) => void;
+  existingImages?: ExistingImage[];
+  onDeleteExistingImage?: (imageId: string) => void;
+}
+
 export default function ItemForm({
   form,
-}: Readonly<{ form: UseFormReturnType<ItemFormValues, (values: ItemFormValues) => ItemFormValues> }>) {
+  files,
+  onFilesChange,
+  existingImages,
+  onDeleteExistingImage,
+}: Readonly<ItemFormProps>) {
   const { categories, loading: categoriesLoading } = useCategories();
 
   return (
@@ -30,7 +41,7 @@ export default function ItemForm({
         <Title order={3} size="lg" mb="md">
           1. Typ ogłoszenia
         </Title>
-        <TypeRadioGroup {...form.getInputProps("type")} />
+        <TypeRadioGroup {...form.getInputProps("type")} key={form.key("type")} />
       </div>
       <div>
         <Title order={3} size="lg" mb="md">
@@ -45,6 +56,7 @@ export default function ItemForm({
               : "Np. Zgubiony czarny portfel w centrum"
           }
           mb="sm"
+          key={form.key("title")}
           {...form.getInputProps("title")}
         />
         <Group gap="sm" mb="sm">
@@ -58,6 +70,7 @@ export default function ItemForm({
             miw={240}
             flex={10}
             allowDeselect={false}
+            key={form.key("categoryId")}
             {...form.getInputProps("categoryId")}
           />
           <DatePickerInput
@@ -71,6 +84,7 @@ export default function ItemForm({
             popoverProps={{
               position: "bottom",
             }}
+            key={form.key("occurredAt")}
             {...form.getInputProps("occurredAt")}
           />
         </Group>
@@ -85,6 +99,7 @@ export default function ItemForm({
           rows={8}
           minRows={4}
           maxRows={12}
+          key={form.key("description")}
           {...form.getInputProps("description")}
         />
       </div>
@@ -96,10 +111,12 @@ export default function ItemForm({
           label="Miejsce"
           placeholder="Np. Warszawa, Dworzec Centralny"
           mb="lg"
+          key={form.key("locationLabel")}
           {...form.getInputProps("locationLabel")}
         />
         <LocationPicker
           {...form.getInputProps("location")}
+          key={form.key("location")}
           color={form.values.type === "found" ? "var(--mantine-color-green-9)" : "var(--mantine-color-red-9)"}
         />
       </div>
@@ -107,31 +124,12 @@ export default function ItemForm({
         <Title order={3} size="lg" mb="md">
           4. Zdjęcia
         </Title>
-        <Dropzone
-          onDrop={(files) => console.log("accepted files", files)}
-          onReject={(files) => console.log("rejected files", files)}
-          maxSize={25 * 1024 ** 2}
-          accept={IMAGE_MIME_TYPE}
-        >
-          <Stack align="center" justify="center" gap="xs" mih={220} style={{ pointerEvents: "none" }}>
-            <DropzoneAccept>
-              <IconUpload size={52} color="var(--mantine-color-blue-6)" stroke={1.5} />
-            </DropzoneAccept>
-            <DropzoneReject>
-              <IconX size={52} color="var(--mantine-color-red-6)" stroke={1.5} />
-            </DropzoneReject>
-            <DropzoneIdle>
-              <IconPhoto size={52} color="var(--mantine-color-dimmed)" stroke={1.5} />
-            </DropzoneIdle>
-
-            <Text size="xl" inline>
-              Przeciągnij zdjęcia lub kliknij, aby dodać
-            </Text>
-            <Text size="sm" c="dimmed" inline mt={7}>
-              PNG, JPG, WEBP • maks. 5 zdjęć
-            </Text>
-          </Stack>
-        </Dropzone>
+        <ImageUploader
+          files={files}
+          onFilesChange={onFilesChange}
+          existingImages={existingImages}
+          onDeleteExistingImage={onDeleteExistingImage}
+        />
       </div>
     </>
   );
