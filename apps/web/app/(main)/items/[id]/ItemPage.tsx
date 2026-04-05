@@ -93,7 +93,6 @@ export default async function ItemPage({ itemId, currentUserId }: { itemId: stri
           <ItemImagesGallery itemId={item.id} itemImages={item.images ?? []} />
         </Box>
       </Group>
-      {/* TODO: handle null location*/}
       <LocationViewer marker={marker} />
     </Stack>
   );
