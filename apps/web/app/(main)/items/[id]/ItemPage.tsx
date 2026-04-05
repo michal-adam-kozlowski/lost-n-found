@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 import ItemEditButton from "@/app/(main)/items/[id]/ItemEditButton";
 import ItemDeleteButton from "@/app/(main)/items/[id]/ItemDeleteButton";
 import { IconMessage } from "@tabler/icons-react";
+import ItemCategory from "@components/items/ItemCategory";
 
 export default async function ItemPage({ itemId, currentUserId }: { itemId: string; currentUserId?: string | null }) {
   "use cache";
@@ -48,7 +49,7 @@ export default async function ItemPage({ itemId, currentUserId }: { itemId: stri
               {item.title}
             </Title>
             <Text c="gray.7" fw={700} mt={4}>
-              {item.categoryId}
+              <ItemCategory categoryId={item.categoryId} />
             </Text>
             {item.locationLabel && (
               <Text c="gray.7" mt={4}>
