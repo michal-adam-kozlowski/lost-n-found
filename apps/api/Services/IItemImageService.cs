@@ -7,6 +7,7 @@ public interface IItemImageService
     Task<PresignResult> CreatePresignedUploadAsync(Guid itemId, PresignRequest request, Guid userId, CancellationToken ct = default);
     Task<ItemImage> ConfirmUploadAsync(Guid itemId, Guid imageId, Guid userId, CancellationToken ct = default);
     Task<DownloadUrlResult> GetDownloadUrlAsync(Guid itemId, Guid imageId, CancellationToken ct = default);
+    Task<DownloadUrlResult> GetThumbnailDownloadUrlAsync(Guid itemId, Guid imageId, CancellationToken ct = default);
     Task DeleteAsync(Guid itemId, Guid imageId, Guid userId, CancellationToken ct = default);
 }
 

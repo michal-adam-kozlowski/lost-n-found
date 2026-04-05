@@ -4,7 +4,7 @@ import { ItemResponse } from "@lost-n-found/api-client";
 import { Optional } from "@/lib/utils/types";
 import { Card, CardSection, Text, Badge, CardProps } from "@mantine/core";
 import React from "react";
-import ImagesViewer from "@components/ImagesViewer";
+import ImagesViewer, { LoadedImage } from "@components/images/ImagesViewer";
 import Link from "next/link";
 import { useItemImageUrls } from "@/lib/hooks/useItemImageUrls";
 
@@ -12,22 +12,33 @@ export default function ItemCard({
   item,
   small,
   cardProps,
-  imageUrls,
+  loadedImageUrls,
 }: Readonly<{
   item: Optional<ItemResponse, "id" | "createdAt">;
   small?: boolean;
   cardProps?: CardProps;
-  imageUrls?: string[];
+  loadedImageUrls?: string[];
 }>) {
-  let images = useItemImageUrls(item.id, item.imageIds ?? []);
-  if (imageUrls) {
-    images = imageUrls;
+  const imageIds = (item.images ?? []).map((img) => img.id);
+  // eslint-disable-next-line prefer-const
+  let { urls: imageUrls, loading: imagesLoading } = useItemImageUrls(item.id, imageIds, "thumbnail");
+  let images: LoadedImage[] = item.images.map((image, index) => ({
+    url: imageUrls[index],
+    blurDataUrl: image.blurDataUrl ?? undefined,
+  }));
+  if (loadedImageUrls) {
+    images = loadedImageUrls.map((url) => ({ url: url }));
   }
 
   return (
     <Card p="md" shadow="xs" className={small ? "min-w-2xs max-w-2xs" : "min-w-xs max-w-xs"} {...cardProps}>
       <CardSection p="md" pb="sm">
-        <ImagesViewer images={images} height={small ? 160 : 190} emptyPlaceholder="Zdjęcie przedmiotu" />
+        <ImagesViewer
+          images={images}
+          loading={imagesLoading}
+          height={small ? 160 : 190}
+          emptyPlaceholder="Zdjęcie przedmiotu"
+        />
       </CardSection>
 
       <Link

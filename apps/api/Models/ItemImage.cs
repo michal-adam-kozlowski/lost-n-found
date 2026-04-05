@@ -18,6 +18,10 @@ public class ItemImage
 
     public UploadStatus UploadStatus { get; set; } = UploadStatus.Pending;
 
+    public string? ThumbnailObjectKey { get; set; }
+
+    public string? BlurDataUrl { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public Guid UploadedByUserId { get; set; }

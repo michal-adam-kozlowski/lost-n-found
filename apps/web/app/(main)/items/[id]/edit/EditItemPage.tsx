@@ -62,9 +62,9 @@ export default function EditItemPage({ item }: Readonly<{ item: ItemResponse }>)
               locationLabel: formValues?.locationLabel || "",
               occurredAt: dayjs(formValues?.occurredAt).locale("pl").format("DD MMMM YYYY") || "Data",
               createdByUserId: "",
-              imageIds: [],
+              images: [],
             }}
-            imageUrls={[...formExistingImages.map((i) => i.url), ...imageUrls]}
+            loadedImageUrls={[...formExistingImages.map((i) => i.url), ...imageUrls]}
           />
         </div>
       </Flex>

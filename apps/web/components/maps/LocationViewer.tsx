@@ -19,14 +19,14 @@ export default function LocationViewer<T>({
   );
 
   const initialViewState: Partial<ViewState> = {
-    latitude: marker.latitude,
-    longitude: marker.longitude,
+    latitude: marker?.latitude ?? 0,
+    longitude: marker?.longitude ?? 0,
     zoom: 15,
   };
 
   return (
     <div style={{ height: 600 }}>
-      <CustomMap markers={[marker]} initialViewState={initialViewState} />
+      <CustomMap markers={marker ? [marker] : []} initialViewState={initialViewState} />
     </div>
   );
 }

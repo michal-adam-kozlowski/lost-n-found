@@ -9,9 +9,14 @@ namespace LostNFound.Api.Services;
 public class ItemImageService(
     AppDbContext db,
     IFileStorageService storage,
+    IImageProcessingService imageProcessing,
     IOptions<StorageOptions> storageOptions,
-    IOptions<UploadOptions> uploadOptions) : IItemImageService
+    IOptions<UploadOptions> uploadOptions,
+    ILogger<ItemImageService> logger) : IItemImageService
 {
+    private const int ThumbnailMaxHeight = 200;
+    private const int BlurMaxDimension = 10;
+    private const int WebpQuality = 50;
     private static readonly Dictionary<string, string> MimeToExtension = new()
     {
         ["image/jpeg"] = "jpg",
@@ -92,6 +97,28 @@ public class ItemImageService(
         image.UploadStatus = UploadStatus.Uploaded;
         await db.SaveChangesAsync(ct);
 
+        try
+        {
+            await using var original = await storage.DownloadObjectAsync(image.ObjectKey, ct);
+
+            await using var thumbStream = await imageProcessing.GenerateThumbnailAsync(original, ThumbnailMaxHeight, WebpQuality, ct);
+            var thumbKey = image.ObjectKey.Replace("/original.", "/thumb.");
+
+            thumbKey = Path.ChangeExtension(thumbKey, ".webp");
+            await storage.UploadObjectAsync(thumbKey, thumbStream, "image/webp", ct);
+            image.ThumbnailObjectKey = thumbKey;
+
+            original.Position = 0;
+            var blurDataUrl = await imageProcessing.GenerateBlurDataUrlAsync(original, BlurMaxDimension, WebpQuality, ct);
+            image.BlurDataUrl = blurDataUrl;
+
+            await db.SaveChangesAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to generate thumbnail/blur for image {ImageId} on item {ItemId}.", imageId, itemId);
+        }
+
         return image;
     }
 
@@ -104,6 +131,22 @@ public class ItemImageService(
 
         var expirySeconds = uploadOptions.Value.PresignedUrlExpirySeconds;
         var downloadUrl = storage.GeneratePresignedDownloadUrl(image.ObjectKey, expirySeconds);
+
+        return new DownloadUrlResult(downloadUrl, DateTime.UtcNow.AddSeconds(expirySeconds));
+    }
+
+    public async Task<DownloadUrlResult> GetThumbnailDownloadUrlAsync(
+        Guid itemId, Guid imageId, CancellationToken ct = default)
+    {
+        var image = await db.ItemImages
+            .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId && i.UploadStatus == UploadStatus.Uploaded, ct)
+            ?? throw new KeyNotFoundException("Image not found.");
+
+        if (string.IsNullOrEmpty(image.ThumbnailObjectKey))
+            throw new KeyNotFoundException("Thumbnail not available for this image.");
+
+        var expirySeconds = uploadOptions.Value.PresignedUrlExpirySeconds;
+        var downloadUrl = storage.GeneratePresignedDownloadUrl(image.ThumbnailObjectKey, expirySeconds);
 
         return new DownloadUrlResult(downloadUrl, DateTime.UtcNow.AddSeconds(expirySeconds));
     }
@@ -127,7 +170,12 @@ public class ItemImageService(
 
         // Delete from storage first; if this fails, the DB record remains unchanged.
         if (image.UploadStatus == UploadStatus.Uploaded)
+        {
             await storage.DeleteObjectAsync(image.ObjectKey, ct);
+
+            if (!string.IsNullOrEmpty(image.ThumbnailObjectKey))
+                await storage.DeleteObjectAsync(image.ThumbnailObjectKey, ct);
+        }
 
         image.UploadStatus = UploadStatus.Deleted;
         await db.SaveChangesAsync(ct);

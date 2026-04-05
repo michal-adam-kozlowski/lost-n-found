@@ -43,6 +43,32 @@ public class S3FileStorageService : IFileStorageService
         return _s3.GetPreSignedURL(request);
     }
 
+    public async Task<Stream> DownloadObjectAsync(string objectKey, CancellationToken ct = default)
+    {
+        var response = await _s3.GetObjectAsync(new GetObjectRequest
+        {
+            BucketName = _bucketName,
+            Key = objectKey,
+        }, ct);
+
+        // Copy to a MemoryStream so the S3 response can be disposed independently.
+        var ms = new MemoryStream();
+        await response.ResponseStream.CopyToAsync(ms, ct);
+        ms.Position = 0;
+        return ms;
+    }
+
+    public async Task UploadObjectAsync(string objectKey, Stream content, string contentType, CancellationToken ct = default)
+    {
+        await _s3.PutObjectAsync(new PutObjectRequest
+        {
+            BucketName = _bucketName,
+            Key = objectKey,
+            InputStream = content,
+            ContentType = contentType,
+        }, ct);
+    }
+
     public async Task DeleteObjectAsync(string objectKey, CancellationToken ct = default)
     {
         await _s3.DeleteObjectAsync(new DeleteObjectRequest

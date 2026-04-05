@@ -36,6 +36,11 @@ export interface ApiItemsItemIdImagesImageIdDownloadUrlGetRequest {
     imageId: string;
 }
 
+export interface ApiItemsItemIdImagesImageIdThumbnailUrlGetRequest {
+    itemId: string;
+    imageId: string;
+}
+
 export interface ApiItemsItemIdImagesPresignPostRequest {
     itemId: string;
     presignImageRequest: PresignImageRequest;
@@ -122,6 +127,31 @@ export interface ItemImagesApiInterface {
      * Returns a time-limited presigned download URL for the specified image.
      */
     apiItemsItemIdImagesImageIdDownloadUrlGet(requestParameters: ApiItemsItemIdImagesImageIdDownloadUrlGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DownloadUrlResult>;
+
+    /**
+     * Creates request options for apiItemsItemIdImagesImageIdThumbnailUrlGet without sending the request
+     * @param {string} itemId 
+     * @param {string} imageId 
+     * @throws {RequiredError}
+     * @memberof ItemImagesApiInterface
+     */
+    apiItemsItemIdImagesImageIdThumbnailUrlGetRequestOpts(requestParameters: ApiItemsItemIdImagesImageIdThumbnailUrlGetRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @summary Returns a time-limited presigned download URL for the thumbnail of the specified image.
+     * @param {string} itemId 
+     * @param {string} imageId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ItemImagesApiInterface
+     */
+    apiItemsItemIdImagesImageIdThumbnailUrlGetRaw(requestParameters: ApiItemsItemIdImagesImageIdThumbnailUrlGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DownloadUrlResult>>;
+
+    /**
+     * Returns a time-limited presigned download URL for the thumbnail of the specified image.
+     */
+    apiItemsItemIdImagesImageIdThumbnailUrlGet(requestParameters: ApiItemsItemIdImagesImageIdThumbnailUrlGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DownloadUrlResult>;
 
     /**
      * Creates request options for apiItemsItemIdImagesPresignPost without sending the request
@@ -334,6 +364,67 @@ export class ItemImagesApi extends runtime.BaseAPI implements ItemImagesApiInter
      */
     async apiItemsItemIdImagesImageIdDownloadUrlGet(requestParameters: ApiItemsItemIdImagesImageIdDownloadUrlGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DownloadUrlResult> {
         const response = await this.apiItemsItemIdImagesImageIdDownloadUrlGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for apiItemsItemIdImagesImageIdThumbnailUrlGet without sending the request
+     */
+    async apiItemsItemIdImagesImageIdThumbnailUrlGetRequestOpts(requestParameters: ApiItemsItemIdImagesImageIdThumbnailUrlGetRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['itemId'] == null) {
+            throw new runtime.RequiredError(
+                'itemId',
+                'Required parameter "itemId" was null or undefined when calling apiItemsItemIdImagesImageIdThumbnailUrlGet().'
+            );
+        }
+
+        if (requestParameters['imageId'] == null) {
+            throw new runtime.RequiredError(
+                'imageId',
+                'Required parameter "imageId" was null or undefined when calling apiItemsItemIdImagesImageIdThumbnailUrlGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/items/{itemId}/images/{imageId}/thumbnail-url`;
+        urlPath = urlPath.replace(`{${"itemId"}}`, encodeURIComponent(String(requestParameters['itemId'])));
+        urlPath = urlPath.replace(`{${"imageId"}}`, encodeURIComponent(String(requestParameters['imageId'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns a time-limited presigned download URL for the thumbnail of the specified image.
+     */
+    async apiItemsItemIdImagesImageIdThumbnailUrlGetRaw(requestParameters: ApiItemsItemIdImagesImageIdThumbnailUrlGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DownloadUrlResult>> {
+        const requestOptions = await this.apiItemsItemIdImagesImageIdThumbnailUrlGetRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response);
+    }
+
+    /**
+     * Returns a time-limited presigned download URL for the thumbnail of the specified image.
+     */
+    async apiItemsItemIdImagesImageIdThumbnailUrlGet(requestParameters: ApiItemsItemIdImagesImageIdThumbnailUrlGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DownloadUrlResult> {
+        const response = await this.apiItemsItemIdImagesImageIdThumbnailUrlGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

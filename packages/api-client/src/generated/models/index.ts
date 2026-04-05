@@ -796,6 +796,18 @@ export interface ItemImage {
      * @type {string}
      * @memberof ItemImage
      */
+    thumbnailObjectKey?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ItemImage
+     */
+    blurDataUrl?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ItemImage
+     */
     createdAt?: string;
     /**
      * 
@@ -815,6 +827,25 @@ export interface ItemImage {
      * @memberof ItemImage
      */
     uploadedBy?: ApplicationUser | null;
+}
+/**
+ * 
+ * @export
+ * @interface ItemImageInfo
+ */
+export interface ItemImageInfo {
+    /**
+     * 
+     * @type {string}
+     * @memberof ItemImageInfo
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ItemImageInfo
+     */
+    blurDataUrl: string | null;
 }
 /**
  * 
@@ -897,10 +928,10 @@ export interface ItemResponse {
     createdByUserId: string | null;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<ItemImageInfo>}
      * @memberof ItemResponse
      */
-    imageIds: Array<string>;
+    images: Array<ItemImageInfo>;
 }
 /**
  * 

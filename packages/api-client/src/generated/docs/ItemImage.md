@@ -14,6 +14,8 @@ Name | Type
 `mimeType` | string
 `sizeBytes` | [ItemImageSizeBytes](ItemImageSizeBytes.md)
 `uploadStatus` | number
+`thumbnailObjectKey` | string
+`blurDataUrl` | string
 `createdAt` | string
 `uploadedByUserId` | string
 `item` | [Item](Item.md)

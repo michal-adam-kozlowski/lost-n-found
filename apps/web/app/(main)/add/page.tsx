@@ -53,9 +53,9 @@ export default function Page() {
               locationLabel: formValues?.locationLabel || "",
               occurredAt: dayjs(formValues?.occurredAt).locale("pl").format("DD MMMM YYYY") || "Data",
               createdByUserId: "",
-              imageIds: [],
+              images: [],
             }}
-            imageUrls={imageUrls}
+            loadedImageUrls={imageUrls}
           />
         </div>
       </Flex>

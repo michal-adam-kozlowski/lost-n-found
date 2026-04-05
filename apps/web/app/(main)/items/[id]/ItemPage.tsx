@@ -90,9 +90,10 @@ export default async function ItemPage({ itemId, currentUserId }: { itemId: stri
           </CardSection>
         </Card>
         <Box className="basis-sm grow shrink h-100 max-h-[min(400px,calc(100vw-var(--mantine-spacing-md)*2))]">
-          <ItemImagesGallery itemId={item.id} imageIds={item.imageIds} />
+          <ItemImagesGallery itemId={item.id} itemImages={item.images ?? []} />
         </Box>
       </Group>
+      {/* TODO: handle null location*/}
       <LocationViewer marker={marker} />
     </Stack>
   );

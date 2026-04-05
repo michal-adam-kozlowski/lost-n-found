@@ -134,6 +134,7 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
 });
 
 builder.Services.AddSingleton<IFileStorageService, S3FileStorageService>();
+builder.Services.AddSingleton<IImageProcessingService, ImageProcessingService>();
 builder.Services.AddScoped<IItemImageService, ItemImageService>();
 
 // CORS_ORIGINS accepts a comma-separated list of allowed origins (e.g. the Railway frontend URL).

@@ -37,6 +37,14 @@ export async function getImageDownloadUrl(itemId: string, imageId: string): Prom
   return itemImagesApi.apiItemsItemIdImagesImageIdDownloadUrlGet({ itemId, imageId });
 }
 
+export async function getThumbnailDownloadUrl(itemId: string, imageId: string): Promise<DownloadUrlResult> {
+  try {
+    return await itemImagesApi.apiItemsItemIdImagesImageIdThumbnailUrlGet({ itemId, imageId });
+  } catch {
+    return itemImagesApi.apiItemsItemIdImagesImageIdDownloadUrlGet({ itemId, imageId });
+  }
+}
+
 export async function deleteItemImage(itemId: string, imageId: string) {
   const token = await getToken();
   const res = await itemImagesApi.apiItemsItemIdImagesImageIdDelete({ itemId, imageId }, addTokenToInit(token));

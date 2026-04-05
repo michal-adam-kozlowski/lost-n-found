@@ -48,14 +48,14 @@ export default function EditItemForm({
     let cancelled = false;
     async function loadImages() {
       const images: ExistingImage[] = [];
-      for (const imageId of item.imageIds) {
+      for (const img of item.images) {
         try {
-          const result = await getImageDownloadUrl(item.id, imageId);
+          const result = await getImageDownloadUrl(item.id, img.id);
           if (!cancelled) {
-            images.push({ id: imageId, url: result.downloadUrl });
+            images.push({ id: img.id, url: result.downloadUrl });
           }
         } catch (err) {
-          console.error(`Failed to load image ${imageId}:`, err);
+          console.error(`Failed to load image ${img.id}:`, err);
         }
       }
       if (!cancelled) {
@@ -66,7 +66,7 @@ export default function EditItemForm({
     return () => {
       cancelled = true;
     };
-  }, [item.id, item.imageIds]);
+  }, [item.id, item.images]);
 
   const clear = () => {
     form.reset();

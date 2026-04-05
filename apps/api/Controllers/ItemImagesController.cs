@@ -65,6 +65,21 @@ public class ItemImagesController(IItemImageService imageService) : ControllerBa
     }
 
     /// <summary>
+    /// Returns a time-limited presigned download URL for the thumbnail of the specified image.
+    /// </summary>
+    [HttpGet("{imageId:guid}/thumbnail-url")]
+    [AllowAnonymous]
+    public async Task<ActionResult<DownloadUrlResult>> GetThumbnailDownloadUrl(Guid itemId, Guid imageId, CancellationToken ct)
+    {
+        try
+        {
+            var result = await imageService.GetThumbnailDownloadUrlAsync(itemId, imageId, ct);
+            return Ok(result);
+        }
+        catch (KeyNotFoundException e) { return NotFound(new { error = e.Message }); }
+    }
+
+    /// <summary>
     /// Deletes the specified image. Marks the DB record as Deleted and removes the object from storage.
     /// </summary>
     [HttpDelete("{imageId:guid}")]

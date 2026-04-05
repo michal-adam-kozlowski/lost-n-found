@@ -24,6 +24,7 @@ docs/Geometry.md
 docs/GeometryFactory.md
 docs/Item.md
 docs/ItemImage.md
+docs/ItemImageInfo.md
 docs/ItemImageSizeBytes.md
 docs/ItemImagesApi.md
 docs/ItemResponse.md

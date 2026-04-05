@@ -87,15 +87,15 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
         var uploadedImages = await db.ItemImages
             .Where(i => itemIds.Contains(i.ItemId) && i.UploadStatus == UploadStatus.Uploaded)
             .OrderBy(i => i.CreatedAt).ThenBy(i => i.Id)
-            .Select(i => new { i.ItemId, i.Id })
+            .Select(i => new { i.ItemId, i.Id, i.BlurDataUrl })
             .ToListAsync();
 
-        var imageIdsByItemId = uploadedImages
+        var imagesByItemId = uploadedImages
             .GroupBy(x => x.ItemId)
-            .ToDictionary( g => g.Key, g => g.Select(x => x.Id).ToArray()
+            .ToDictionary( g => g.Key, g => g.Select(x => new ItemImageInfo(x.Id, x.BlurDataUrl)).ToArray()
 );
 
-        return items.Select(item => ToResponse(item, imageIdsByItemId.TryGetValue(item.Id, out var imageIds) ? imageIds : [])).ToList();
+        return items.Select(item => ToResponse(item, imagesByItemId.TryGetValue(item.Id, out var images) ? images : [])).ToList();
     }
 
     /// <summary>
@@ -114,13 +114,13 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
                 title: "Not Found",
                 detail: $"No item found with id {id}");
         }
-        var imageIds = await db.ItemImages
+        var images = await db.ItemImages
             .Where(i => i.ItemId == id && i.UploadStatus == UploadStatus.Uploaded)
             .OrderBy(i => i.CreatedAt).ThenBy(i => i.Id) 
-            .Select(i => i.Id)
+            .Select(i => new ItemImageInfo(i.Id, i.BlurDataUrl))
             .ToArrayAsync();
 
-        return ToResponse(item, imageIds);
+        return ToResponse(item, images);
     }
 
     /// <summary>
@@ -317,17 +317,17 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
 
         await db.SaveChangesAsync();
 
-        var imageIds = await db.ItemImages
+        var images = await db.ItemImages
            .Where(i => i.ItemId == id && i.UploadStatus == UploadStatus.Uploaded)
            .OrderBy(i => i.CreatedAt).ThenBy(i => i.Id)
-           .Select(i => i.Id)
+           .Select(i => new ItemImageInfo(i.Id, i.BlurDataUrl))
            .ToArrayAsync();
 
-        return ToResponse(item, imageIds);
+        return ToResponse(item, images);
     }
 
     
-    private static ItemResponse ToResponse (Item item, Guid[] imageIds) => new ItemResponse(
+    private static ItemResponse ToResponse (Item item, ItemImageInfo[] images) => new ItemResponse(
         item.Id,
         item.CategoryId,
         item.Title,
@@ -339,7 +339,7 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
         item.OccurredAt,
         item.CreatedAt,
         item.CreatedByUserId,
-        imageIds
+        images
     );
 }
 
@@ -355,6 +355,8 @@ public record CreateItemRequest(
     DateOnly OccurredAt
 );
 
+public record ItemImageInfo(Guid Id, string? BlurDataUrl);
+
 public record ItemResponse(
     Guid Id,
     Guid CategoryId,
@@ -367,5 +369,5 @@ public record ItemResponse(
     DateOnly OccurredAt,
     DateTime CreatedAt,
     Guid? CreatedByUserId,
-    Guid[] ImageIds
+    ItemImageInfo[] Images
 );
