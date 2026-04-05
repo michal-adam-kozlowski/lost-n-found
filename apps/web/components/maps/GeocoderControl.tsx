@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useMap } from "react-map-gl/maplibre";
+import { useMap, Source, Layer } from "react-map-gl/maplibre";
+import type { LineLayerSpecification, FillLayerSpecification } from "maplibre-gl";
 import { TextInput, ActionIcon, Box, Text, Combobox, useCombobox } from "@mantine/core";
 import { IconSearch, IconLoader2, IconX } from "@tabler/icons-react";
 
@@ -16,6 +17,8 @@ interface NominatimResult {
   display_name: string;
   addresstype?: string;
   boundingbox?: [string, string, string, string];
+  geojson?: GeoJSON.Geometry;
+  place_rank?: number;
 }
 
 interface SearchControlProps {
@@ -31,6 +34,30 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
 
   const [searchCompleted, setSearchCompleted] = useState<boolean>(false);
 
+  const [polygonData, setPolygonData] = useState<GeoJSON.Feature | null>(null);
+
+  const dashedLineLayer: LineLayerSpecification = {
+    id: "geocoder-boundary-line",
+    type: "line",
+    source: "geocoder-boundary",
+    paint: {
+      "line-color": "#228be6",
+      "line-width": 2,
+      "line-dasharray": [3, 2],
+      "line-opacity": 0.8,
+    },
+  };
+
+  const fillLayer: FillLayerSpecification = {
+    id: "geocoder-boundary-fill",
+    type: "fill",
+    source: "geocoder-boundary",
+    paint: {
+      "fill-color": "#228be6",
+      "fill-opacity": 0.05,
+    },
+  };
+
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
@@ -42,7 +69,7 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
     setSearchCompleted(false);
 
     try {
-      let apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&countrycodes=pl&accept-language=pl&addressdetails=1`;
+      let apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&countrycodes=pl&accept-language=pl&addressdetails=1&polygon_geojson=1`;
 
       if (map) {
         const bounds = map.getBounds();
@@ -79,6 +106,7 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
     setSearchQuery("");
     setResults([]);
     setSearchCompleted(false);
+    setPolygonData(null);
     combobox.closeDropdown();
   };
 
@@ -105,6 +133,20 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
     setSearchCompleted(false);
     combobox.closeDropdown();
 
+    if (
+      location.geojson &&
+      ["Polygon", "MultiPolygon"].includes(location.geojson.type) &&
+      (location.place_rank ?? 100) <= 22
+    ) {
+      setPolygonData({
+        type: "Feature",
+        properties: {},
+        geometry: location.geojson,
+      });
+    } else {
+      setPolygonData(null);
+    }
+
     if (map) {
       if (location.boundingbox) {
         const [minLat, maxLat, minLon, maxLon] = location.boundingbox.map(parseFloat);
@@ -122,72 +164,80 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
   };
 
   return (
-    <Box className="absolute top-3 left-3 z-10 w-80">
-      <Combobox store={combobox} onOptionSubmit={handleOptionSubmit} withinPortal={false}>
-        <Combobox.Target>
-          <TextInput
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setSearchCompleted(false); // Reset empty state when user types
-              combobox.closeDropdown();
-            }}
-            onKeyDown={handleKeyDown}
-            onClick={() => (results.length > 0 || searchCompleted) && combobox.openDropdown()}
-            onFocus={() => (results.length > 0 || searchCompleted) && combobox.openDropdown()}
-            placeholder="Wyszukaj miejsce..."
-            readOnly={isLoading}
-            size="md"
-            radius="md"
-            classNames={{
-              input: "shadow-md border-none!",
-            }}
-            rightSectionWidth={searchQuery ? 80 : 40}
-            rightSectionProps={{ className: "flex items-center justify-end! gap-1 px-1" }}
-            rightSection={
-              <>
-                {searchQuery && (
+    <>
+      <Box className="absolute top-3 left-3 z-10 w-80">
+        <Combobox store={combobox} onOptionSubmit={handleOptionSubmit} withinPortal={false}>
+          <Combobox.Target>
+            <TextInput
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSearchCompleted(false); // Reset empty state when user types
+                combobox.closeDropdown();
+              }}
+              onKeyDown={handleKeyDown}
+              onClick={() => (results.length > 0 || searchCompleted) && combobox.openDropdown()}
+              onFocus={() => (results.length > 0 || searchCompleted) && combobox.openDropdown()}
+              placeholder="Wyszukaj miejsce..."
+              readOnly={isLoading}
+              size="md"
+              radius="md"
+              classNames={{
+                input: "shadow-md border-none!",
+              }}
+              rightSectionWidth={searchQuery ? 80 : 40}
+              rightSectionProps={{ className: "flex items-center justify-end! gap-1 px-1" }}
+              rightSection={
+                <>
+                  {searchQuery && (
+                    <ActionIcon
+                      onClick={handleClear}
+                      onMouseDown={(e) => e.preventDefault()}
+                      variant="white"
+                      size="lg"
+                      color="gray.6"
+                    >
+                      <IconX size={20} />
+                    </ActionIcon>
+                  )}
                   <ActionIcon
-                    onClick={handleClear}
+                    type="button"
+                    onClick={handleSearch}
                     onMouseDown={(e) => e.preventDefault()}
-                    variant="white"
+                    variant="subtle"
                     size="lg"
-                    color="gray.6"
+                    disabled={isLoading}
                   >
-                    <IconX size={20} />
+                    {isLoading ? <IconLoader2 size={20} className="animate-spin" /> : <IconSearch size={20} />}
                   </ActionIcon>
-                )}
-                <ActionIcon
-                  type="button"
-                  onClick={handleSearch}
-                  onMouseDown={(e) => e.preventDefault()}
-                  variant="subtle"
-                  size="lg"
-                  disabled={isLoading}
-                >
-                  {isLoading ? <IconLoader2 size={20} className="animate-spin" /> : <IconSearch size={20} />}
-                </ActionIcon>
-              </>
-            }
-          />
-        </Combobox.Target>
-        <Combobox.Dropdown
-          hidden={results.length === 0 && !searchCompleted}
-          styles={{ dropdown: { borderRadius: "var(--mantine-radius-md)" } }}
-        >
-          <Combobox.Options style={{ overflowY: "auto" }} mah={240}>
-            {results.length === 0 && searchCompleted ? (
-              <Combobox.Empty>Brak wyników</Combobox.Empty>
-            ) : (
-              results.map((result) => (
-                <Combobox.Option value={result.place_id.toString()} key={result.place_id} className="p-3">
-                  <Text truncate="end">{result.display_name}</Text>
-                </Combobox.Option>
-              ))
-            )}
-          </Combobox.Options>
-        </Combobox.Dropdown>
-      </Combobox>
-    </Box>
+                </>
+              }
+            />
+          </Combobox.Target>
+          <Combobox.Dropdown
+            hidden={results.length === 0 && !searchCompleted}
+            styles={{ dropdown: { borderRadius: "var(--mantine-radius-md)" } }}
+          >
+            <Combobox.Options style={{ overflowY: "auto" }} mah={240}>
+              {results.length === 0 && searchCompleted ? (
+                <Combobox.Empty>Brak wyników</Combobox.Empty>
+              ) : (
+                results.map((result) => (
+                  <Combobox.Option value={result.place_id.toString()} key={result.place_id} className="p-3">
+                    <Text truncate="end">{result.display_name}</Text>
+                  </Combobox.Option>
+                ))
+              )}
+            </Combobox.Options>
+          </Combobox.Dropdown>
+        </Combobox>
+      </Box>
+      {polygonData && (
+        <Source id="geocoder-boundary" type="geojson" data={polygonData}>
+          <Layer {...fillLayer} />
+          <Layer {...dashedLineLayer} />
+        </Source>
+      )}
+    </>
   );
 }
