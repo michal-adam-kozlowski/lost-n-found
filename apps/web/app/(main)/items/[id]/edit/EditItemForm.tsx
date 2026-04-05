@@ -3,7 +3,7 @@
 import { Button, Divider, Stack, Text, Title } from "@mantine/core";
 import React, { useCallback, useEffect, useState } from "react";
 import { editItem } from "@/actions/items";
-import { useForm } from "@mantine/form";
+import { FormErrors, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
 import { useDebouncedCallback } from "@mantine/hooks";
@@ -113,6 +113,12 @@ export default function EditItemForm({
       location: { latitude: item.latitude as number, longitude: item.longitude as number },
       locationLabel: item.locationLabel || "",
     },
+    clearInputErrorOnChange: true,
+    validate: {
+      title: isNotEmpty("Tytuł jest wymagany"),
+      categoryId: isNotEmpty("Kategoria jest wymagana"),
+      occurredAt: (value) => (value ? null : "Data jest wymagana"),
+    },
     onValuesChange: (values) => {
       debouncedOnChange?.(values);
     },
@@ -121,6 +127,11 @@ export default function EditItemForm({
   useEffect(() => {
     onChange?.(form.values);
   }, []);
+
+  const handleErrors = (errors: FormErrors) => {
+    const firstErrorPath = Object.keys(errors)[0];
+    form.getInputNode(firstErrorPath)?.focus();
+  };
 
   const handleSubmit = async (values: EditItemFormValues) => {
     console.log("FORM VALUES", values);
@@ -177,7 +188,7 @@ export default function EditItemForm({
       gap="xl"
       mb="xl"
       className="flex-12 basis-md"
-      renderRoot={(props) => <form {...props} onSubmit={form.onSubmit(handleSubmit)} />}
+      renderRoot={(props) => <form {...props} onSubmit={form.onSubmit(handleSubmit, handleErrors)} />}
     >
       <div>
         <Title order={2} mb="sm">

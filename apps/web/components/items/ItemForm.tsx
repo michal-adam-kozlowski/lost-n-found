@@ -59,7 +59,7 @@ export default function ItemForm({
           key={form.key("title")}
           {...form.getInputProps("title")}
         />
-        <Group gap="sm" mb="sm">
+        <Group gap="sm" mb="sm" align="flex-start">
           <Select
             withAsterisk
             label="Kategoria"
