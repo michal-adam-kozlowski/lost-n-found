@@ -34,7 +34,7 @@ export default async function Page({
 
   return (
     <>
-      <Paper shadow="xs" className="flex! flex-row gap-4 items-center" p="md" mb="md" pt="sm">
+      <Paper shadow="xs" p="md" mb="md" pt="sm">
         <ItemsFilters hideType />
       </Paper>
       <Group
