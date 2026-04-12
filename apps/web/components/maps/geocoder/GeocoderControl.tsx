@@ -1,62 +1,20 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useMap, Source, Layer } from "react-map-gl/maplibre";
-import type { LineLayerSpecification, FillLayerSpecification } from "maplibre-gl";
 import { TextInput, ActionIcon, Box, Text, Combobox, useCombobox } from "@mantine/core";
 import { IconSearch, IconLoader2, IconX } from "@tabler/icons-react";
+import type { GeocoderControlProps, NominatimResult } from "./types";
+import { getPlaceName, formatAddress } from "./utils";
+import { dashedLineLayer, fillLayer } from "./layers";
 
-export interface SelectedLocation {
-  lat: number;
-  lon: number;
-  name: string;
-}
-
-interface NominatimResult {
-  place_id: number;
-  lat: string;
-  lon: string;
-  display_name: string;
-  addresstype?: string;
-  boundingbox?: [string, string, string, string];
-  geojson?: GeoJSON.Geometry;
-  place_rank?: number;
-}
-
-interface SearchControlProps {
-  onLocationSelect?: (location: SelectedLocation) => void;
-}
-
-export default function GeocoderControl({ onLocationSelect }: SearchControlProps) {
+export default function GeocoderControl({ onLocationSelect }: GeocoderControlProps) {
   const { current: map } = useMap();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [results, setResults] = useState<NominatimResult[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const [searchCompleted, setSearchCompleted] = useState<boolean>(false);
-
   const [polygonData, setPolygonData] = useState<GeoJSON.Feature | null>(null);
-
-  const dashedLineLayer: LineLayerSpecification = {
-    id: "geocoder-boundary-line",
-    type: "line",
-    source: "geocoder-boundary",
-    paint: {
-      "line-color": "#228be6",
-      "line-width": 2,
-      "line-dasharray": [3, 2],
-      "line-opacity": 0.8,
-    },
-  };
-
-  const fillLayer: FillLayerSpecification = {
-    id: "geocoder-boundary-fill",
-    type: "fill",
-    source: "geocoder-boundary",
-    paint: {
-      "fill-color": "#228be6",
-      "fill-opacity": 0.05,
-    },
-  };
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -132,6 +90,7 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
     setSearchQuery(location.display_name);
     setSearchCompleted(false);
     combobox.closeDropdown();
+    inputRef.current?.blur();
 
     if (
       location.geojson &&
@@ -169,10 +128,11 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
         <Combobox store={combobox} onOptionSubmit={handleOptionSubmit} withinPortal={false}>
           <Combobox.Target>
             <TextInput
+              ref={inputRef}
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                setSearchCompleted(false); // Reset empty state when user types
+                setSearchCompleted(false);
                 combobox.closeDropdown();
               }}
               onKeyDown={handleKeyDown}
@@ -223,8 +183,15 @@ export default function GeocoderControl({ onLocationSelect }: SearchControlProps
                 <Combobox.Empty>Brak wyników</Combobox.Empty>
               ) : (
                 results.map((result) => (
-                  <Combobox.Option value={result.place_id.toString()} key={result.place_id} className="p-3">
-                    <Text truncate="end">{result.display_name}</Text>
+                  <Combobox.Option value={result.place_id.toString()} key={result.place_id} className="group p-3">
+                    <Text truncate="end" fw={500} size="sm">
+                      {getPlaceName(result)}
+                    </Text>
+                    {formatAddress(result) && (
+                      <Text truncate="end" size="xs" c="dimmed" className="group-data-combobox-active:text-white!">
+                        {formatAddress(result)}
+                      </Text>
+                    )}
                   </Combobox.Option>
                 ))
               )}

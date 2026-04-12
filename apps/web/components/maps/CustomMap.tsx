@@ -6,7 +6,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./maplibre.scss";
 import styles from "./CustomMap.module.scss";
 import React, { useCallback, useState } from "react";
-import GeocoderControl from "@components/maps/GeocoderControl";
+import GeocoderControl from "@components/maps/geocoder/GeocoderControl";
 import { setMapLanguage } from "@components/maps/utils";
 import CustomMapControls from "@components/maps/CustomMapControls";
 import { Location } from "@/lib/utils/types";
