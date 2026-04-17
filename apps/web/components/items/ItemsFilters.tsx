@@ -10,6 +10,7 @@ import TypePicker from "@components/TypePicker";
 import { useLoading } from "@/lib/context/LoadingContext";
 import { ItemType } from "@/lib/utils/types";
 import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
+import RegionFilter from "@components/maps/geocoder/RegionFilter";
 
 export interface ItemsFiltersValues {
   type?: ItemType;
@@ -86,22 +87,14 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
         />
       </Group>
       <Group gap="xs" align="flex-start" flex={1} className="flex-wrap! @min-[330px]:flex-nowrap!">
-        <Select
-          label="Lokalizacja"
-          placeholder="Wybierz lokalizację"
-          data={[]}
-          searchable
-          allowDeselect={true}
-          clearable
-          style={{ flex: 1, minWidth: 160 }}
-        />
+        <RegionFilter />
         <DatePickerInput
           type="range"
           allowSingleDateInRange
           label={form.values.type === "found" ? "Zakres daty znalezienia" : "Zakres daty zagubienia"}
           placeholder="Wybierz zakres dat"
           locale="pl"
-          valueFormat={"DD MMMM YYYY"}
+          valueFormat={"DD MMM YYYY"}
           maxDate={new Date()}
           clearable
           popoverProps={{

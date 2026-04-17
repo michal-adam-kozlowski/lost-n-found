@@ -14,7 +14,7 @@ namespace LostNFound.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ItemsController(AppDbContext db, IFileStorageService storage, ILogger<ItemsController> logger) : ControllerBase
+public class ItemsController(AppDbContext db, IFileStorageService storage, ILogger<ItemsController> logger, IMapTilerService mapTiler) : ControllerBase
 {
     private static readonly HashSet<string> ValidTypes = ["lost", "found"];
 
@@ -30,7 +30,8 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
         [FromQuery] string? type = null,
         [FromQuery] List<Guid>? categoryIds = null,
         [FromQuery] DateOnly? occurredAtFrom = null,
-        [FromQuery] DateOnly? occurredAtTo = null)
+        [FromQuery] DateOnly? occurredAtTo = null,
+        [FromQuery] string? locationId = null)
     {
         IQueryable<Item> query = db.Items;
 
@@ -77,6 +78,14 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
             query = query.Where(i => i.OccurredAt <= occurredAtTo.Value);
         }
 
+        if (!string.IsNullOrWhiteSpace(locationId))
+        {
+            var polygon = await mapTiler.FetchPolygonAsync(locationId);
+            if (polygon != null)
+            {
+                query = query.Where(i => i.Location != null && polygon.Contains(i.Location));
+            }
+        }
 
         var items = await query.OrderByDescending(i => i.CreatedAt).ToListAsync();
 

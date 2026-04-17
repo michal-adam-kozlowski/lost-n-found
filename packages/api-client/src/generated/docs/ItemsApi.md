@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 
 ## apiItemsGet
 
-> Array&lt;ItemResponse&gt; apiItemsGet(mine, type, categoryIds, occurredAtFrom, occurredAtTo)
+> Array&lt;ItemResponse&gt; apiItemsGet(mine, type, categoryIds, occurredAtFrom, occurredAtTo, locationId)
 
 Returns all items ordered from newest to oldest.
 
@@ -42,6 +42,8 @@ async function example() {
     occurredAtFrom: 2013-10-20,
     // string (optional)
     occurredAtTo: 2013-10-20,
+    // string (optional)
+    locationId: locationId_example,
   } satisfies ApiItemsGetRequest;
 
   try {
@@ -66,6 +68,7 @@ example().catch(console.error);
 | **categoryIds** | `Array<string>` |  | [Optional] |
 | **occurredAtFrom** | `string` |  | [Optional] [Defaults to `undefined`] |
 | **occurredAtTo** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **locationId** | `string` |  | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 

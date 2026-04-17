@@ -47,6 +47,7 @@ export async function getItems(
   categoryIds?: ItemsViewOptions["categoryIds"],
   occurredAtRange?: ItemsViewOptions["occurredAtRange"],
   page?: ItemsViewOptions["page"],
+  locationId?: ItemsViewOptions["locationId"],
 ): Promise<PaginatedItemsResult> {
   "use cache";
   cacheTag("items");
@@ -61,6 +62,7 @@ export async function getItems(
       occurredAtFrom: occurredAtRangeFormatted?.[0] ?? undefined,
       occurredAtTo: occurredAtRangeFormatted?.[1] ?? undefined,
       mine: false,
+      locationId,
     });
     return paginateItems(items, page);
   } catch (error) {
@@ -74,6 +76,7 @@ export async function getItemsForCurrentUser(
   categoryIds?: ItemsViewOptions["categoryIds"],
   occurredAtRange?: ItemsViewOptions["occurredAtRange"],
   page?: ItemsViewOptions["page"],
+  locationId?: ItemsViewOptions["locationId"],
 ): Promise<PaginatedItemsResult> {
   try {
     const token = await getToken();
@@ -85,6 +88,7 @@ export async function getItemsForCurrentUser(
         occurredAtFrom: occurredAtRangeFormatted?.[0] ?? undefined,
         occurredAtTo: occurredAtRangeFormatted?.[1] ?? undefined,
         mine: true,
+        locationId,
       },
       addTokenToInit(token),
     );

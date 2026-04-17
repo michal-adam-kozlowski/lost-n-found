@@ -1,6 +1,12 @@
 export default function Pin({ color }: { color: string }) {
   return (
-    <svg display="block" height="41px" width="27px" viewBox="0 0 27 41" style={{ transform: "translate(0, -14px)" }}>
+    <svg
+      display="block"
+      height="41px"
+      width="27px"
+      viewBox="0 0 27 41"
+      style={{ transform: "translate(0, -14px)", cursor: "pointer" }}
+    >
       <g fillRule="nonzero">
         <g transform="translate(3.0, 29.0)" fill="#000000" opacity="0.5">
           <ellipse opacity="0.04" cx="10.5" cy="5.80029008" rx="10.5" ry="5.25002273"></ellipse>

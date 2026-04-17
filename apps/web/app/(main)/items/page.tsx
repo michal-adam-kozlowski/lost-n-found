@@ -26,7 +26,7 @@ export default async function ItemsPage({
   }
 
   const { items, pageCount, totalCount } = await runtimeGet(
-    () => getItems(options.type, options.categoryIds, options.occurredAtRange, options.page),
+    () => getItems(options.type, options.categoryIds, options.occurredAtRange, options.page, options.locationId),
     EMPTY_ITEMS_RESULT,
   );
 

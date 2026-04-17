@@ -7,6 +7,7 @@ import "./maplibre.scss";
 import styles from "./CustomMap.module.scss";
 import React, { useCallback, useState } from "react";
 import GeocoderControl from "@components/maps/geocoder/GeocoderControl";
+import type { ExternalLocation } from "@components/maps/geocoder/types";
 import { setMapLanguage } from "@components/maps/utils";
 import CustomMapControls from "@components/maps/CustomMapControls";
 import { Location } from "@/lib/utils/types";
@@ -23,10 +24,12 @@ export type InteractiveMarker<T> = Location & {
 export default function CustomMap<T>({
   markers,
   renderPopup,
+  geocoderLocation,
   ...props
 }: React.ComponentProps<typeof Map> & {
   markers?: InteractiveMarker<T>[];
   renderPopup?: (data: T) => React.ReactNode;
+  geocoderLocation?: ExternalLocation;
 }) {
   const onMapLoad = useCallback((e: MapLibreEvent) => {
     setMapLanguage(e.target, "pl");
@@ -43,6 +46,10 @@ export default function CustomMap<T>({
 
   return (
     <div className={styles.Container} ref={clickOutsideRef}>
+      <a href="https://www.maptiler.com" target="_blank" rel="noopener noreferrer" className={styles.MapTilerLogo}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler" />
+      </a>
       <Map
         initialViewState={{
           longitude: 19.134422,
@@ -51,7 +58,7 @@ export default function CustomMap<T>({
         }}
         reuseMaps={true}
         style={{ width: "100%" }}
-        mapStyle="https://tiles.openfreemap.org/styles/bright"
+        mapStyle={`https://api.maptiler.com/maps/streets-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_API_KEY ?? ""}`}
         maxPitch={0}
         minPitch={0}
         onLoad={onMapLoad}
@@ -65,7 +72,7 @@ export default function CustomMap<T>({
         }}
       >
         <CustomMapControls />
-        <GeocoderControl />
+        <GeocoderControl externalLocation={geocoderLocation} />
         {markers?.map((marker) => (
           <Marker
             key={marker.key}
