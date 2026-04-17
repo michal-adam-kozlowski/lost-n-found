@@ -70,6 +70,7 @@ export default function ItemForm({
             miw={240}
             flex={10}
             allowDeselect={false}
+            withScrollArea={false}
             key={form.key("categoryId")}
             {...form.getInputProps("categoryId")}
           />

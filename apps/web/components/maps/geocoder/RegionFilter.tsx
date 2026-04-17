@@ -1,12 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Combobox, TextInput, useCombobox, Text, ActionIcon } from "@mantine/core";
+import { Combobox, TextInput, useCombobox, Text, CloseButton } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
-import { IconMapPin, IconLoader2, IconX } from "@tabler/icons-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
-import { useLoading } from "@/lib/context/LoadingContext";
+import { IconLoader2 } from "@tabler/icons-react";
 import { searchMapTiler, REGION_SEARCH_TYPES } from "./api";
 import type { MapTilerFeature } from "./types";
 import { getPlaceName, formatAddress } from "./utils";
@@ -24,15 +21,20 @@ const DEFAULT_CITIES: Array<{ name: string; description: string; query: string }
   { name: "Katowice", query: "Katowice, Polska", description: "województwo śląskie, Polska" },
 ];
 
-export default function RegionFilter() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const { setLoading } = useLoading();
+export interface RegionValue {
+  locationId?: string;
+  locationName?: string;
+}
+
+interface RegionFilterProps {
+  value: RegionValue;
+  onChange: (value: RegionValue) => void;
+}
+
+export default function RegionFilter({ value, onChange }: RegionFilterProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const initialOptions = ItemsViewOptions.fromQueryParams(searchParams);
-  const [inputValue, setInputValue] = useState(initialOptions.locationName ?? "");
+  const [inputValue, setInputValue] = useState(value.locationName ?? "");
   const [results, setResults] = useState<MapTilerFeature[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDefaults, setShowDefaults] = useState(false);
@@ -43,9 +45,8 @@ export default function RegionFilter() {
   });
 
   useEffect(() => {
-    const options = ItemsViewOptions.fromQueryParams(searchParams);
-    setInputValue(options.locationName ?? "");
-  }, [searchParams]);
+    setInputValue(value.locationName ?? "");
+  }, [value.locationName]);
 
   const runSearch = useDebouncedCallback(async (query: string) => {
     if (!query.trim()) {
@@ -71,15 +72,6 @@ export default function RegionFilter() {
     }
   }, 200);
 
-  const applyLocation = (locationId: string | undefined, locationName: string | undefined) => {
-    const oldOptions = ItemsViewOptions.fromQueryParams(searchParams);
-    const newOptions = oldOptions.copyWith({ locationId, locationName });
-    if (oldOptions.toQueryString() === newOptions.toQueryString()) return;
-    newOptions.page = 1;
-    setLoading("itemsFilters", true);
-    router.replace(newOptions.getRedirectUrl());
-  };
-
   const handleOptionSubmit = async (featureId: string) => {
     if (featureId.startsWith("default:")) {
       const cityName = featureId.slice("default:".length);
@@ -93,7 +85,7 @@ export default function RegionFilter() {
         const best = features[0];
         if (best) {
           setInputValue(getPlaceName(best));
-          applyLocation(best.id, getPlaceName(best));
+          onChange({ locationId: best.id, locationName: getPlaceName(best) });
           inputRef.current?.blur();
         }
       } finally {
@@ -110,7 +102,7 @@ export default function RegionFilter() {
     setSearchCompleted(false);
     combobox.closeDropdown();
     inputRef.current?.blur();
-    applyLocation(feature.id, getPlaceName(feature));
+    onChange({ locationId: feature.id, locationName: getPlaceName(feature) });
   };
 
   const handleClear = () => {
@@ -119,13 +111,11 @@ export default function RegionFilter() {
     setSearchCompleted(false);
     setShowDefaults(false);
     combobox.closeDropdown();
-    applyLocation(undefined, undefined);
+    onChange({ locationId: undefined, locationName: undefined });
   };
 
   const showSearchResults = !showDefaults && (results.length > 0 || searchCompleted);
   const dropdownHidden = !showDefaults && !showSearchResults;
-
-  if (!["/items", "/account/items"].includes(pathname)) return null;
 
   return (
     <Combobox store={combobox} onOptionSubmit={(val) => void handleOptionSubmit(val)} withinPortal={true}>
@@ -157,18 +147,8 @@ export default function RegionFilter() {
             isLoading ? (
               <IconLoader2 size={16} className="animate-spin" style={{ color: "var(--mantine-color-gray-5)" }} />
             ) : inputValue ? (
-              <ActionIcon
-                variant="subtle"
-                size="sm"
-                color="gray"
-                onClick={handleClear}
-                onMouseDown={(e) => e.preventDefault()}
-              >
-                <IconX size={14} />
-              </ActionIcon>
-            ) : (
-              <IconMapPin size={16} style={{ color: "var(--mantine-color-gray-5)" }} />
-            )
+              <CloseButton size="sm" variant="transparent" onClick={handleClear} />
+            ) : null
           }
         />
       </Combobox.Target>
@@ -181,7 +161,12 @@ export default function RegionFilter() {
                 <Text size="sm" fw={500} truncate="end">
                   {city.name}
                 </Text>
-                <Text size="xs" c="dimmed" truncate="end" className="group-data-combobox-active:text-white!">
+                <Text
+                  size="xs"
+                  c="dimmed"
+                  truncate="end"
+                  className="group-data-combobox-active:text-white! group-data-combobox-selected:text-white!"
+                >
                   {city.description}
                 </Text>
               </Combobox.Option>

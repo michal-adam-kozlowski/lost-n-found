@@ -250,7 +250,12 @@ export default function GeocoderControl({ onLocationSelect, externalLocation }: 
                       {getPlaceName(feature)}
                     </Text>
                     {formatAddress(feature) && (
-                      <Text truncate="end" size="xs" c="dimmed" className="group-data-combobox-active:text-white!">
+                      <Text
+                        truncate="end"
+                        size="xs"
+                        c="dimmed"
+                        className="group-data-combobox-active:text-white! group-data-combobox-selected:text-white!"
+                      >
                         {formatAddress(feature)}
                       </Text>
                     )}
