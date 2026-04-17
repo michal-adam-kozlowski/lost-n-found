@@ -10,6 +10,7 @@ import GeocoderControl from "@components/maps/geocoder/GeocoderControl";
 import RegionOverlay from "@components/maps/geocoder/RegionOverlay";
 import { setMapLanguage } from "@components/maps/utils";
 import CustomMapControls from "@components/maps/CustomMapControls";
+import MapStyleSwitcher from "@components/maps/MapStyleSwitcher";
 import { Location } from "@/lib/utils/types";
 import { useClickOutside } from "@mantine/hooks";
 import Pin from "@components/maps/Pin";
@@ -72,6 +73,7 @@ export default function CustomMap<T>({
         }}
       >
         <CustomMapControls />
+        <MapStyleSwitcher />
         <RegionOverlay locationId={regionLocationId} />
         <GeocoderControl />
         {markers?.map((marker) => (

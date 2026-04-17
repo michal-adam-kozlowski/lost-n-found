@@ -6,7 +6,7 @@ export const regionOverlayFillLayer: FillLayerSpecification = {
   source: "region-overlay",
   paint: {
     "fill-color": "#000000",
-    "fill-opacity": 0.3,
+    "fill-opacity": 0.4,
   },
 };
 

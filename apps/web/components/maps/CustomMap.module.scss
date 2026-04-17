@@ -8,8 +8,8 @@
 
 .MapTilerLogo {
   position: absolute;
-  bottom: 6px;
-  left: 8px;
+  bottom: calc(var(--spacing) * 3);
+  left: calc(var(--spacing) * 6 + 80px);
   z-index: 1000;
   line-height: 0;
   pointer-events: auto;
