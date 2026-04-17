@@ -38,3 +38,40 @@ export function formatAddress(feature: MapTilerFeature): string {
 
   return contextParts.join(", ");
 }
+
+export function buildCutoutFeature(
+  regionGeometry: GeoJSON.Geometry,
+): GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon> {
+  const worldRing: GeoJSON.Position[] = [
+    [-180, -90],
+    [-180, 90],
+    [180, 90],
+    [180, -90],
+    [-180, -90],
+  ];
+
+  if (regionGeometry.type !== "Polygon" && regionGeometry.type !== "MultiPolygon") {
+    return { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [worldRing] } };
+  }
+
+  if (regionGeometry.type === "Polygon") {
+    return {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "Polygon",
+        coordinates: [worldRing, ...regionGeometry.coordinates],
+      },
+    };
+  }
+
+  const holes = (regionGeometry as GeoJSON.MultiPolygon).coordinates.flatMap((poly: GeoJSON.Position[][]) => poly);
+  return {
+    type: "Feature",
+    properties: {},
+    geometry: {
+      type: "Polygon",
+      coordinates: [worldRing, ...holes],
+    },
+  };
+}

@@ -7,7 +7,7 @@ import "./maplibre.scss";
 import styles from "./CustomMap.module.scss";
 import React, { useCallback, useState } from "react";
 import GeocoderControl from "@components/maps/geocoder/GeocoderControl";
-import type { ExternalLocation } from "@components/maps/geocoder/types";
+import RegionOverlay from "@components/maps/geocoder/RegionOverlay";
 import { setMapLanguage } from "@components/maps/utils";
 import CustomMapControls from "@components/maps/CustomMapControls";
 import { Location } from "@/lib/utils/types";
@@ -24,12 +24,12 @@ export type InteractiveMarker<T> = Location & {
 export default function CustomMap<T>({
   markers,
   renderPopup,
-  geocoderLocation,
+  regionLocationId,
   ...props
 }: React.ComponentProps<typeof Map> & {
   markers?: InteractiveMarker<T>[];
   renderPopup?: (data: T) => React.ReactNode;
-  geocoderLocation?: ExternalLocation;
+  regionLocationId?: string;
 }) {
   const onMapLoad = useCallback((e: MapLibreEvent) => {
     setMapLanguage(e.target, "pl");
@@ -72,7 +72,8 @@ export default function CustomMap<T>({
         }}
       >
         <CustomMapControls />
-        <GeocoderControl externalLocation={geocoderLocation} />
+        <RegionOverlay locationId={regionLocationId} />
+        <GeocoderControl />
         {markers?.map((marker) => (
           <Marker
             key={marker.key}

@@ -1,19 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useMap, Source, Layer } from "react-map-gl/maplibre";
 import { TextInput, ActionIcon, Box, Text, Combobox, useCombobox } from "@mantine/core";
 import { IconSearch, IconLoader2, IconX } from "@tabler/icons-react";
 import { useDebouncedCallback } from "@mantine/hooks";
-import type { ExternalLocation, MapTilerFeature, SelectedLocation } from "./types";
+import type { MapTilerFeature, SelectedLocation } from "./types";
 import { getPlaceName, formatAddress } from "./utils";
 import { dashedLineLayer, fillLayer } from "./layers";
-import { searchMapTiler, fetchFeatureById, fetchFeaturePolygon, ALL_SEARCH_TYPES } from "./api";
+import { searchMapTiler, fetchFeaturePolygon, ALL_SEARCH_TYPES } from "./api";
 
 interface GeocoderControlProps {
   onLocationSelect?: (location: SelectedLocation) => void;
-  externalLocation?: ExternalLocation;
 }
 
-export default function GeocoderControl({ onLocationSelect, externalLocation }: GeocoderControlProps) {
+export default function GeocoderControl({ onLocationSelect }: GeocoderControlProps) {
   const { current: map } = useMap();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -27,59 +26,6 @@ export default function GeocoderControl({ onLocationSelect, externalLocation }: 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
-
-  useEffect(() => {
-    if (!externalLocation) {
-      setSearchQuery("");
-      setPolygonData(null);
-      setSelectedFeature(null);
-      return;
-    }
-
-    let cancelled = false;
-    setSearchQuery(externalLocation.name);
-    setResults([]);
-    setSearchCompleted(false);
-    combobox.closeDropdown();
-    setIsLoading(true);
-
-    fetchFeatureById(externalLocation.id)
-      .then((feature) => {
-        if (cancelled || !feature) {
-          setIsLoading(false);
-          return;
-        }
-        setIsLoading(false);
-        setSelectedFeature(feature);
-
-        if (["Polygon", "MultiPolygon"].includes(feature.geometry.type)) {
-          setPolygonData({ type: "Feature", properties: {}, geometry: feature.geometry });
-        } else {
-          setPolygonData(null);
-        }
-
-        if (map) {
-          if (feature.bbox) {
-            const [west, south, east, north] = feature.bbox;
-            map.fitBounds(
-              [
-                [west, south],
-                [east, north],
-              ],
-              { padding: 40, duration: 2000, maxZoom: 16 },
-            );
-          } else {
-            const [lon, lat] = feature.center;
-            map.flyTo({ center: [lon, lat], zoom: 16, duration: 2000 });
-          }
-        }
-      })
-      .catch(() => setIsLoading(false));
-
-    return () => {
-      cancelled = true;
-    };
-  }, [externalLocation?.id, map]);
 
   const runSearch = useDebouncedCallback(async (query: string) => {
     if (!query.trim()) {

@@ -44,3 +44,15 @@ export async function fetchFeaturePolygon(featureId: string): Promise<GeoJSON.Fe
   if (!["Polygon", "MultiPolygon"].includes(feature.geometry.type)) return null;
   return { type: "Feature", properties: {}, geometry: feature.geometry };
 }
+
+export async function fetchPolandFeature(): Promise<MapTilerFeature | null> {
+  const params = new URLSearchParams({
+    key: MAPTILER_API_KEY,
+    language: "pl",
+  });
+  const url = `https://api.maptiler.com/geocoding/country.107.json?${params}`;
+  const response = await fetch(url);
+  if (!response.ok) return null;
+  const data: MapTilerGeocodingResponse = await response.json();
+  return data.features?.[0] ?? null;
+}
