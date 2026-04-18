@@ -56,7 +56,9 @@ export default async function Page({
         <ViewControl />
       </Group>
       <LoadingContextOverlay loadingKey="itemsFilters">
-        {options.view === "map" && <MapList markers={markers} renderPopup={ItemPopup} />}
+        {options.view === "map" && (
+          <MapList markers={markers} renderPopup={ItemPopup} locationId={options.locationId} />
+        )}
         {options.view === "list" && (
           <>
             <ItemsList items={items} />

@@ -5,8 +5,8 @@ import { IconSearch, IconLoader2, IconX } from "@tabler/icons-react";
 import { useDebouncedCallback } from "@mantine/hooks";
 import type { MapTilerFeature, SelectedLocation } from "./types";
 import { getPlaceName, formatAddress } from "./utils";
-import { dashedLineLayer, fillLayer } from "./layers";
-import { searchMapTiler, fetchFeaturePolygon, ALL_SEARCH_TYPES } from "./api";
+import { dashedLineLayer, fillLayer, circleLayer } from "./layers";
+import { searchMapTiler, fetchFeatureGeometry, ALL_SEARCH_TYPES } from "./api";
 
 interface GeocoderControlProps {
   onLocationSelect?: (location: SelectedLocation) => void;
@@ -20,7 +20,7 @@ export default function GeocoderControl({ onLocationSelect }: GeocoderControlPro
   const [results, setResults] = useState<MapTilerFeature[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchCompleted, setSearchCompleted] = useState<boolean>(false);
-  const [polygonData, setPolygonData] = useState<GeoJSON.Feature | null>(null);
+  const [geometryData, setGeometryData] = useState<GeoJSON.Feature | null>(null);
   const [selectedFeature, setSelectedFeature] = useState<MapTilerFeature | null>(null);
 
   const combobox = useCombobox({
@@ -55,7 +55,7 @@ export default function GeocoderControl({ onLocationSelect }: GeocoderControlPro
     setSearchQuery("");
     setResults([]);
     setSearchCompleted(false);
-    setPolygonData(null);
+    setGeometryData(null);
     setSelectedFeature(null);
     combobox.closeDropdown();
   };
@@ -100,8 +100,16 @@ export default function GeocoderControl({ onLocationSelect }: GeocoderControlPro
     combobox.closeDropdown();
     inputRef.current?.blur();
 
-    const polygon = await fetchFeaturePolygon(feature.id);
-    setPolygonData(polygon);
+    const geometry = await fetchFeatureGeometry(feature.id);
+    if (geometry) {
+      setGeometryData(geometry);
+    } else {
+      setGeometryData({
+        type: "Feature",
+        properties: {},
+        geometry: { type: "Point", coordinates: [lon, lat] },
+      });
+    }
 
     if (map) {
       if (feature.bbox) {
@@ -212,10 +220,11 @@ export default function GeocoderControl({ onLocationSelect }: GeocoderControlPro
           </Combobox.Dropdown>
         </Combobox>
       </Box>
-      {polygonData && (
-        <Source id="geocoder-boundary" type="geojson" data={polygonData}>
+      {geometryData && (
+        <Source id="geocoder-boundary" type="geojson" data={geometryData}>
           <Layer {...fillLayer} />
           <Layer {...dashedLineLayer} />
+          <Layer {...circleLayer} />
         </Source>
       )}
     </>

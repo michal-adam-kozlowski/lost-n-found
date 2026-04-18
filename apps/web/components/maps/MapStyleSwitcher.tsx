@@ -28,7 +28,9 @@ const LABELS: Record<MapStyle, string> = {
 
 export default function MapStyleSwitcher() {
   const { current: map } = useMap();
-  const [currentStyle, setCurrentStyle] = useState<MapStyle>("streets");
+  const [currentStyle, setCurrentStyle] = useState<MapStyle>(
+    map?.getStyle()?.name?.toLowerCase().includes("hybrid") ? "satellite" : "streets",
+  );
 
   const nextStyle: MapStyle = currentStyle === "streets" ? "satellite" : "streets";
 

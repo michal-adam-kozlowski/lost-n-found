@@ -26,11 +26,13 @@ export default function CustomMap<T>({
   markers,
   renderPopup,
   regionLocationId,
+  displayRegion,
   ...props
 }: React.ComponentProps<typeof Map> & {
   markers?: InteractiveMarker<T>[];
   renderPopup?: (data: T) => React.ReactNode;
   regionLocationId?: string;
+  displayRegion?: boolean;
 }) {
   const onMapLoad = useCallback((e: MapLibreEvent) => {
     setMapLanguage(e.target, "pl");
@@ -57,7 +59,7 @@ export default function CustomMap<T>({
           latitude: 52,
           zoom: 5.2,
         }}
-        reuseMaps={true}
+        reuseMaps={false}
         style={{ width: "100%" }}
         mapStyle={`https://api.maptiler.com/maps/streets-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_API_KEY ?? ""}`}
         maxPitch={0}
@@ -74,7 +76,7 @@ export default function CustomMap<T>({
       >
         <CustomMapControls />
         <MapStyleSwitcher />
-        <RegionOverlay locationId={regionLocationId} />
+        {displayRegion && <RegionOverlay locationId={regionLocationId} />}
         <GeocoderControl />
         {markers?.map((marker) => (
           <Marker

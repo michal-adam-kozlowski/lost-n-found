@@ -38,10 +38,13 @@ export async function fetchFeatureById(featureId: string): Promise<MapTilerFeatu
   return data.features?.[0] ?? null;
 }
 
-export async function fetchFeaturePolygon(featureId: string): Promise<GeoJSON.Feature | null> {
+export async function fetchFeatureGeometry(featureId: string): Promise<GeoJSON.Feature | null> {
   const feature = await fetchFeatureById(featureId);
   if (!feature) return null;
-  if (!["Polygon", "MultiPolygon"].includes(feature.geometry.type)) return null;
+  if (
+    !["Polygon", "MultiPolygon", "LineString", "MultiLineString", "Point", "MultiPoint"].includes(feature.geometry.type)
+  )
+    return null;
   return { type: "Feature", properties: {}, geometry: feature.geometry };
 }
 
