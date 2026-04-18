@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useMap, Source, Layer } from "react-map-gl/maplibre";
-import { TextInput, ActionIcon, Box, Text, Combobox, useCombobox } from "@mantine/core";
+import { TextInput, ActionIcon, Box, Text, Combobox, useCombobox, ScrollArea } from "@mantine/core";
 import { IconSearch, IconLoader2, IconX } from "@tabler/icons-react";
 import { useDebouncedCallback } from "@mantine/hooks";
 import type { MapTilerFeature, SelectedLocation } from "./types";
@@ -195,27 +195,29 @@ export default function GeocoderControl({ onLocationSelect }: GeocoderControlPro
             styles={{ dropdown: { borderRadius: "var(--mantine-radius-md)" } }}
           >
             <Combobox.Options style={{ overflowY: "auto" }} mah={240}>
-              {results.length === 0 && searchCompleted ? (
-                <Combobox.Empty>Brak wyników</Combobox.Empty>
-              ) : (
-                results.map((feature) => (
-                  <Combobox.Option value={feature.id} key={feature.id} className="group p-3">
-                    <Text truncate="end" fw={500} size="sm">
-                      {getPlaceName(feature)}
-                    </Text>
-                    {formatAddress(feature) && (
-                      <Text
-                        truncate="end"
-                        size="xs"
-                        c="dimmed"
-                        className="group-data-combobox-active:text-white! group-data-combobox-selected:text-white!"
-                      >
-                        {formatAddress(feature)}
+              <ScrollArea.Autosize type="scroll" mah={240} scrollbarSize={12}>
+                {results.length === 0 && searchCompleted ? (
+                  <Combobox.Empty>Brak wyników</Combobox.Empty>
+                ) : (
+                  results.map((feature) => (
+                    <Combobox.Option value={feature.id} key={feature.id} className="group p-3">
+                      <Text truncate="end" fw={500} size="sm">
+                        {getPlaceName(feature)}
                       </Text>
-                    )}
-                  </Combobox.Option>
-                ))
-              )}
+                      {formatAddress(feature) && (
+                        <Text
+                          truncate="end"
+                          size="xs"
+                          c="dimmed"
+                          className="group-data-combobox-active:text-white! group-data-combobox-selected:text-white!"
+                        >
+                          {formatAddress(feature)}
+                        </Text>
+                      )}
+                    </Combobox.Option>
+                  ))
+                )}
+              </ScrollArea.Autosize>
             </Combobox.Options>
           </Combobox.Dropdown>
         </Combobox>

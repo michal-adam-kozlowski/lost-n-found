@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Combobox, TextInput, useCombobox, Text, CloseButton } from "@mantine/core";
+import { Combobox, TextInput, useCombobox, Text, CloseButton, ScrollArea } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { IconLoader2 } from "@tabler/icons-react";
 import { searchMapTiler, REGION_SEARCH_TYPES } from "./api";
@@ -155,43 +155,45 @@ export default function RegionFilter({ value, onChange }: RegionFilterProps) {
 
       <Combobox.Dropdown hidden={dropdownHidden}>
         <Combobox.Options mah={260} style={{ overflowY: "auto" }}>
-          {showDefaults &&
-            DEFAULT_CITIES.map((city) => (
-              <Combobox.Option value={`default:${city.name}`} key={city.name} className="group p-2">
-                <Text size="sm" fw={500} truncate="end">
-                  {city.name}
-                </Text>
-                <Text
-                  size="xs"
-                  c="dimmed"
-                  truncate="end"
-                  className="group-data-combobox-active:text-white! group-data-combobox-selected:text-white!"
-                >
-                  {city.description}
-                </Text>
-              </Combobox.Option>
-            ))}
-
-          {showSearchResults && results.length === 0 && searchCompleted && (
-            <Combobox.Empty>Brak wyników</Combobox.Empty>
-          )}
-
-          {showSearchResults &&
-            results.map((feature) => {
-              const contextLabel = formatAddress(feature);
-              return (
-                <Combobox.Option value={feature.id} key={feature.id} className="group p-2">
+          <ScrollArea.Autosize type="scroll" mah={240} scrollbarSize={12}>
+            {showDefaults &&
+              DEFAULT_CITIES.map((city) => (
+                <Combobox.Option value={`default:${city.name}`} key={city.name} className="group p-2">
                   <Text size="sm" fw={500} truncate="end">
-                    {getPlaceName(feature)}
+                    {city.name}
                   </Text>
-                  {contextLabel && (
-                    <Text size="xs" c="dimmed" truncate="end" className="group-data-combobox-active:text-white!">
-                      {contextLabel}
-                    </Text>
-                  )}
+                  <Text
+                    size="xs"
+                    c="dimmed"
+                    truncate="end"
+                    className="group-data-combobox-active:text-white! group-data-combobox-selected:text-white!"
+                  >
+                    {city.description}
+                  </Text>
                 </Combobox.Option>
-              );
-            })}
+              ))}
+
+            {showSearchResults && results.length === 0 && searchCompleted && (
+              <Combobox.Empty>Brak wyników</Combobox.Empty>
+            )}
+
+            {showSearchResults &&
+              results.map((feature) => {
+                const contextLabel = formatAddress(feature);
+                return (
+                  <Combobox.Option value={feature.id} key={feature.id} className="group p-2">
+                    <Text size="sm" fw={500} truncate="end">
+                      {getPlaceName(feature)}
+                    </Text>
+                    {contextLabel && (
+                      <Text size="xs" c="dimmed" truncate="end" className="group-data-combobox-active:text-white!">
+                        {contextLabel}
+                      </Text>
+                    )}
+                  </Combobox.Option>
+                );
+              })}
+          </ScrollArea.Autosize>
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>

@@ -88,7 +88,9 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
           allowDeselect={true}
           clearable
           style={{ flex: 1, minWidth: 140 }}
-          withScrollArea={false}
+          maxDropdownHeight={240}
+          withScrollArea={true}
+          scrollAreaProps={{ scrollbarSize: 12 }}
           {...form.getInputProps("categoryId")}
         />
       </Group>
@@ -105,6 +107,11 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
           clearable
           popoverProps={{
             position: "bottom",
+            styles: {
+              dropdown: {
+                padding: "calc(.25rem * var(--mantine-scale))",
+              },
+            },
           }}
           style={{ flex: 1, minWidth: 160 }}
           {...form.getInputProps("occurredAtRange")}

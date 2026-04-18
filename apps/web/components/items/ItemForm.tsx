@@ -69,8 +69,10 @@ export default function ItemForm({
             searchable
             miw={240}
             flex={10}
+            maxDropdownHeight={240}
             allowDeselect={false}
-            withScrollArea={false}
+            withScrollArea={true}
+            scrollAreaProps={{ scrollbarSize: 12 }}
             key={form.key("categoryId")}
             {...form.getInputProps("categoryId")}
           />
@@ -84,6 +86,11 @@ export default function ItemForm({
             maxDate={new Date()}
             popoverProps={{
               position: "bottom",
+              styles: {
+                dropdown: {
+                  padding: "calc(.25rem * var(--mantine-scale))",
+                },
+              },
             }}
             key={form.key("occurredAt")}
             {...form.getInputProps("occurredAt")}
@@ -109,8 +116,12 @@ export default function ItemForm({
           3. Lokalizacja
         </Title>
         <TextInput
-          label="Miejsce"
-          placeholder="Np. Warszawa, Dworzec Centralny"
+          label="Opis lokalizacji"
+          placeholder={
+            form.values.type === "found"
+              ? "Opisz dokładnie miejsce znalezienia."
+              : "Opisz dokładnie miejsce zagubienia."
+          }
           mb="lg"
           key={form.key("locationLabel")}
           {...form.getInputProps("locationLabel")}

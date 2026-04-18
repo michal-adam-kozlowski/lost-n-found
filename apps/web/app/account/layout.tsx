@@ -43,8 +43,8 @@ export default async function Layout({ children }: Readonly<{ children: React.Re
           </Container>
         </Paper>
         <Container size="lg" px="0" pt="md">
-          <Flex direction="row" gap="lg" mt="md">
-            <Card className="w-xs min-w-xs max-w-xs" shadow="xs">
+          <Flex direction="row" gap="lg" mt="md" align="flex-start" className="flex-wrap! md:flex-nowrap!">
+            <Card className="w-full md:w-xs min-w-xs md:max-w-xs" shadow="xs">
               <CardSection withBorder p="md">
                 <div className="h-full flex  items-center px-0 gap-4 cursor-default">
                   <Avatar name={user.email} color="initials" size="lg" radius="md" />
