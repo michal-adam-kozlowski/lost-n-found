@@ -27,6 +27,7 @@ export interface ApiItemsGetRequest {
     categoryIds?: Array<string>;
     occurredAtFrom?: string;
     occurredAtTo?: string;
+    locationId?: string;
 }
 
 export interface ApiItemsIdDeleteRequest {
@@ -60,6 +61,7 @@ export interface ItemsApiInterface {
      * @param {Array<string>} [categoryIds] 
      * @param {string} [occurredAtFrom] 
      * @param {string} [occurredAtTo] 
+     * @param {string} [locationId] 
      * @throws {RequiredError}
      * @memberof ItemsApiInterface
      */
@@ -73,6 +75,7 @@ export interface ItemsApiInterface {
      * @param {Array<string>} [categoryIds] 
      * @param {string} [occurredAtFrom] 
      * @param {string} [occurredAtTo] 
+     * @param {string} [locationId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ItemsApiInterface
@@ -209,6 +212,10 @@ export class ItemsApi extends runtime.BaseAPI implements ItemsApiInterface {
 
         if (requestParameters['occurredAtTo'] != null) {
             queryParameters['occurredAtTo'] = requestParameters['occurredAtTo'];
+        }
+
+        if (requestParameters['locationId'] != null) {
+            queryParameters['locationId'] = requestParameters['locationId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

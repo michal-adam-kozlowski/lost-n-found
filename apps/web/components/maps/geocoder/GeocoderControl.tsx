@@ -1,56 +1,47 @@
 import React, { useRef, useState } from "react";
 import { useMap, Source, Layer } from "react-map-gl/maplibre";
-import { TextInput, ActionIcon, Box, Text, Combobox, useCombobox } from "@mantine/core";
+import { TextInput, ActionIcon, Box, Text, Combobox, useCombobox, ScrollArea } from "@mantine/core";
 import { IconSearch, IconLoader2, IconX } from "@tabler/icons-react";
-import type { GeocoderControlProps, NominatimResult } from "./types";
+import { useDebouncedCallback } from "@mantine/hooks";
+import type { MapTilerFeature, SelectedLocation } from "./types";
 import { getPlaceName, formatAddress } from "./utils";
-import { dashedLineLayer, fillLayer } from "./layers";
+import { dashedLineLayer, fillLayer, circleLayer } from "./layers";
+import { searchMapTiler, fetchFeatureGeometry, ALL_SEARCH_TYPES } from "./api";
+
+interface GeocoderControlProps {
+  onLocationSelect?: (location: SelectedLocation) => void;
+}
 
 export default function GeocoderControl({ onLocationSelect }: GeocoderControlProps) {
   const { current: map } = useMap();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [results, setResults] = useState<NominatimResult[]>([]);
+  const [results, setResults] = useState<MapTilerFeature[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchCompleted, setSearchCompleted] = useState<boolean>(false);
-  const [polygonData, setPolygonData] = useState<GeoJSON.Feature | null>(null);
+  const [geometryData, setGeometryData] = useState<GeoJSON.Feature | null>(null);
+  const [selectedFeature, setSelectedFeature] = useState<MapTilerFeature | null>(null);
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+  const runSearch = useDebouncedCallback(async (query: string) => {
+    if (!query.trim()) {
+      setResults([]);
+      setSearchCompleted(false);
+      combobox.closeDropdown();
+      return;
+    }
 
     setIsLoading(true);
-    setSearchCompleted(false);
-
     try {
-      let apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&countrycodes=pl&accept-language=pl&addressdetails=1&polygon_geojson=1`;
-
-      if (map) {
-        const bounds = map.getBounds();
-        const viewbox = `${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()},${bounds.getSouth()}`;
-        apiUrl += `&viewbox=${viewbox}`;
-      }
-
-      const response = await fetch(apiUrl);
-      const data: NominatimResult[] = await response.json();
-
-      const sortedData = data.sort((a, b) => {
-        if (a.addresstype === "city" && b.addresstype === "administrative") return -1;
-        if (a.addresstype === "administrative" && b.addresstype === "city") return 1;
-        return 0;
-      });
-
-      const uniqueResults = sortedData.filter(
-        (result, index, self) => index === self.findIndex((r) => r.display_name === result.display_name),
-      );
-
-      setResults(uniqueResults);
+      const center = map?.getCenter();
+      const proximity: [number, number] | undefined = center ? [center.lng, center.lat] : undefined;
+      const features = await searchMapTiler(query, { proximity, types: ALL_SEARCH_TYPES });
+      setResults(features);
       setSearchCompleted(true);
-
       combobox.openDropdown();
       combobox.resetSelectedOption();
     } catch (error) {
@@ -58,88 +49,113 @@ export default function GeocoderControl({ onLocationSelect }: GeocoderControlPro
     } finally {
       setIsLoading(false);
     }
-  };
+  }, 200);
 
   const handleClear = () => {
     setSearchQuery("");
     setResults([]);
     setSearchCompleted(false);
-    setPolygonData(null);
+    setGeometryData(null);
+    setSelectedFeature(null);
     combobox.closeDropdown();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !combobox.dropdownOpened) {
-      e.preventDefault();
-      void handleSearch();
+    if (e.key === "Escape") {
+      handleClear();
     }
   };
 
-  const handleOptionSubmit = (val: string) => {
-    const location = results.find((r) => r.place_id.toString() === val);
-    if (!location) return;
+  const flyToFeature = (feature: MapTilerFeature) => {
+    if (!map) return;
+    if (feature.bbox) {
+      const [west, south, east, north] = feature.bbox;
+      map.fitBounds(
+        [
+          [west, south],
+          [east, north],
+        ],
+        { padding: 40, duration: 1200, maxZoom: 16 },
+      );
+    } else {
+      const [lon, lat] = feature.center;
+      map.flyTo({ center: [lon, lat], zoom: 16, duration: 1200 });
+    }
+  };
 
-    const lat = parseFloat(location.lat);
-    const lon = parseFloat(location.lon);
+  const handleOptionSubmit = async (val: string) => {
+    const feature = results.find((r) => r.id === val);
+    if (!feature) return;
+
+    const [lon, lat] = feature.center;
 
     if (onLocationSelect) {
-      onLocationSelect({ lat, lon, name: location.display_name });
+      onLocationSelect({ lat, lon, name: feature.place_name });
     }
 
     setResults([]);
-    setSearchQuery(location.display_name);
+    setSearchQuery(getPlaceName(feature));
     setSearchCompleted(false);
+    setSelectedFeature(feature);
     combobox.closeDropdown();
     inputRef.current?.blur();
 
-    if (
-      location.geojson &&
-      ["Polygon", "MultiPolygon"].includes(location.geojson.type) &&
-      (location.place_rank ?? 100) <= 22
-    ) {
-      setPolygonData({
+    const geometry = await fetchFeatureGeometry(feature.id);
+    if (geometry) {
+      setGeometryData(geometry);
+    } else {
+      setGeometryData({
         type: "Feature",
         properties: {},
-        geometry: location.geojson,
+        geometry: { type: "Point", coordinates: [lon, lat] },
       });
-    } else {
-      setPolygonData(null);
     }
 
     if (map) {
-      if (location.boundingbox) {
-        const [minLat, maxLat, minLon, maxLon] = location.boundingbox.map(parseFloat);
+      if (feature.bbox) {
+        const [west, south, east, north] = feature.bbox;
         map.fitBounds(
           [
-            [minLon, minLat],
-            [maxLon, maxLat],
+            [west, south],
+            [east, north],
           ],
-          { padding: 40, duration: 2000 },
+          { padding: 40, duration: 2000, maxZoom: 16 },
         );
       } else {
-        map.flyTo({ center: [lon, lat], zoom: 14, duration: 2000 });
+        map.flyTo({ center: [lon, lat], zoom: 16, duration: 2000 });
       }
+    }
+  };
+
+  const handleSearchButtonClick = async () => {
+    if (combobox.dropdownOpened && results.length > 0) {
+      const idx = combobox.selectedOptionIndex >= 0 ? combobox.selectedOptionIndex : 0;
+      const feature = results[idx];
+      if (feature) {
+        await handleOptionSubmit(feature.id);
+      }
+    } else if (selectedFeature) {
+      flyToFeature(selectedFeature);
     }
   };
 
   return (
     <>
       <Box className="absolute top-3 left-3 z-10 w-80">
-        <Combobox store={combobox} onOptionSubmit={handleOptionSubmit} withinPortal={false}>
+        <Combobox store={combobox} onOptionSubmit={(val) => void handleOptionSubmit(val)} withinPortal={false}>
           <Combobox.Target>
             <TextInput
               ref={inputRef}
               value={searchQuery}
               onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setSearchCompleted(false);
-                combobox.closeDropdown();
+                const val = e.target.value;
+                setSearchQuery(val);
+                void runSearch(val);
               }}
               onKeyDown={handleKeyDown}
               onClick={() => (results.length > 0 || searchCompleted) && combobox.openDropdown()}
               onFocus={() => (results.length > 0 || searchCompleted) && combobox.openDropdown()}
               placeholder="Wyszukaj miejsce..."
-              readOnly={isLoading}
               size="md"
               radius="md"
               classNames={{
@@ -162,7 +178,7 @@ export default function GeocoderControl({ onLocationSelect }: GeocoderControlPro
                   )}
                   <ActionIcon
                     type="button"
-                    onClick={handleSearch}
+                    onClick={() => void handleSearchButtonClick()}
                     onMouseDown={(e) => e.preventDefault()}
                     variant="subtle"
                     size="lg"
@@ -179,30 +195,38 @@ export default function GeocoderControl({ onLocationSelect }: GeocoderControlPro
             styles={{ dropdown: { borderRadius: "var(--mantine-radius-md)" } }}
           >
             <Combobox.Options style={{ overflowY: "auto" }} mah={240}>
-              {results.length === 0 && searchCompleted ? (
-                <Combobox.Empty>Brak wyników</Combobox.Empty>
-              ) : (
-                results.map((result) => (
-                  <Combobox.Option value={result.place_id.toString()} key={result.place_id} className="group p-3">
-                    <Text truncate="end" fw={500} size="sm">
-                      {getPlaceName(result)}
-                    </Text>
-                    {formatAddress(result) && (
-                      <Text truncate="end" size="xs" c="dimmed" className="group-data-combobox-active:text-white!">
-                        {formatAddress(result)}
+              <ScrollArea.Autosize type="scroll" mah={240} scrollbarSize={12}>
+                {results.length === 0 && searchCompleted ? (
+                  <Combobox.Empty>Brak wyników</Combobox.Empty>
+                ) : (
+                  results.map((feature) => (
+                    <Combobox.Option value={feature.id} key={feature.id} className="group p-3">
+                      <Text truncate="end" fw={500} size="sm">
+                        {getPlaceName(feature)}
                       </Text>
-                    )}
-                  </Combobox.Option>
-                ))
-              )}
+                      {formatAddress(feature) && (
+                        <Text
+                          truncate="end"
+                          size="xs"
+                          c="dimmed"
+                          className="group-data-combobox-active:text-white! group-data-combobox-selected:text-white!"
+                        >
+                          {formatAddress(feature)}
+                        </Text>
+                      )}
+                    </Combobox.Option>
+                  ))
+                )}
+              </ScrollArea.Autosize>
             </Combobox.Options>
           </Combobox.Dropdown>
         </Combobox>
       </Box>
-      {polygonData && (
-        <Source id="geocoder-boundary" type="geojson" data={polygonData}>
+      {geometryData && (
+        <Source id="geocoder-boundary" type="geojson" data={geometryData}>
           <Layer {...fillLayer} />
           <Layer {...dashedLineLayer} />
+          <Layer {...circleLayer} />
         </Source>
       )}
     </>

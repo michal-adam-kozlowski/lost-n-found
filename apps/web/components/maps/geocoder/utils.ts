@@ -1,40 +1,77 @@
-import type { NominatimResult } from "./types";
+import type { MapTilerFeature } from "./types";
 
-export function getPlaceName(result: NominatimResult): string {
-  if (result.name) return result.name;
-  return result.display_name.split(",")[0].trim();
+const ADMINISTRATIVE_PREFIXES = new Set([
+  "country",
+  "region",
+  "subregion",
+  "county",
+  "joint_municipality",
+  "joint_submunicipality",
+  "municipality",
+  "municipal_district",
+  "locality",
+  "neighbourhood",
+  "place",
+]);
+
+function isAdministrative(contextId: string): boolean {
+  const prefix = contextId.split(".")[0];
+  return ADMINISTRATIVE_PREFIXES.has(prefix);
 }
 
-export function formatAddress(result: NominatimResult): string {
-  const addr = result.address;
-  if (!addr) return "";
+export function getPlaceName(feature: MapTilerFeature): string {
+  return feature.text || feature.place_name.split(",")[0].trim();
+}
 
-  const placeName = getPlaceName(result);
-  const pick = (val: string | undefined) => (val && val !== placeName ? val : undefined);
+export function formatAddress(feature: MapTilerFeature): string {
+  const placeName = getPlaceName(feature);
+  const seen = new Set<string>();
+  const contextParts: string[] = [];
 
-  const parts: string[] = [];
-
-  const road = pick(addr.road);
-  if (road) {
-    parts.push(road + (addr.house_number ? ` ${addr.house_number}` : ""));
+  for (const c of feature.context ?? []) {
+    if (!isAdministrative(c.id)) continue;
+    if (!c.text || c.text === placeName || seen.has(c.text)) continue;
+    seen.add(c.text);
+    contextParts.push(c.text);
+    if (contextParts.length === 3) break;
   }
 
-  const districtRaw = addr.suburb ?? addr.neighbourhood ?? addr.quarter ?? addr.city_district ?? addr.district;
-  const district = pick(districtRaw);
-  if (district) parts.push(district);
+  return contextParts.join(", ");
+}
 
-  const cityRaw = addr.city ?? addr.town ?? addr.village;
-  const city = pick(cityRaw);
-  if (city) parts.push(city);
+export function buildCutoutFeature(
+  regionGeometry: GeoJSON.Geometry,
+): GeoJSON.Feature<GeoJSON.Polygon | GeoJSON.MultiPolygon> {
+  const worldRing: GeoJSON.Position[] = [
+    [-180, -90],
+    [-180, 90],
+    [180, 90],
+    [180, -90],
+    [-180, -90],
+  ];
 
-  if (!city) {
-    const municipality = pick(addr.municipality);
-    if (municipality) parts.push(municipality);
-    const county = pick(addr.county);
-    if (county) parts.push(county);
-    const state = pick(addr.state);
-    if (state) parts.push(state);
+  if (regionGeometry.type !== "Polygon" && regionGeometry.type !== "MultiPolygon") {
+    return { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [worldRing] } };
   }
 
-  return parts.join(", ");
+  if (regionGeometry.type === "Polygon") {
+    return {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "Polygon",
+        coordinates: [worldRing, ...regionGeometry.coordinates],
+      },
+    };
+  }
+
+  const holes = (regionGeometry as GeoJSON.MultiPolygon).coordinates.flatMap((poly: GeoJSON.Position[][]) => poly);
+  return {
+    type: "Feature",
+    properties: {},
+    geometry: {
+      type: "Polygon",
+      coordinates: [worldRing, ...holes],
+    },
+  };
 }

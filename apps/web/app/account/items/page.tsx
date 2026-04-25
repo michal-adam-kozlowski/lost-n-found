@@ -26,7 +26,8 @@ export default async function Page({
   }
 
   const { items, pageCount, totalCount } = await runtimeGet(
-    () => getItemsForCurrentUser(undefined, options.categoryIds, options.occurredAtRange, options.page),
+    () =>
+      getItemsForCurrentUser(undefined, options.categoryIds, options.occurredAtRange, options.page, options.locationId),
     EMPTY_ITEMS_RESULT,
   );
 
@@ -55,7 +56,9 @@ export default async function Page({
         <ViewControl />
       </Group>
       <LoadingContextOverlay loadingKey="itemsFilters">
-        {options.view === "map" && <MapList markers={markers} renderPopup={ItemPopup} />}
+        {options.view === "map" && (
+          <MapList markers={markers} renderPopup={ItemPopup} locationId={options.locationId} />
+        )}
         {options.view === "list" && (
           <>
             <ItemsList items={items} />

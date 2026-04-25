@@ -7,8 +7,10 @@ import "./maplibre.scss";
 import styles from "./CustomMap.module.scss";
 import React, { useCallback, useState } from "react";
 import GeocoderControl from "@components/maps/geocoder/GeocoderControl";
+import RegionOverlay from "@components/maps/geocoder/RegionOverlay";
 import { setMapLanguage } from "@components/maps/utils";
 import CustomMapControls from "@components/maps/CustomMapControls";
+import MapStyleSwitcher from "@components/maps/MapStyleSwitcher";
 import { Location } from "@/lib/utils/types";
 import { useClickOutside } from "@mantine/hooks";
 import Pin from "@components/maps/Pin";
@@ -23,10 +25,14 @@ export type InteractiveMarker<T> = Location & {
 export default function CustomMap<T>({
   markers,
   renderPopup,
+  regionLocationId,
+  displayRegion,
   ...props
 }: React.ComponentProps<typeof Map> & {
   markers?: InteractiveMarker<T>[];
   renderPopup?: (data: T) => React.ReactNode;
+  regionLocationId?: string;
+  displayRegion?: boolean;
 }) {
   const onMapLoad = useCallback((e: MapLibreEvent) => {
     setMapLanguage(e.target, "pl");
@@ -43,15 +49,19 @@ export default function CustomMap<T>({
 
   return (
     <div className={styles.Container} ref={clickOutsideRef}>
+      <a href="https://www.maptiler.com" target="_blank" rel="noopener noreferrer" className={styles.MapTilerLogo}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler" />
+      </a>
       <Map
         initialViewState={{
           longitude: 19.134422,
           latitude: 52,
           zoom: 5.2,
         }}
-        reuseMaps={true}
+        reuseMaps={false}
         style={{ width: "100%" }}
-        mapStyle="https://tiles.openfreemap.org/styles/bright"
+        mapStyle={`https://api.maptiler.com/maps/streets-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_API_KEY ?? ""}`}
         maxPitch={0}
         minPitch={0}
         onLoad={onMapLoad}
@@ -65,6 +75,8 @@ export default function CustomMap<T>({
         }}
       >
         <CustomMapControls />
+        <MapStyleSwitcher />
+        {displayRegion && <RegionOverlay locationId={regionLocationId} />}
         <GeocoderControl />
         {markers?.map((marker) => (
           <Marker

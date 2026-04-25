@@ -141,6 +141,17 @@ builder.Services.AddScoped<IItemImageService, ItemImageService>();
 var corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "http://localhost:3000")
     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
+builder.Services.AddOptions<MapTilerOptions>()
+    .Configure(o =>
+    {
+        o.ApiKey = Environment.GetEnvironmentVariable("MAPTILER_API_KEY") ?? builder.Configuration["MapTiler:ApiKey"] ?? "";
+    });
+builder.Services.AddHttpClient<IMapTilerService, MapTilerService>(client =>
+{
+    var referer = corsOrigins.FirstOrDefault() ?? "http://localhost:3000";
+    client.DefaultRequestHeaders.Referrer = new Uri(referer);
+});
+
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
         policy

@@ -8,6 +8,8 @@ export class ItemsViewOptions {
     public occurredAtRange?: [Date | null, Date | null],
     public view?: ViewType,
     public page?: number,
+    public locationId?: string,
+    public locationName?: string,
   ) {}
 
   public static parseDateRange(range: [string | null, string | null]): [Date | null, Date | null] {
@@ -36,7 +38,9 @@ export class ItemsViewOptions {
       occurredAtFrom || occurredAtTo ? ItemsViewOptions.parseDateRange([occurredAtFrom, occurredAtTo]) : undefined;
     const view = typeof obj.view === "string" ? (obj.view as ViewType) : undefined;
     const page = typeof obj.page === "string" ? parseInt(obj.page) : undefined;
-    return new ItemsViewOptions(type, categoryIds, occurredAtRange, view, page);
+    const locationId = typeof obj.locationId === "string" ? obj.locationId : undefined;
+    const locationName = typeof obj.locationName === "string" ? obj.locationName : undefined;
+    return new ItemsViewOptions(type, categoryIds, occurredAtRange, view, page, locationId, locationName);
   }
 
   public static fromQueryParams(params: URLSearchParams): ItemsViewOptions {
@@ -66,6 +70,12 @@ export class ItemsViewOptions {
     if (this.page) {
       params.set("page", this.page.toString());
     }
+    if (this.locationId) {
+      params.set("locationId", this.locationId);
+    }
+    if (this.locationName) {
+      params.set("locationName", this.locationName);
+    }
     return params;
   }
 
@@ -80,6 +90,8 @@ export class ItemsViewOptions {
       this.occurredAtRange ? [...this.occurredAtRange] : undefined,
       this.view,
       this.page,
+      this.locationId,
+      this.locationName,
     );
     if (Object.hasOwn(changes, "type")) {
       newOptions.type = changes.type;
@@ -95,6 +107,12 @@ export class ItemsViewOptions {
     }
     if (Object.hasOwn(changes, "page")) {
       newOptions.page = changes.page;
+    }
+    if (Object.hasOwn(changes, "locationId")) {
+      newOptions.locationId = changes.locationId;
+    }
+    if (Object.hasOwn(changes, "locationName")) {
+      newOptions.locationName = changes.locationName;
     }
     return newOptions;
   }

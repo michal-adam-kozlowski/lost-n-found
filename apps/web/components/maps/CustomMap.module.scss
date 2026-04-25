@@ -6,6 +6,26 @@
   }
 }
 
+.MapTilerLogo {
+  position: absolute;
+  bottom: calc(var(--spacing) * 3);
+  left: calc(var(--spacing) * 6 + 80px);
+  z-index: 1000;
+  line-height: 0;
+  pointer-events: auto;
+
+  img {
+    height: 20px;
+    width: auto;
+    display: block;
+    opacity: 0.9;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
 .Placeholder {
   background: #f6f2ee;
 }

@@ -10,12 +10,14 @@ import TypePicker from "@components/TypePicker";
 import { useLoading } from "@/lib/context/LoadingContext";
 import { ItemType } from "@/lib/utils/types";
 import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
+import RegionFilter, { RegionValue } from "@components/maps/geocoder/RegionFilter";
 
 export interface ItemsFiltersValues {
   type?: ItemType;
   categoryId: string;
   categorySearch: string;
   occurredAtRange: [string | null, string | null];
+  location: RegionValue;
 }
 
 export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
@@ -34,6 +36,7 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
       categoryId: initialOptions.categoryIds ? initialOptions.categoryIds[0] : "",
       categorySearch: "",
       occurredAtRange: ItemsViewOptions.formatDateRange(initialOptions.occurredAtRange || [null, null]),
+      location: { locationId: initialOptions.locationId, locationName: initialOptions.locationName },
     },
     onValuesChange: (values) => {
       const oldOptions = ItemsViewOptions.fromQueryParams(searchParams);
@@ -41,6 +44,8 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
         type: values.type,
         categoryIds: values.categoryId ? [values.categoryId] : undefined,
         occurredAtRange: ItemsViewOptions.parseDateRange(values.occurredAtRange),
+        locationId: values.location.locationId,
+        locationName: values.location.locationName,
       });
       if (oldOptions.toQueryString() === newOptions.toQueryString()) {
         return;
@@ -59,6 +64,7 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
       type: options.type || (hideType ? undefined : "found"),
       categoryId: options.categoryIds ? options.categoryIds[0] : "",
       occurredAtRange: ItemsViewOptions.formatDateRange(options.occurredAtRange || [null, null]),
+      location: { locationId: options.locationId, locationName: options.locationName },
     });
     if (!options.categoryIds || options.categoryIds.length === 0) {
       form.setFieldValue("categorySearch", "");
@@ -82,30 +88,30 @@ export default function ItemsFilters({ hideType }: { hideType?: boolean }) {
           allowDeselect={true}
           clearable
           style={{ flex: 1, minWidth: 140 }}
+          maxDropdownHeight={240}
+          withScrollArea={true}
+          scrollAreaProps={{ scrollbarSize: 12 }}
           {...form.getInputProps("categoryId")}
         />
       </Group>
       <Group gap="xs" align="flex-start" flex={1} className="flex-wrap! @min-[330px]:flex-nowrap!">
-        <Select
-          label="Lokalizacja"
-          placeholder="Wybierz lokalizację"
-          data={[]}
-          searchable
-          allowDeselect={true}
-          clearable
-          style={{ flex: 1, minWidth: 160 }}
-        />
+        <RegionFilter value={form.values.location} onChange={(value) => form.setFieldValue("location", value)} />
         <DatePickerInput
           type="range"
           allowSingleDateInRange
           label={form.values.type === "found" ? "Zakres daty znalezienia" : "Zakres daty zagubienia"}
           placeholder="Wybierz zakres dat"
           locale="pl"
-          valueFormat={"DD MMMM YYYY"}
+          valueFormat={"DD MMM YYYY"}
           maxDate={new Date()}
           clearable
           popoverProps={{
             position: "bottom",
+            styles: {
+              dropdown: {
+                padding: "calc(.25rem * var(--mantine-scale))",
+              },
+            },
           }}
           style={{ flex: 1, minWidth: 160 }}
           {...form.getInputProps("occurredAtRange")}
