@@ -1,5 +1,6 @@
 ﻿using LostNFound.Api.Configuration;
 using LostNFound.Api.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,11 +9,11 @@ using System.Text;
 
 namespace LostNFound.Api.Services
 {
-    public class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJwtTokenService
+    public class JwtTokenService(UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions) : IJwtTokenService
     {
         private readonly JwtOptions jwt = jwtOptions.Value;
 
-        public JwtTokenResult CreateToken(ApplicationUser user)
+        public async Task<JwtTokenResult> CreateTokenAsync(ApplicationUser user)
         {
             if (string.IsNullOrWhiteSpace(user.Email))
             {
@@ -26,6 +27,9 @@ namespace LostNFound.Api.Services
               new(ClaimTypes.NameIdentifier, user.Id.ToString()),
               new(ClaimTypes.Email, user.Email)
           };
+
+            var roles = await userManager.GetRolesAsync(user);
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key));
             var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);

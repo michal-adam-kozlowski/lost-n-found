@@ -37,7 +37,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
             return ValidationProblem(ModelState);
         }
 
-        var token = jwtTokenService.CreateToken(user);
+        var token = await jwtTokenService.CreateTokenAsync(user);
 
         return Ok(new LoginUserResponse(token.AccessToken, token.ExpiresAtUtc, user.Id, user.Email!));
     }
@@ -60,7 +60,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
         if (!signInResult.Succeeded)
             return UnauthorizedProblem();
 
-        var token = jwtTokenService.CreateToken(user);
+        var token = await jwtTokenService.CreateTokenAsync(user);
 
         return Ok(new LoginUserResponse(token.AccessToken, token.ExpiresAtUtc, user.Id, user.Email!));
     }

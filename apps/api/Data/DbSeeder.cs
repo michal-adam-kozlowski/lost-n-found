@@ -6,8 +6,19 @@ namespace LostNFound.Api.Data;
 
 public static class DbSeeder
 {
-    public static async Task SeedAsync(AppDbContext db, UserManager<ApplicationUser> userManager)
+    public static async Task SeedAsync(AppDbContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<Guid>> roleManager)
     {
+        const string adminRoleName = "Admin";
+        if (!await roleManager.RoleExistsAsync(adminRoleName))
+        {
+            var result = await roleManager.CreateAsync(new IdentityRole<Guid>(adminRoleName));
+            if (!result.Succeeded)
+            {
+                throw new Exception("Failed to create Admin role: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+        }
+
+
         string seedEmail = "qwe@qw.pl";
         string seedPassword = "qwerty";
 
