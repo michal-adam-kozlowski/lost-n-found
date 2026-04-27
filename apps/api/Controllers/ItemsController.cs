@@ -1,5 +1,3 @@
-using Amazon.Runtime.Internal.Util;
-using Amazon.S3.Model;
 using LostNFound.Api.Data;
 using LostNFound.Api.Models;
 using LostNFound.Api.Services;
@@ -14,7 +12,7 @@ namespace LostNFound.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ItemsController(AppDbContext db, IFileStorageService storage, ILogger<ItemsController> logger, IMapTilerService mapTiler) : ControllerBase
+public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionService, IMapTilerService mapTiler) : ControllerBase
 {
     private static readonly HashSet<string> ValidTypes = ["lost", "found"];
 
@@ -232,27 +230,7 @@ public class ItemsController(AppDbContext db, IFileStorageService storage, ILogg
         }
 
         
-        var imageObjectKeys = await db.ItemImages
-            .Where(x => x.ItemId == id && x.UploadStatus != UploadStatus.Deleted)
-            .Select(x => x.ObjectKey)
-            .Distinct()
-            .ToListAsync();
-
-        //ItemImage rows will cascade delete with the item
-        db.Items.Remove(item);
-        await db.SaveChangesAsync();
-
-        foreach (var objectKey in imageObjectKeys)
-        {
-            try
-            {
-                await storage.DeleteObjectAsync(objectKey);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed to delete ItemImage {ObjectKey} for item {ItemId}", objectKey, id);
-            }
-        }
+        await itemDeletionService.DeleteItemAsync(id);
 
         return NoContent(); 
     }
