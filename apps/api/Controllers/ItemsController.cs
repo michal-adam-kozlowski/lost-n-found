@@ -31,7 +31,8 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
         [FromQuery] DateOnly? occurredAtTo = null,
         [FromQuery] string? locationId = null)
     {
-        IQueryable<Item> query = db.Items;
+        IQueryable<Item> query = db.Items
+            .Where(i => !i.CreatedByUser.IsBlocked);
 
         if (mine)
         {
@@ -113,7 +114,10 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ItemResponse>> GetById(Guid id)
     {
-        var item = await db.Items.FindAsync(id);
+        var item = await db.Items
+            .Where(i => !i.CreatedByUser.IsBlocked)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
         if (item is null)
         {
             return Problem(
