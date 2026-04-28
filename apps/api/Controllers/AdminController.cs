@@ -11,13 +11,15 @@ namespace LostNFound.Api.Controllers;
 [Authorize(Policy = "AdminOnly")]
 public class AdminController(IItemDeletionService itemDeletionService, UserManager<ApplicationUser> userManager) : ControllerBase
 {
+    //only for testing 
+    /*
     [HttpGet]
     public ActionResult<string> GetAdminData()
     {
         return Ok("admin access");
     }
-
-
+    */
+   
 
 
     [HttpDelete("items/{itemId:guid}")]
@@ -39,9 +41,12 @@ public class AdminController(IItemDeletionService itemDeletionService, UserManag
         }
 
     }
-
-
+    /// <summary>
+    /// Blocks a user.
+    /// </summary>
     [HttpPost("users/{userId:guid}/block")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> BlockUser(Guid userId)
     {
         var user = await userManager.FindByIdAsync(userId.ToString());
@@ -66,8 +71,12 @@ public class AdminController(IItemDeletionService itemDeletionService, UserManag
         return NoContent();
     }
 
-
+    /// <summary>
+    /// Unblocks a user.
+    /// </summary>
     [HttpPost("users/{userId:guid}/unblock")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> UnblockUser(Guid userId)
     {
         var user = await userManager.FindByIdAsync(userId.ToString());

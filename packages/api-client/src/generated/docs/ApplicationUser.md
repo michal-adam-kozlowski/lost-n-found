@@ -6,6 +6,8 @@
 
 Name | Type
 ------------ | -------------
+`isBlocked` | boolean
+`blockedAt` | string
 `id` | string
 `userName` | string
 `normalizedUserName` | string
