@@ -6,6 +6,7 @@
 
 Name | Type
 ------------ | -------------
+`blockedAt` | string
 `id` | string
 `userName` | string
 `normalizedUserName` | string

@@ -37,7 +37,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
             return ValidationProblem(ModelState);
         }
 
-        var token = jwtTokenService.CreateToken(user);
+        var token = await jwtTokenService.CreateTokenAsync(user);
 
         return Ok(new LoginUserResponse(token.AccessToken, token.ExpiresAtUtc, user.Id, user.Email!));
     }
@@ -52,7 +52,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
     {
         var user = await userManager.FindByEmailAsync(req.Email);
 
-        if (user == null)
+        if (user == null || user.BlockedAt != null)
             return UnauthorizedProblem();
 
         var signInResult = await signInManager.CheckPasswordSignInAsync(user, req.Password, false);
@@ -60,7 +60,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
         if (!signInResult.Succeeded)
             return UnauthorizedProblem();
 
-        var token = jwtTokenService.CreateToken(user);
+        var token = await jwtTokenService.CreateTokenAsync(user);
 
         return Ok(new LoginUserResponse(token.AccessToken, token.ExpiresAtUtc, user.Id, user.Email!));
     }

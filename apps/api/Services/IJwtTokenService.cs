@@ -4,7 +4,7 @@ namespace LostNFound.Api.Services
 {
     public interface IJwtTokenService
     {
-        JwtTokenResult CreateToken(ApplicationUser user);
+        Task<JwtTokenResult> CreateTokenAsync(ApplicationUser user);
     }
     public record JwtTokenResult(string AccessToken, DateTime ExpiresAtUtc);
 }

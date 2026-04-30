@@ -75,5 +75,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.HasIndex(x => new { x.ItemId, x.UploadStatus });
             e.HasIndex(x => x.UploadedByUserId);
         });
+
+        modelBuilder.Entity<ApplicationUser>(e =>
+        {
+            e.Property(x => x.BlockedAt).HasColumnType("timestamptz");
+        });
+
     }
 }

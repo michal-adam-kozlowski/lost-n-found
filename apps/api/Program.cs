@@ -1,5 +1,6 @@
 using Amazon.S3;
 using LostNFound.Api.Configuration;
+using LostNFound.Api.Constants;
 using LostNFound.Api.Data;
 using LostNFound.Api.Models;
 using LostNFound.Api.Services;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -81,11 +83,16 @@ builder.Services
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
 
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
+
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AuthConstants.AdminOnlyPolicy, policy => policy.RequireRole(AuthConstants.AdminRole));
+});
 
 // ── Storage (S3-compatible) ───────────────────────────────────────────────
 var storageOptionsBuilder = builder.Services.AddOptions<StorageOptions>()
@@ -136,6 +143,7 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
 builder.Services.AddSingleton<IFileStorageService, S3FileStorageService>();
 builder.Services.AddSingleton<IImageProcessingService, ImageProcessingService>();
 builder.Services.AddScoped<IItemImageService, ItemImageService>();
+builder.Services.AddScoped<IItemDeletionService, ItemDeletionService>();
 
 // CORS_ORIGINS accepts a comma-separated list of allowed origins (e.g. the Railway frontend URL).
 var corsOrigins = (Environment.GetEnvironmentVariable("CORS_ORIGINS") ?? "http://localhost:3000")
@@ -187,6 +195,7 @@ if (!isDesignTime)
     {
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
         var pending = (await db.Database.GetPendingMigrationsAsync()).ToList();
         app.Logger.LogInformation("Pending EF migrations: {Count} ({Names})",
@@ -194,7 +203,7 @@ if (!isDesignTime)
             pending.Count == 0 ? "none" : string.Join(", ", pending));
 
         await db.Database.MigrateAsync();
-        await DbSeeder.SeedAsync(db, userManager);
+        await DbSeeder.SeedAsync(db, userManager, roleManager);
     }
 }
 

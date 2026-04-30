@@ -126,7 +126,7 @@ public class ItemImageService(
         Guid itemId, Guid imageId, CancellationToken ct = default)
     {
         var image = await db.ItemImages
-            .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId && i.UploadStatus == UploadStatus.Uploaded, ct)
+            .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId && i.UploadStatus == UploadStatus.Uploaded && i.Item.CreatedByUser.BlockedAt == null, ct)
             ?? throw new KeyNotFoundException("Image not found.");
 
         var expirySeconds = uploadOptions.Value.PresignedUrlExpirySeconds;
@@ -139,7 +139,7 @@ public class ItemImageService(
         Guid itemId, Guid imageId, CancellationToken ct = default)
     {
         var image = await db.ItemImages
-            .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId && i.UploadStatus == UploadStatus.Uploaded, ct)
+            .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId && i.UploadStatus == UploadStatus.Uploaded && i.Item.CreatedByUser.BlockedAt == null, ct)
             ?? throw new KeyNotFoundException("Image not found.");
 
         if (string.IsNullOrEmpty(image.ThumbnailObjectKey))

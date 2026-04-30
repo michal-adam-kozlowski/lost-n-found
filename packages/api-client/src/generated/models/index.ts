@@ -11,6 +11,12 @@ export interface ApplicationUser {
      * @type {string}
      * @memberof ApplicationUser
      */
+    blockedAt?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ApplicationUser
+     */
     id?: string;
     /**
      * 
