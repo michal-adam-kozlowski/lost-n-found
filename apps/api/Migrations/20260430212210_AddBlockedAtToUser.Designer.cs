@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LostNFound.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260428201631_AddIsBlockedToUser")]
-    partial class AddIsBlockedToUser
+    [Migration("20260430212210_AddBlockedAtToUser")]
+    partial class AddBlockedAtToUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,9 +48,6 @@ namespace LostNFound.Api.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsBlocked")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("LockoutEnabled")

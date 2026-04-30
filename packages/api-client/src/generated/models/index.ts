@@ -8,12 +8,6 @@
 export interface ApplicationUser {
     /**
      * 
-     * @type {boolean}
-     * @memberof ApplicationUser
-     */
-    isBlocked?: boolean;
-    /**
-     * 
      * @type {string}
      * @memberof ApplicationUser
      */

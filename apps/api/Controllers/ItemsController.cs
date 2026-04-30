@@ -32,7 +32,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
         [FromQuery] string? locationId = null)
     {
         IQueryable<Item> query = db.Items
-            .Where(i => !i.CreatedByUser.IsBlocked);
+            .Where(i => i.CreatedByUser.BlockedAt == null);
 
         if (mine)
         {
@@ -115,7 +115,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
     public async Task<ActionResult<ItemResponse>> GetById(Guid id)
     {
         var item = await db.Items
-            .Where(i => !i.CreatedByUser.IsBlocked)
+            .Where(i => i.CreatedByUser.BlockedAt == null)
             .FirstOrDefaultAsync(i => i.Id == id);
 
         if (item is null)

@@ -52,7 +52,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
     {
         var user = await userManager.FindByEmailAsync(req.Email);
 
-        if (user == null || user.IsBlocked)
+        if (user == null || user.BlockedAt != null)
             return UnauthorizedProblem();
 
         var signInResult = await signInManager.CheckPasswordSignInAsync(user, req.Password, false);

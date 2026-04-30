@@ -1,5 +1,6 @@
 using Amazon.S3;
 using LostNFound.Api.Configuration;
+using LostNFound.Api.Constants;
 using LostNFound.Api.Data;
 using LostNFound.Api.Models;
 using LostNFound.Api.Services;
@@ -90,7 +91,7 @@ builder.Services
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy(AuthConstants.AdminOnlyPolicy, policy => policy.RequireRole(AuthConstants.AdminRole));
 });
 
 // ── Storage (S3-compatible) ───────────────────────────────────────────────

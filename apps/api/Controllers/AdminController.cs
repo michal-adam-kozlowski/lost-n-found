@@ -1,4 +1,5 @@
-﻿using LostNFound.Api.Models;
+﻿using LostNFound.Api.Constants;
+using LostNFound.Api.Models;
 using LostNFound.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +9,7 @@ namespace LostNFound.Api.Controllers;
 
 [ApiController]
 [Route("api/admin")]
-[Authorize(Policy = "AdminOnly")]
+[Authorize(Policy = AuthConstants.AdminOnlyPolicy)]
 public class AdminController(IItemDeletionService itemDeletionService, UserManager<ApplicationUser> userManager) : ControllerBase
 {
     //only for testing 
@@ -55,7 +56,6 @@ public class AdminController(IItemDeletionService itemDeletionService, UserManag
             return NotFound();
         }
 
-        user.IsBlocked = true;
         user.BlockedAt = DateTime.UtcNow;
 
         var result = await userManager.UpdateAsync(user);
@@ -85,7 +85,6 @@ public class AdminController(IItemDeletionService itemDeletionService, UserManag
             return NotFound();
         }
 
-        user.IsBlocked = false;
         user.BlockedAt = null;
 
         var result = await userManager.UpdateAsync(user);

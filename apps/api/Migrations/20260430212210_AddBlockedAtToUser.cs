@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LostNFound.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddIsBlockedToUser : Migration
+    public partial class AddBlockedAtToUser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,13 +16,6 @@ namespace LostNFound.Api.Migrations
                 table: "AspNetUsers",
                 type: "timestamptz",
                 nullable: true);
-
-            migrationBuilder.AddColumn<bool>(
-                name: "IsBlocked",
-                table: "AspNetUsers",
-                type: "boolean",
-                nullable: false,
-                defaultValue: false);
         }
 
         /// <inheritdoc />
@@ -30,10 +23,6 @@ namespace LostNFound.Api.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "BlockedAt",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "IsBlocked",
                 table: "AspNetUsers");
         }
     }
