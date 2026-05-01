@@ -220,9 +220,11 @@ git commit -m "chore: add pnpm lockfile"
 
 Create a user through normal registration and promote them to admin directly in the db:
 
-  INSERT INTO "AspNetUserRoles" ("UserId", "RoleId")
-  SELECT u."Id", r."Id"
-  FROM "AspNetUsers" u
-  JOIN "AspNetRoles" r ON r."Name" = 'Admin'
-  WHERE u."Email" = 'user@example.com'
-  ON CONFLICT DO NOTHING;
+```sql
+INSERT INTO "AspNetUserRoles" ("UserId", "RoleId")
+SELECT u."Id", r."Id"
+FROM "AspNetUsers" u
+JOIN "AspNetRoles" r ON r."Name" = 'Admin'
+WHERE u."Email" = 'user@example.com'
+ON CONFLICT DO NOTHING;
+```
