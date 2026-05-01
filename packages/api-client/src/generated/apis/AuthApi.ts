@@ -15,6 +15,7 @@
 
 import * as runtime from '../runtime';
 import type {
+  ChangePasswordRequest,
   CurrentUserResponse,
   LoginUserRequest,
   LoginUserResponse,
@@ -22,6 +23,10 @@ import type {
   RegisterUserRequest,
   ValidationProblemDetails,
 } from '../models/index';
+
+export interface ApiAuthChangePasswordPostRequest {
+    changePasswordRequest: ChangePasswordRequest;
+}
 
 export interface ApiAuthLoginPostRequest {
     loginUserRequest: LoginUserRequest;
@@ -38,6 +43,29 @@ export interface ApiAuthRegisterPostRequest {
  * @interface AuthApiInterface
  */
 export interface AuthApiInterface {
+    /**
+     * Creates request options for apiAuthChangePasswordPost without sending the request
+     * @param {ChangePasswordRequest} changePasswordRequest 
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthChangePasswordPostRequestOpts(requestParameters: ApiAuthChangePasswordPostRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @summary Changes the password of the currently authenticated user.
+     * @param {ChangePasswordRequest} changePasswordRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthChangePasswordPostRaw(requestParameters: ApiAuthChangePasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     * Changes the password of the currently authenticated user.
+     */
+    apiAuthChangePasswordPost(requestParameters: ApiAuthChangePasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
     /**
      * Creates request options for apiAuthLoginPost without sending the request
      * @param {LoginUserRequest} loginUserRequest 
@@ -111,6 +139,60 @@ export interface AuthApiInterface {
  * 
  */
 export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
+
+    /**
+     * Creates request options for apiAuthChangePasswordPost without sending the request
+     */
+    async apiAuthChangePasswordPostRequestOpts(requestParameters: ApiAuthChangePasswordPostRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['changePasswordRequest'] == null) {
+            throw new runtime.RequiredError(
+                'changePasswordRequest',
+                'Required parameter "changePasswordRequest" was null or undefined when calling apiAuthChangePasswordPost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/auth/change-password`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['changePasswordRequest'],
+        };
+    }
+
+    /**
+     * Changes the password of the currently authenticated user.
+     */
+    async apiAuthChangePasswordPostRaw(requestParameters: ApiAuthChangePasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.apiAuthChangePasswordPostRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Changes the password of the currently authenticated user.
+     */
+    async apiAuthChangePasswordPost(requestParameters: ApiAuthChangePasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiAuthChangePasswordPostRaw(requestParameters, initOverrides);
+    }
 
     /**
      * Creates request options for apiAuthLoginPost without sending the request

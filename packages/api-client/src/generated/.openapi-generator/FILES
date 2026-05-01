@@ -12,6 +12,7 @@ docs/AuthApi.md
 docs/CategoriesApi.md
 docs/Category.md
 docs/CategoryResponse.md
+docs/ChangePasswordRequest.md
 docs/Coordinate.md
 docs/CoordinateSequence.md
 docs/CoordinateSequenceFactory.md

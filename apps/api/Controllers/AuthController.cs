@@ -85,6 +85,40 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
         return Ok(new CurrentUserResponse(userId, emailClaim));
     }
 
+
+    /// <summary>
+    /// Changes the password of the currently authenticated user.
+    /// </summary>
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return UnauthorizedProblem();
+        }
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+        {
+            return UnauthorizedProblem();
+        }
+
+        var result = await userManager.ChangePasswordAsync(user, req.CurrentPassword, req.NewPassword);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.Code, error.Description);
+            }
+            return ValidationProblem(ModelState);
+        }
+
+        return NoContent();
+    }
     private ObjectResult UnauthorizedProblem()
     {
         return Problem(
@@ -107,3 +141,9 @@ public record LoginUserRequest(
 public record LoginUserResponse(string AccessToken, DateTime ExpiresAtUtc, Guid Id, string Email);
 
 public record CurrentUserResponse(Guid UserId, string Email);
+
+
+public record ChangePasswordRequest(
+    [Required] string CurrentPassword,
+    [Required, MinLength(6)] string NewPassword
+);

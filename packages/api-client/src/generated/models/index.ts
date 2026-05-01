@@ -151,6 +151,25 @@ export interface CategoryResponse {
 /**
  * 
  * @export
+ * @interface ChangePasswordRequest
+ */
+export interface ChangePasswordRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ChangePasswordRequest
+     */
+    currentPassword: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChangePasswordRequest
+     */
+    newPassword: string;
+}
+/**
+ * 
+ * @export
  * @interface Coordinate
  */
 export interface Coordinate {
