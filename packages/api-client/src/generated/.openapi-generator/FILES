@@ -1,3 +1,4 @@
+apis/AccountApi.ts
 apis/AdminApi.ts
 apis/AuthApi.ts
 apis/CategoriesApi.ts
@@ -5,6 +6,7 @@ apis/ItemImagesApi.ts
 apis/ItemsApi.ts
 apis/LostNFoundApiApi.ts
 apis/index.ts
+docs/AccountApi.md
 docs/AdminApi.md
 docs/ApplicationUser.md
 docs/ApplicationUserAccessFailedCount.md
