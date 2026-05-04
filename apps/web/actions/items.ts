@@ -3,9 +3,10 @@
 import { cacheTag, updateTag } from "next/cache";
 import { addTokenToInit, itemsApi } from "@/lib/api";
 import { getToken } from "@/actions/auth";
-import { runtimeCacheLife } from "@/lib/utils/data";
+import { runtimeCacheLife } from "@/lib/utils/server";
+import { paginate } from "@/lib/utils/data";
 import { ItemsViewOptions } from "@/lib/utils/ItemsViewOptions";
-import { EMPTY_ITEMS_RESULT, PaginatedItemsResult, paginateItems } from "@/lib/utils/items";
+import { EMPTY_ITEMS_RESULT, PaginatedItemsResult } from "@/lib/utils/items";
 
 export async function addItem(item: Parameters<typeof itemsApi.apiItemsPost>[0]["createItemRequest"]) {
   try {
@@ -64,7 +65,7 @@ export async function getItems(
       mine: false,
       locationId,
     });
-    return paginateItems(items, page);
+    return paginate(items, page);
   } catch (error) {
     console.error("Error fetching items:", error);
     return EMPTY_ITEMS_RESULT;
@@ -92,7 +93,7 @@ export async function getItemsForCurrentUser(
       },
       addTokenToInit(token),
     );
-    return paginateItems(items, page);
+    return paginate(items, page);
   } catch (error) {
     console.error("Error fetching items:", error);
     return EMPTY_ITEMS_RESULT;

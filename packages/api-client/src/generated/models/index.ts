@@ -686,6 +686,37 @@ export interface GeometryFactory {
 /**
  * 
  * @export
+ * @interface GetUserResponse
+ */
+export interface GetUserResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetUserResponse
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetUserResponse
+     */
+    email: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetUserResponse
+     */
+    blockedAt: string | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GetUserResponse
+     */
+    roles: Array<string> | null;
+}
+/**
+ * 
+ * @export
  * @interface Item
  */
 export interface Item {
