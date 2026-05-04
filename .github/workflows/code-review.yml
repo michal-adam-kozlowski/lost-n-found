@@ -19,6 +19,8 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          show_full_output: true
           prompt: |
             Review this PR. Focus on bugs, security issues, and logic errors.
             Read the CLAUDE.md file for project-specific review guidelines.
+            Post your review as a PR comment.
