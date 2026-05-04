@@ -8,14 +8,6 @@ export type PaginatedItemsResult = {
   totalCount: number;
 };
 
-const PAGE_SIZE = 20;
-
-export function paginateItems<T>(items: T[], page?: number): { items: T[]; pageCount: number; totalCount: number } {
-  if (!page) return { items, pageCount: 1, totalCount: items.length };
-  const pageCount = Math.ceil(items.length / PAGE_SIZE);
-  return { items: items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), pageCount, totalCount: items.length };
-}
-
 export const EMPTY_ITEMS_RESULT: PaginatedItemsResult = { items: [], pageCount: 0, totalCount: 0 };
 
 export function getMarkersForItems(items: ItemResponse[]): InteractiveMarker<ItemResponse>[] {

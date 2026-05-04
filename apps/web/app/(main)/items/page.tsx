@@ -1,7 +1,7 @@
 import MapList from "@components/maps/MapList";
 import ItemsList from "@components/items/ItemsList";
 import ItemPopup from "@components/items/ItemPopup";
-import { runtimeGet } from "@/lib/utils/data";
+import { runtimeGet } from "@/lib/utils/server";
 import { getItems } from "@/actions/items";
 import { redirect } from "next/navigation";
 import { Paper, Text, Title, Group } from "@mantine/core";
