@@ -2,9 +2,7 @@ import { test, expect } from "@playwright/test";
 import { register, login, createItem } from "./helpers";
 
 test.describe("Happy Path", () => {
-  test("register → login → create item → view details → logout", async ({
-    page,
-  }) => {
+  test("register → login → create item → view details → logout", async ({ page }) => {
     // 1. Register
     const creds = await register(page);
 
@@ -32,8 +30,6 @@ test.describe("Happy Path", () => {
     await page.waitForURL(/\/login/);
 
     // 8. Verify logged out — should see login button
-    await expect(
-      page.getByRole("link", { name: "Zaloguj się" }),
-    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Zaloguj się" })).toBeVisible();
   });
 });

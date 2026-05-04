@@ -22,25 +22,30 @@ jobs:
         with:
           fetch-depth: 2
 
-      - uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          direct_prompt: |
-            Look at the latest commit diff by running: git diff HEAD~1
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
 
-            Then read the current README.md.
+      - name: Check and update README
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude --print --allowedTools "Bash(git diff:*),Bash(gh *),Read,Edit,Write" <<'PROMPT'
+          Look at the latest commit diff by running: git diff HEAD~1
 
-            Determine if the changes affect anything documented in the README:
-            - New or changed API endpoints
-            - New or changed environment variables
-            - New or changed setup steps, prerequisites, or commands
-            - New or changed database schema
-            - Structural changes to the repository
+          Then read the current README.md.
 
-            If the README needs updating:
-            1. Create a new branch named "docs/update-readme-${{ github.sha }}"
-            2. Update only the sections of README.md that are affected by the changes
-            3. Commit the changes
-            4. Open a PR to master using: gh pr create --title "docs: update README" --body "Auto-generated README update based on recent changes."
+          Determine if the changes affect anything documented in the README:
+          - New or changed API endpoints
+          - New or changed environment variables
+          - New or changed setup steps, prerequisites, or commands
+          - New or changed database schema
+          - Structural changes to the repository
 
-            If nothing in the README needs updating, do nothing and exit.
+          If the README needs updating:
+          1. Create a new branch named "docs/update-readme-${{ github.sha }}"
+          2. Update only the sections of README.md that are affected by the changes
+          3. Commit the changes
+          4. Open a PR to master using: gh pr create --title "docs: update README" --body "Auto-generated README update based on recent changes."
+
+          If nothing in the README needs updating, just say "No README update needed" and exit.
+          PROMPT

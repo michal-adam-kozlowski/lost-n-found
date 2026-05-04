@@ -12,9 +12,7 @@ const TEST_PASSWORD = "TestPassword123!";
 /**
  * Register a new user and return the credentials.
  */
-export async function register(
-  page: Page,
-): Promise<{ email: string; password: string }> {
+export async function register(page: Page): Promise<{ email: string; password: string }> {
   const email = uniqueEmail();
 
   await page.goto("/register");
@@ -33,11 +31,7 @@ export async function register(
 /**
  * Log in with existing credentials.
  */
-export async function login(
-  page: Page,
-  email: string,
-  password: string,
-): Promise<void> {
+export async function login(page: Page, email: string, password: string): Promise<void> {
   await page.goto("/login");
   // Wait for hydration to settle (Next.js 16 can briefly duplicate inputs)
   await page.waitForLoadState("networkidle");
@@ -54,9 +48,7 @@ export async function login(
  * Create a lost item via the UI. Assumes user is already logged in.
  * Returns the item title for later assertions.
  */
-export async function createItem(
-  page: Page,
-): Promise<{ title: string }> {
+export async function createItem(page: Page): Promise<{ title: string }> {
   const title = `Test item ${Date.now()}`;
 
   await page.goto("/add");

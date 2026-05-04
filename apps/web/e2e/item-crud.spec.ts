@@ -21,13 +21,8 @@ test.describe("Item CRUD", () => {
     await page.getByRole("button", { name: "Usuń" }).click();
 
     // Confirm in the modal dialog
-    await expect(
-      page.getByText("Czy na pewno chcesz usunąć to ogłoszenie?"),
-    ).toBeVisible();
-    await page
-      .getByRole("dialog")
-      .getByRole("button", { name: "Usuń" })
-      .click();
+    await expect(page.getByText("Czy na pewno chcesz usunąć to ogłoszenie?")).toBeVisible();
+    await page.getByRole("dialog").getByRole("button", { name: "Usuń" }).click();
 
     // Should redirect to account items page
     await page.waitForURL(/\/account\/items/);
