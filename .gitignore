@@ -24,6 +24,9 @@ pnpm-debug.log*
 # ── Test / Coverage ───────────────────────────────────────────────────────────
 coverage/
 .nyc_output/
+test-results/
+playwright-report/
+.playwright/
 
 # ── .NET ─────────────────────────────────────────────────────────────────────
 [Bb]in/
@@ -47,3 +50,4 @@ Desktop.ini
 
 # ── AI / tool-specific ───────────────────────────────────────────────────────
 .claude/
+docs/
