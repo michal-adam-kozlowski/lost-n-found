@@ -81,7 +81,7 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
         {
           accessor: "category",
           title: "Kategoria",
-          width: 180,
+          width: 200,
           sortable: true,
         },
         {
@@ -96,7 +96,15 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
           ),
         },
         { accessor: "user", title: "Dodane przez", width: 200, sortable: true },
-        { accessor: "title", title: "Tytuł", width: 200, sortable: true },
+        {
+          accessor: "title",
+          title: "Tytuł",
+          width: 200,
+          sortable: true,
+          render: (item) => {
+            return <span className="block overflow-hidden whitespace-nowrap text-ellipsis">{item.title}</span>;
+          },
+        },
         {
           accessor: "description",
           title: "Opis",
