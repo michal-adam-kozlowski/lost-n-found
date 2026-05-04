@@ -3,15 +3,20 @@
 import { ItemResponse } from "@lost-n-found/api-client";
 import { DataTable, DataTableSortStatus } from "mantine-datatable";
 import { useCategories } from "@/lib/context/CategoriesContext";
-import { Badge, Button } from "@mantine/core";
+import { Badge, Button, Text } from "@mantine/core";
 import React, { useState } from "react";
 import dayjs from "dayjs";
 import { paginate } from "@/lib/utils/data";
 import { sortBy } from "lodash";
+import Link from "next/link";
+import { modals } from "@mantine/modals";
+import { deleteItemFromAdmin } from "@/actions/admin";
+import { useRouter } from "next/navigation";
 
 const PAGE_SIZE = 20;
 
 export default function ItemsTable({ items }: { items: ItemResponse[] }) {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<ItemResponse>>({
     columnAccessor: "createdAt",
@@ -30,6 +35,26 @@ export default function ItemsTable({ items }: { items: ItemResponse[] }) {
   }
 
   const { items: paginatedItems } = paginate(sortedItems, page, PAGE_SIZE);
+
+  const openDeleteModal = (itemId: string) => {
+    modals.openConfirmModal({
+      title: "Usunąć ogłoszenie?",
+      centered: true,
+      children: (
+        <Text size="sm">
+          Czy na pewno chcesz usunąć to ogłoszenie? <br /> Ta operacja jest nieodwracalna.
+        </Text>
+      ),
+      labels: { confirm: "Usuń", cancel: "Anuluj" },
+      confirmProps: { color: "red" },
+      groupProps: { justify: "space-between" },
+      onCancel: () => {},
+      onConfirm: async () => {
+        await deleteItemFromAdmin(itemId);
+        router.refresh();
+      },
+    });
+  };
 
   if (categoriesLoading) {
     return null;
@@ -113,13 +138,21 @@ export default function ItemsTable({ items }: { items: ItemResponse[] }) {
         {
           accessor: "actions",
           title: "Akcje",
-          width: 150,
+          width: 156,
           render: (item) => (
             <div className="flex flex-row gap-3">
-              <Button variant="filled" size="compact-sm" radius="sm">
-                Zobacz
-              </Button>
-              <Button variant="filled" size="compact-sm" radius="sm" color="red">
+              <Link href={`/items/${item.id}`}>
+                <Button variant="filled" size="compact-sm" radius="sm">
+                  Zobacz
+                </Button>
+              </Link>
+              <Button
+                variant="filled"
+                size="compact-sm"
+                radius="sm"
+                color="red"
+                onClick={() => openDeleteModal(item.id)}
+              >
                 Usuń
               </Button>
             </div>
