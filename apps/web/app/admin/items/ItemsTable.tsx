@@ -49,6 +49,7 @@ export default function ItemsTable({ items }: { items: ItemResponse[] }) {
       records={paginatedItems}
       sortStatus={sortStatus}
       onSortStatusChange={setSortStatus}
+      pinLastColumn
       columns={[
         { accessor: "id", title: "ID", width: 340 },
         {
@@ -91,7 +92,7 @@ export default function ItemsTable({ items }: { items: ItemResponse[] }) {
           width: 220,
           sortable: true,
           render: (item) => (
-            <span className="whitespace-pre">{dayjs(item.createdAt).locale("pl").format("HH:MM DD MMMM YYYY")}</span>
+            <span className="whitespace-pre">{dayjs(item.createdAt).locale("pl").format("HH:mm DD MMMM YYYY")}</span>
           ),
         },
         {
