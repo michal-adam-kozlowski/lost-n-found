@@ -57,6 +57,10 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: http://localhost:8080
 
+      - name: Dump Docker logs
+        if: failure()
+        run: docker compose -f infra/docker-compose.yml logs api
+
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4
