@@ -1,6 +1,6 @@
 "use client";
 
-import { ItemResponse } from "@lost-n-found/api-client";
+import { GetUserResponse, ItemResponse } from "@lost-n-found/api-client";
 import { DataTable, DataTableSortStatus } from "mantine-datatable";
 import { useCategories } from "@/lib/context/CategoriesContext";
 import { Badge, Button, Text } from "@mantine/core";
@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 
 const PAGE_SIZE = 20;
 
-export default function ItemsTable({ items }: { items: ItemResponse[] }) {
+export default function ItemsTable({ items, users }: { items: ItemResponse[]; users: GetUserResponse[] }) {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<ItemResponse>>({
@@ -27,6 +27,7 @@ export default function ItemsTable({ items }: { items: ItemResponse[] }) {
   const transformedItems = items.map((item) => ({
     ...item,
     category: categories.find((c) => c.id === item.categoryId)?.name || "-",
+    user: users.find((u) => u.id === item.createdByUserId)?.email || "-",
   }));
 
   const sortedItems = sortBy(transformedItems, sortStatus.columnAccessor);
@@ -94,6 +95,7 @@ export default function ItemsTable({ items }: { items: ItemResponse[] }) {
             </Badge>
           ),
         },
+        { accessor: "user", title: "Dodane przez", width: 200, sortable: true },
         { accessor: "title", title: "Tytuł", width: 200, sortable: true },
         {
           accessor: "description",
