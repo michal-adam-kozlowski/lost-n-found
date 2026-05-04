@@ -1,5 +1,5 @@
 import { cacheTag } from "next/cache";
-import { runtimeCacheLife } from "@/lib/utils/data";
+import { runtimeCacheLife } from "@/lib/utils/server";
 import { ApiError, itemsApi } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { getMarkersForItems } from "@/lib/utils/items";

@@ -32,10 +32,21 @@ export async function getCurrentUser() {
   if (expires && expires * 1000 < Date.now()) {
     return null;
   }
+  const rolesData = data["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+  const roles = Array.isArray(rolesData) ? rolesData : [rolesData];
   return {
     email: data["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] as string,
     id: data["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] as string,
+    roles,
   };
+}
+
+export async function currentUserHasRole(role: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return false;
+  }
+  return user.roles.includes(role);
 }
 
 export async function logout() {

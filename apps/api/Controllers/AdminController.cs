@@ -42,6 +42,30 @@ public class AdminController(IItemDeletionService itemDeletionService, UserManag
         }
 
     }
+
+    /// <summary>
+    /// Get all users
+    /// </summary>
+    [HttpGet("users/")]
+    [ProducesResponseType<List<GetUserResponse>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<GetUserResponse>>> GetUsers()
+    {
+        var users = userManager.Users.ToList();
+        if (users.Count == 0)
+        {
+            return NoContent();
+        }
+
+        var response = new List<GetUserResponse>();
+        foreach (var user in users)        {
+            var roles = await userManager.GetRolesAsync(user);
+            response.Add(new GetUserResponse(user.Id, user.Email!, user.BlockedAt, roles.ToList()));
+        }
+
+        return Ok(response);
+    }
+
+
     /// <summary>
     /// Blocks a user.
     /// </summary>
@@ -99,8 +123,8 @@ public class AdminController(IItemDeletionService itemDeletionService, UserManag
 
         return  NoContent();
     }
-
-
 }
 
+
+public record GetUserResponse(Guid Id, string Email, DateTime? BlockedAt, List<string>? Roles);
 
