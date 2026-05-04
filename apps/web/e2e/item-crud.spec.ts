@@ -10,7 +10,7 @@ test.describe("Item CRUD", () => {
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
 
     // Should show the "Zgubione" badge (lost type)
-    await expect(page.getByText("Zgubione")).toBeVisible();
+    await expect(page.getByRole("main").getByText("Zgubione", { exact: true })).toBeVisible();
   });
 
   test("delete own item", async ({ page }) => {

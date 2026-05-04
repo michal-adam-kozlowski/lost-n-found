@@ -24,14 +24,14 @@ test.describe("Authentication", () => {
     await expect(page).toHaveURL("/");
 
     // Should see user email in the header menu
-    await expect(page.getByText(creds.email)).toBeVisible();
+    await expect(page.getByText(creds.email).first()).toBeVisible();
   });
 
   test("show validation errors for invalid input", async ({ page }) => {
     await page.goto("/register");
 
     // Submit empty form
-    await page.getByRole("button", { name: "Zarejestruj się" }).click();
+    await page.locator('button[type="submit"]').click();
 
     // Should show validation errors
     await expect(page.getByText("Nieprawidłowy email")).toBeVisible();

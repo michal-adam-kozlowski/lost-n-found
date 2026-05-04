@@ -14,18 +14,18 @@ test.describe("Happy Path", () => {
     await login(page, creds.email, creds.password);
 
     // 3. Verify authenticated — user email visible
-    await expect(page.getByText(creds.email)).toBeVisible();
+    await expect(page.getByText(creds.email).first()).toBeVisible();
 
     // 4. Create an item
     const { title } = await createItem(page);
 
     // 5. Verify on item detail page
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
-    await expect(page.getByText("Zgubione")).toBeVisible();
+    await expect(page.getByRole("main").getByText("Zgubione", { exact: true })).toBeVisible();
 
     // 6. Navigate to items list and find the item
     await page.goto("/items?type=lost&view=list&page=1");
-    await expect(page.getByText(title)).toBeVisible();
+    await expect(page.getByText(title).first()).toBeVisible();
 
     // 7. Logout
     await page.goto("/logout");

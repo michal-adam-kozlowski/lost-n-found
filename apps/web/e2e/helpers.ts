@@ -18,10 +18,11 @@ export async function register(
   const email = uniqueEmail();
 
   await page.goto("/register");
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Hasło", { exact: true }).fill(TEST_PASSWORD);
-  await page.getByLabel("Potwierdź hasło").fill(TEST_PASSWORD);
-  await page.getByRole("button", { name: "Zarejestruj się" }).click();
+  const registerForm = page.locator("form");
+  await registerForm.getByPlaceholder("email@example.com").fill(email);
+  await registerForm.getByPlaceholder("Twoje hasło").fill(TEST_PASSWORD);
+  await registerForm.getByPlaceholder("Powtórz hasło").fill(TEST_PASSWORD);
+  await registerForm.locator('button[type="submit"]').click();
 
   // Wait for redirect to home page after successful registration
   await page.waitForURL("/");
@@ -38,9 +39,12 @@ export async function login(
   password: string,
 ): Promise<void> {
   await page.goto("/login");
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Hasło", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Zaloguj się" }).click();
+  // Wait for hydration to settle (Next.js 16 can briefly duplicate inputs)
+  await page.waitForLoadState("networkidle");
+  const loginForm = page.locator("form");
+  await loginForm.getByPlaceholder("email@example.com").first().fill(email);
+  await loginForm.getByPlaceholder("Twoje hasło").first().fill(password);
+  await loginForm.locator('button[type="submit"]').click();
 
   // Wait for redirect to home page after successful login
   await page.waitForURL("/");
@@ -64,12 +68,12 @@ export async function createItem(
   await page.getByLabel("Tytuł ogłoszenia").fill(title);
 
   // Select first available category (wait for options to load from API)
-  await page.getByLabel("Kategoria").click();
+  await page.getByRole("textbox", { name: "Kategoria" }).click();
   await page.getByRole("option").first().waitFor({ state: "visible" });
   await page.getByRole("option").first().click();
 
   // Submit
-  await page.getByRole("button", { name: "Dodaj ogłoszenie" }).click();
+  await page.locator('button[type="submit"]').click();
 
   // Wait for redirect to the item detail page
   await page.waitForURL(/\/items\/.+/);
