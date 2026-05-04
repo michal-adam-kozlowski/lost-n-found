@@ -6,10 +6,14 @@ import { Button } from "@mantine/core";
 import React, { useState } from "react";
 import { paginate } from "@/lib/utils/data";
 import { sortBy } from "lodash";
+import { useRouter } from "next/navigation";
+import { blockUser, unblockUser } from "@/actions/admin";
+import dayjs from "dayjs";
 
 const PAGE_SIZE = 20;
 
 export default function UsersTable({ users }: { users: GetUserResponse[] }) {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<GetUserResponse>>({
     columnAccessor: "email",
@@ -57,7 +61,8 @@ export default function UsersTable({ users }: { users: GetUserResponse[] }) {
           title: "Zablokowany",
           width: 240,
           sortable: true,
-          render: (user) => (user.blockedAt ? `Tak, ${user.blockedAt}` : "Nie"),
+          render: (user) =>
+            user.blockedAt ? `Tak, od ${dayjs(user.blockedAt).locale("pl").format("HH:mm DD MMMM YYYY")}` : "Nie",
         },
         {
           accessor: "actions",
@@ -66,11 +71,23 @@ export default function UsersTable({ users }: { users: GetUserResponse[] }) {
           render: (user) => (
             <div className="flex flex-row gap-3">
               {user.blockedAt ? (
-                <Button variant="filled" size="compact-sm" radius="sm" color="green">
+                <Button
+                  variant="filled"
+                  size="compact-sm"
+                  radius="sm"
+                  color="green"
+                  onClick={() => unblockUser(user.id).then(() => router.refresh())}
+                >
                   Odblokuj
                 </Button>
               ) : (
-                <Button variant="filled" size="compact-sm" radius="sm" color="red">
+                <Button
+                  variant="filled"
+                  size="compact-sm"
+                  radius="sm"
+                  color="red"
+                  onClick={() => blockUser(user.id).then(() => router.refresh())}
+                >
                   Zablokuj
                 </Button>
               )}
