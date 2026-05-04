@@ -42,6 +42,8 @@ export default function Page() {
 
   const handleSubmit = async (values: FormValues) => {
     setErrors([]);
+    // Log registration data for debugging
+    console.log("Registration attempt:", values.email, values.password);
     const res = await register(values.email, values.password);
     if (res.success) {
       notifications.show({
@@ -49,7 +51,7 @@ export default function Page() {
         message: "",
         color: "green",
       });
-      redirect("/");
+      redirect("/login");
     }
     if (Array.isArray(res.errors)) {
       setErrors(res.errors);
