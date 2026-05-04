@@ -1,0 +1,66 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install Playwright browsers
+        run: pnpm --filter web exec playwright install --with-deps chromium
+
+      - name: Start backend (Docker Compose)
+        run: docker compose -f infra/docker-compose.yml up -d --build --wait
+        env:
+          AWS_ENDPOINT_URL: "http://localhost:4572"
+          AWS_S3_BUCKET_NAME: "fake"
+          AWS_DEFAULT_REGION: "us-east-1"
+          AWS_ACCESS_KEY_ID: "123"
+          AWS_SECRET_ACCESS_KEY: "xyz"
+          MAPTILER_API_KEY: "fake"
+
+      - name: Wait for API to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/health > /dev/null 2>&1; then
+              echo "API is ready"
+              exit 0
+            fi
+            echo "Waiting for API... ($i/30)"
+            sleep 2
+          done
+          echo "API did not become ready"
+          exit 1
+
+      - name: Run Playwright tests
+        run: pnpm --filter web test:e2e
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8080
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 7
