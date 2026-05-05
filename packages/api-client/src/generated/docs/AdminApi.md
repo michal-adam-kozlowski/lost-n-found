@@ -4,10 +4,75 @@ All URIs are relative to *http://localhost*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
+| [**apiAdminItemsGet**](AdminApi.md#apiadminitemsget) | **GET** /api/admin/items | Returns all items ordered from newest to oldest. |
 | [**apiAdminItemsItemIdDelete**](AdminApi.md#apiadminitemsitemiddelete) | **DELETE** /api/admin/items/{itemId} |  |
+| [**apiAdminUsersGet**](AdminApi.md#apiadminusersget) | **GET** /api/admin/users | Get all users |
 | [**apiAdminUsersUserIdBlockPost**](AdminApi.md#apiadminusersuseridblockpost) | **POST** /api/admin/users/{userId}/block | Blocks a user. |
 | [**apiAdminUsersUserIdUnblockPost**](AdminApi.md#apiadminusersuseridunblockpost) | **POST** /api/admin/users/{userId}/unblock | Unblocks a user. |
 
+
+
+## apiAdminItemsGet
+
+> Array&lt;ItemResponse&gt; apiAdminItemsGet()
+
+Returns all items ordered from newest to oldest.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  AdminApi,
+} from '';
+import type { ApiAdminItemsGetRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new AdminApi(config);
+
+  try {
+    const data = await api.apiAdminItemsGet();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**Array&lt;ItemResponse&gt;**](ItemResponse.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **401** | Unauthorized |  -  |
+| **400** | Bad Request |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## apiAdminItemsItemIdDelete
@@ -76,6 +141,67 @@ example().catch(console.error);
 |-------------|-------------|------------------|
 | **204** | No Content |  -  |
 | **404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## apiAdminUsersGet
+
+> Array&lt;GetUserResponse&gt; apiAdminUsersGet()
+
+Get all users
+
+### Example
+
+```ts
+import {
+  Configuration,
+  AdminApi,
+} from '';
+import type { ApiAdminUsersGetRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new AdminApi(config);
+
+  try {
+    const data = await api.apiAdminUsersGet();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**Array&lt;GetUserResponse&gt;**](GetUserResponse.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

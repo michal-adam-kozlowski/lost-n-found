@@ -318,7 +318,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
     }
 
     
-    private static ItemResponse ToResponse (Item item, ItemImageInfo[] images) => new ItemResponse(
+    public static ItemResponse ToResponse (Item item, ItemImageInfo[] images) => new ItemResponse(
         item.Id,
         item.CategoryId,
         item.Title,
