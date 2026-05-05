@@ -47,7 +47,7 @@ export default function UsersTable({ users }: { users: GetUserResponse[] }) {
       withColumnBorders
       striped={true}
       shadow="sm"
-      totalRecords={users.length}
+      totalRecords={transformedUsers.length}
       recordsPerPage={PAGE_SIZE}
       page={page}
       onPageChange={(p) => setPage(p)}

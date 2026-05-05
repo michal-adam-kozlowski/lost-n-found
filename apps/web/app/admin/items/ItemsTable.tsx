@@ -84,7 +84,7 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
       withColumnBorders
       striped={true}
       shadow="sm"
-      totalRecords={items.length}
+      totalRecords={transformedItems.length}
       recordsPerPage={PAGE_SIZE}
       page={page}
       onPageChange={(p) => setPage(p)}
