@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import { UserRole } from "@/lib/utils/types";
 import { IconSearch, IconX } from "@tabler/icons-react";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 100;
 
 export default function UsersTable({ users }: { users: GetUserResponse[] }) {
   const router = useRouter();
@@ -71,7 +71,10 @@ export default function UsersTable({ users }: { users: GetUserResponse[] }) {
                 </ActionIcon>
               }
               value={searchId}
-              onChange={(e) => setSearchId(e.currentTarget.value)}
+              onChange={(e) => {
+                setSearchId(e.currentTarget.value);
+                setPage(1);
+              }}
             />
           ),
           filtering: searchId !== "",
@@ -92,7 +95,10 @@ export default function UsersTable({ users }: { users: GetUserResponse[] }) {
                 </ActionIcon>
               }
               value={searchEmail}
-              onChange={(e) => setSearchEmail(e.currentTarget.value)}
+              onChange={(e) => {
+                setSearchEmail(e.currentTarget.value);
+                setPage(1);
+              }}
             />
           ),
           filtering: searchEmail !== "",

@@ -14,7 +14,7 @@ import { deleteItemFromAdmin } from "@/actions/admin";
 import { useRouter } from "next/navigation";
 import { IconSearch, IconX } from "@tabler/icons-react";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 100;
 
 export default function ItemsTable({ items, users }: { items: ItemResponse[]; users: GetUserResponse[] }) {
   const router = useRouter();
@@ -109,7 +109,10 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
                 </ActionIcon>
               }
               value={searchId}
-              onChange={(e) => setSearchId(e.currentTarget.value)}
+              onChange={(e) => {
+                setSearchId(e.currentTarget.value);
+                setPage(1);
+              }}
             />
           ),
           filtering: searchId !== "",
@@ -130,7 +133,10 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
                 </ActionIcon>
               }
               value={searchCategory}
-              onChange={(e) => setSearchCategory(e.currentTarget.value)}
+              onChange={(e) => {
+                setSearchCategory(e.currentTarget.value);
+                setPage(1);
+              }}
             />
           ),
           filtering: searchCategory !== "",
@@ -162,7 +168,10 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
                 </ActionIcon>
               }
               value={searchUser}
-              onChange={(e) => setSearchUser(e.currentTarget.value)}
+              onChange={(e) => {
+                setSearchUser(e.currentTarget.value);
+                setPage(1);
+              }}
             />
           ),
           filtering: searchUser !== "",
@@ -186,7 +195,10 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
                 </ActionIcon>
               }
               value={searchTitle}
-              onChange={(e) => setSearchTitle(e.currentTarget.value)}
+              onChange={(e) => {
+                setSearchTitle(e.currentTarget.value);
+                setPage(1);
+              }}
             />
           ),
           filtering: searchTitle !== "",
