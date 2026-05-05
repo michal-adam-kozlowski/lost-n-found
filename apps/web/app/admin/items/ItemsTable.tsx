@@ -201,6 +201,14 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
           },
         },
         {
+          accessor: "locationLabel",
+          title: "Opis lokalizacji",
+          width: 300,
+          render: (item) => {
+            return <span className="block overflow-hidden whitespace-nowrap text-ellipsis">{item.locationLabel}</span>;
+          },
+        },
+        {
           accessor: "occurredAt",
           title: "Data znalezienia/zgubienia",
           width: 220,
@@ -215,21 +223,6 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
           render: (item) => (
             <span className="whitespace-pre">{dayjs(item.createdAt).locale("pl").format("HH:mm DD MMMM YYYY")}</span>
           ),
-        },
-        {
-          accessor: "locationLabel",
-          title: "Opis lokalizacji",
-          width: 300,
-          render: (item) => {
-            return <span className="block overflow-hidden whitespace-nowrap text-ellipsis">{item.locationLabel}</span>;
-          },
-        },
-        {
-          accessor: "location",
-          title: "Lokalizacja (lat, lng)",
-          width: 200,
-          render: (item) =>
-            `${(item.latitude as number)?.toFixed(6) ?? "-"}, ${(item.longitude as number)?.toFixed(6) ?? "-"}`,
         },
         {
           accessor: "actions",
