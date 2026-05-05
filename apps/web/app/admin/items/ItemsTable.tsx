@@ -3,7 +3,7 @@
 import { GetUserResponse, ItemResponse } from "@lost-n-found/api-client";
 import { DataTable, DataTableSortStatus } from "mantine-datatable";
 import { useCategories } from "@/lib/context/CategoriesContext";
-import { Badge, Button, Text } from "@mantine/core";
+import { ActionIcon, Badge, Button, Text, TextInput } from "@mantine/core";
 import React, { useState } from "react";
 import dayjs from "dayjs";
 import { paginate } from "@/lib/utils/data";
@@ -12,6 +12,7 @@ import Link from "next/link";
 import { modals } from "@mantine/modals";
 import { deleteItemFromAdmin } from "@/actions/admin";
 import { useRouter } from "next/navigation";
+import { IconSearch, IconX } from "@tabler/icons-react";
 
 const PAGE_SIZE = 20;
 
@@ -23,12 +24,24 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
     direction: "desc",
   });
   const { categories, loading: categoriesLoading } = useCategories();
+  const [searchId, setSearchId] = useState("");
+  const [searchTitle, setSearchTitle] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
+  const [searchUser, setSearchUser] = useState("");
 
-  const transformedItems = items.map((item) => ({
-    ...item,
-    category: categories.find((c) => c.id === item.categoryId)?.name || "-",
-    user: users.find((u) => u.id === item.createdByUserId)?.email || "-",
-  }));
+  const transformedItems = items
+    .map((item) => ({
+      ...item,
+      category: categories.find((c) => c.id === item.categoryId)?.name || "-",
+      user: users.find((u) => u.id === item.createdByUserId)?.email || "-",
+    }))
+    .filter(
+      (item) =>
+        item.id.includes(searchId) &&
+        item.title.toLowerCase().includes(searchTitle.toLowerCase()) &&
+        item.category.toLowerCase().includes(searchCategory.toLowerCase()) &&
+        item.user.toLowerCase().includes(searchUser.toLowerCase()),
+    );
 
   const sortedItems = sortBy(transformedItems, sortStatus.columnAccessor);
   if (sortStatus.direction === "desc") {
@@ -60,8 +73,12 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
   if (categoriesLoading) {
     return null;
   }
+
   return (
     <DataTable
+      minHeight={100}
+      noRecordsText={"Nie znaleziono ogłoszeń"}
+      noRecordsIcon={<></>}
       withTableBorder
       borderRadius="sm"
       withColumnBorders
@@ -77,12 +94,46 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
       onSortStatusChange={setSortStatus}
       pinLastColumn
       columns={[
-        { accessor: "id", title: "ID", width: 340 },
+        {
+          accessor: "id",
+          title: "ID",
+          width: 340,
+          filter: (
+            <TextInput
+              label="Wyszukaj po ID"
+              placeholder="Wpisz ID ogłoszenia"
+              leftSection={<IconSearch size={16} />}
+              rightSection={
+                <ActionIcon size="sm" variant="transparent" c="dimmed" onClick={() => setSearchId("")}>
+                  <IconX size={14} />
+                </ActionIcon>
+              }
+              value={searchId}
+              onChange={(e) => setSearchId(e.currentTarget.value)}
+            />
+          ),
+          filtering: searchId !== "",
+        },
         {
           accessor: "category",
           title: "Kategoria",
           width: 200,
           sortable: true,
+          filter: (
+            <TextInput
+              label="Wyszukaj po kategorii"
+              placeholder="Wpisz kategorię ogłoszenia"
+              leftSection={<IconSearch size={16} />}
+              rightSection={
+                <ActionIcon size="sm" variant="transparent" c="dimmed" onClick={() => setSearchCategory("")}>
+                  <IconX size={14} />
+                </ActionIcon>
+              }
+              value={searchCategory}
+              onChange={(e) => setSearchCategory(e.currentTarget.value)}
+            />
+          ),
+          filtering: searchCategory !== "",
         },
         {
           accessor: "type",
@@ -95,7 +146,27 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
             </Badge>
           ),
         },
-        { accessor: "user", title: "Dodane przez", width: 200, sortable: true },
+        {
+          accessor: "user",
+          title: "Dodane przez",
+          width: 200,
+          sortable: true,
+          filter: (
+            <TextInput
+              label="Wyszukaj po użytkowniku"
+              placeholder="Wpisz email użytkownika"
+              leftSection={<IconSearch size={16} />}
+              rightSection={
+                <ActionIcon size="sm" variant="transparent" c="dimmed" onClick={() => setSearchUser("")}>
+                  <IconX size={14} />
+                </ActionIcon>
+              }
+              value={searchUser}
+              onChange={(e) => setSearchUser(e.currentTarget.value)}
+            />
+          ),
+          filtering: searchUser !== "",
+        },
         {
           accessor: "title",
           title: "Tytuł",
@@ -104,6 +175,21 @@ export default function ItemsTable({ items, users }: { items: ItemResponse[]; us
           render: (item) => {
             return <span className="block overflow-hidden whitespace-nowrap text-ellipsis">{item.title}</span>;
           },
+          filter: (
+            <TextInput
+              label="Wyszukaj po tytule"
+              placeholder="Wpisz tytuł ogłoszenia"
+              leftSection={<IconSearch size={16} />}
+              rightSection={
+                <ActionIcon size="sm" variant="transparent" c="dimmed" onClick={() => setSearchTitle("")}>
+                  <IconX size={14} />
+                </ActionIcon>
+              }
+              value={searchTitle}
+              onChange={(e) => setSearchTitle(e.currentTarget.value)}
+            />
+          ),
+          filtering: searchTitle !== "",
         },
         {
           accessor: "description",
