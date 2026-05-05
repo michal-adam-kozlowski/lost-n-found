@@ -9,6 +9,7 @@ import { sortBy } from "lodash";
 import { useRouter } from "next/navigation";
 import { blockUser, unblockUser } from "@/actions/admin";
 import dayjs from "dayjs";
+import { UserRole } from "@/lib/utils/types";
 
 const PAGE_SIZE = 20;
 
@@ -70,7 +71,7 @@ export default function UsersTable({ users }: { users: GetUserResponse[] }) {
           width: 100,
           render: (user) => (
             <div className="flex flex-row gap-3">
-              {user.blockedAt ? (
+              {user.roles?.includes(UserRole.Admin) ? null : user.blockedAt ? (
                 <Button
                   variant="filled"
                   size="compact-sm"

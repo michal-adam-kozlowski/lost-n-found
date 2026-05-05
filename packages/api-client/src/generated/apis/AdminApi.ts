@@ -16,7 +16,9 @@
 import * as runtime from '../runtime';
 import type {
   GetUserResponse,
+  ItemResponse,
   ProblemDetails,
+  ValidationProblemDetails,
 } from '../models/index';
 
 export interface ApiAdminItemsItemIdDeleteRequest {
@@ -38,6 +40,27 @@ export interface ApiAdminUsersUserIdUnblockPostRequest {
  * @interface AdminApiInterface
  */
 export interface AdminApiInterface {
+    /**
+     * Creates request options for apiAdminItemsGet without sending the request
+     * @throws {RequiredError}
+     * @memberof AdminApiInterface
+     */
+    apiAdminItemsGetRequestOpts(): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @summary Returns all items ordered from newest to oldest.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminApiInterface
+     */
+    apiAdminItemsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ItemResponse>>>;
+
+    /**
+     * Returns all items ordered from newest to oldest.
+     */
+    apiAdminItemsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ItemResponse>>;
+
     /**
      * Creates request options for apiAdminItemsItemIdDelete without sending the request
      * @param {string} itemId 
@@ -132,6 +155,51 @@ export interface AdminApiInterface {
  * 
  */
 export class AdminApi extends runtime.BaseAPI implements AdminApiInterface {
+
+    /**
+     * Creates request options for apiAdminItemsGet without sending the request
+     */
+    async apiAdminItemsGetRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/admin/items`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns all items ordered from newest to oldest.
+     */
+    async apiAdminItemsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ItemResponse>>> {
+        const requestOptions = await this.apiAdminItemsGetRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response);
+    }
+
+    /**
+     * Returns all items ordered from newest to oldest.
+     */
+    async apiAdminItemsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ItemResponse>> {
+        const response = await this.apiAdminItemsGetRaw(initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for apiAdminItemsItemIdDelete without sending the request

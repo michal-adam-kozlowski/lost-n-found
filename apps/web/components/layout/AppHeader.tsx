@@ -6,6 +6,7 @@ import AppHeaderAuth from "@components/layout/AppHeaderAuth";
 import AppHeaderDrawer from "@components/layout/AppHeaderDrawer";
 import { IconPlus } from "@tabler/icons-react";
 import { currentUserHasRole } from "@/actions/auth";
+import { UserRole } from "@/lib/utils/types";
 
 function HeaderLink({
   href,
@@ -23,7 +24,7 @@ function HeaderLink({
 }
 
 export async function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }>) {
-  const isAdmin = await currentUserHasRole("Admin");
+  const isAdmin = await currentUserHasRole(UserRole.Admin);
 
   return (
     <Container size="lg" h="100%" px="0">

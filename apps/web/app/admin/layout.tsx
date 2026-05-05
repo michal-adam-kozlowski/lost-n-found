@@ -4,9 +4,10 @@ import { currentUserHasRole } from "@/actions/auth";
 import { AppHeader } from "@components/layout/AppHeader";
 import { redirect } from "next/navigation";
 import AdminNavLinks from "@/app/admin/AdminNavLinks";
+import { UserRole } from "@/lib/utils/types";
 
 export default async function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const isAdmin = await currentUserHasRole("Admin");
+  const isAdmin = await currentUserHasRole(UserRole.Admin);
   if (!isAdmin) {
     redirect("/");
   }

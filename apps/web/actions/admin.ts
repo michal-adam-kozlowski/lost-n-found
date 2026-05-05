@@ -7,11 +7,13 @@ import { updateTag } from "next/cache";
 export async function blockUser(userId: string) {
   const token = await getToken();
   await adminApi.apiAdminUsersUserIdBlockPost({ userId }, addTokenToInit(token));
+  updateTag("items");
 }
 
 export async function unblockUser(userId: string) {
   const token = await getToken();
   await adminApi.apiAdminUsersUserIdUnblockPost({ userId }, addTokenToInit(token));
+  updateTag("items");
 }
 
 export async function deleteItemFromAdmin(itemId: string) {
