@@ -9,12 +9,16 @@ using LostNFound.Api.Models;
 namespace LostNFound.Api.Controllers;
 
 [ApiController]
-[Route("api/chat")]
+[Route("api/chats")]
 public class ChatController(AppDbContext db) : ControllerBase
 {
+
+    /// <summary>
+    /// Creates or gets a chat for a given item.
+    /// </summary>
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<CreateChatResponse>> CreateChat([FromBody] CreateChatRequest req)
+    public async Task<ActionResult<ChatResponse>> CreateOrGet([FromBody] CreateChatRequest req)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
@@ -38,25 +42,58 @@ public class ChatController(AppDbContext db) : ControllerBase
 
 
         var chat = await db.Chats.FirstOrDefaultAsync(c => c.ItemId == req.ItemId && c.ItemOwnerId == item.CreatedByUserId && c.InquirerId == userId);
-        if (chat != null)
+        if (chat == null)
         {
-            return new CreateChatResponse(chat.Id);
+            chat = new Chat
+            {
+                ItemId = req.ItemId,
+                ItemOwnerId = item.CreatedByUserId,
+                InquirerId = userId
+            };
+
+            db.Chats.Add(chat);
+            await db.SaveChangesAsync();
         }
 
-
-        chat = new Chat{
-            ItemId = req.ItemId,
-            ItemOwnerId = item.CreatedByUserId,
-            InquirerId = userId
-        };
-
-        db.Chats.Add(chat);
-        await db.SaveChangesAsync();
-
-        return new CreateChatResponse(chat.Id);
+        return await ChatResponses(userId).FirstAsync(c => c.Id == chat.Id);
     }
+
+    /// <summary>
+    /// Get's all chats of the authenticated user, both as an inquirer and as an item owner.
+    /// </summary>
+
+    [HttpGet]
+    [Authorize]
+    public async Task<ActionResult<List<ChatResponse>>> GetMine()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        return await ChatResponses(userId).OrderByDescending(x => x.LastMessageAt ?? x.CreatedAt).ToListAsync();
+    }
+
+    private IQueryable<ChatResponse> ChatResponses(Guid userId) =>
+          db.Chats.Where(x => x.ItemOwnerId == userId || x.InquirerId == userId)
+        .Select(x => new ChatResponse(
+              x.Id,
+              x.ItemId,
+              x.Item.Title,
+              x.CreatedAt,
+              x.LastMessageAt
+          ));
 }
 
 
 public record CreateChatRequest(Guid ItemId);
-public record CreateChatResponse(Guid ChatId);
+
+//TODO: Check what else is needed on frontend
+public record ChatResponse(
+    Guid Id,
+    Guid ItemId,
+    string ItemTitle,
+    DateTime CreatedAt,
+    DateTime? LastMessageAt
+    );
