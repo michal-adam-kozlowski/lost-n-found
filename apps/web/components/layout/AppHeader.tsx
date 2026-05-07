@@ -5,6 +5,8 @@ import Link from "next/link";
 import AppHeaderAuth from "@components/layout/AppHeaderAuth";
 import AppHeaderDrawer from "@components/layout/AppHeaderDrawer";
 import { IconPlus } from "@tabler/icons-react";
+import { currentUserHasRole } from "@/actions/auth";
+import { UserRole } from "@/lib/utils/types";
 
 function HeaderLink({
   href,
@@ -21,7 +23,9 @@ function HeaderLink({
   );
 }
 
-export function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }>) {
+export async function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }>) {
+  const isAdmin = await currentUserHasRole(UserRole.Admin);
+
   return (
     <Container size="lg" h="100%" px="0">
       <Group h="100%" justify="space-between" visibleFrom="md">
@@ -30,6 +34,7 @@ export function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }
         </Link>
         {showLinks && (
           <Group gap="0" h="100%">
+            {isAdmin && <HeaderLink href="/admin">Panel administracyjny</HeaderLink>}
             <HeaderLink href="/items?type=found&view=list&page=1">Znalezione</HeaderLink>
             <HeaderLink href="/items?type=lost&view=list&page=1">Zgubione</HeaderLink>
             <Link href="/add">
@@ -49,6 +54,11 @@ export function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }
           {showLinks && (
             <>
               <Group gap="0" mx="-md">
+                {isAdmin && (
+                  <HeaderLink href="/admin" horizontal>
+                    Panel administracyjny
+                  </HeaderLink>
+                )}
                 <HeaderLink href="/items?type=found&view=list&page=1" horizontal>
                   Znalezione
                 </HeaderLink>

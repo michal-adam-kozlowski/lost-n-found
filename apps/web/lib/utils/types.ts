@@ -8,3 +8,7 @@ export type Location = {
 export type ItemType = "found" | "lost";
 
 export type ViewType = "list" | "map";
+
+export enum UserRole {
+  Admin = "Admin",
+}
