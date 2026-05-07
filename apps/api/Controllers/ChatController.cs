@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using LostNFound.Api.Models;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace LostNFound.Api.Controllers;
@@ -59,7 +60,7 @@ public class ChatController(AppDbContext db) : ControllerBase
     }
 
     /// <summary>
-    /// Get's all chats of the authenticated user, both as an inquirer and as an item owner.
+    /// Gets all chats of the authenticated user, both as an inquirer and as an item owner.
     /// </summary>
 
     [HttpGet]
@@ -75,6 +76,102 @@ public class ChatController(AppDbContext db) : ControllerBase
         return await ChatResponses(userId).OrderByDescending(x => x.LastMessageAt ?? x.CreatedAt).ToListAsync();
     }
 
+    /// <summary>
+    /// Sends a message in a chat. Only the inquirer and the item owner can send messages in the chat.
+    /// </summary>
+    [HttpPost("{chatId:guid}/messages")]
+    [Authorize]
+    public async Task<ActionResult<ChatMessageResponse>> SendMessage([FromBody] SendMessageRequest req, Guid chatId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var chat = await db.Chats.FirstOrDefaultAsync(c => c.Id == chatId);
+        if (chat == null)
+        {
+            return NotFound();
+        }
+
+        if (chat.ItemOwnerId != userId && chat.InquirerId != userId)
+        {
+            return Forbid();
+        }
+
+        var body = req.Body.Trim();
+        if (body.Length == 0)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Bad Request",
+                detail: "Message can't be empty."
+                );
+        }
+        var message = new ChatMessage
+        {
+            Body = body,
+            SenderId = userId,
+            ChatId = chatId
+        };
+        chat.LastMessageAt = message.CreatedAt;
+
+        db.ChatMessages.Add(message);
+        await db.SaveChangesAsync();
+
+        return new ChatMessageResponse(
+            message.Id,
+            message.ChatId,
+            message.SenderId,
+            message.Body,
+            message.CreatedAt
+            );
+    }
+
+    //todo: add pagination
+
+    /// <summary>
+    /// Gets all messages of a chat. Only the inquirer and the item owner can see the messages in the chat.
+    /// </summary>
+    [HttpGet("{chatId:guid}/messages")]
+    [Authorize]
+    public async Task<ActionResult<List<ChatMessageResponse>>> GetMessages(Guid chatId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized();
+        }
+        var chat = await db.Chats.FirstOrDefaultAsync(c => c.Id == chatId);
+
+        if (chat == null)
+        {
+            return NotFound();
+        }
+
+        if (chat.ItemOwnerId != userId && chat.InquirerId != userId)
+        {
+            return Forbid();
+        }
+
+        var messages = await db.ChatMessages
+            .Where(m => m.ChatId == chatId)
+            .OrderBy(m => m.CreatedAt)
+            .ThenBy(m => m.Id)
+            .Select(m => new ChatMessageResponse(
+                m.Id,
+                m.ChatId,
+                m.SenderId,
+                m.Body,
+                m.CreatedAt
+            ))
+            .ToListAsync();
+
+        return messages;
+
+
+    }
     private IQueryable<ChatResponse> ChatResponses(Guid userId) =>
           db.Chats.Where(x => x.ItemOwnerId == userId || x.InquirerId == userId)
         .Select(x => new ChatResponse(
@@ -96,4 +193,16 @@ public record ChatResponse(
     string ItemTitle,
     DateTime CreatedAt,
     DateTime? LastMessageAt
+    );
+
+public record SendMessageRequest(
+     [Required, MaxLength(2000)] string Body
+ );
+
+public record ChatMessageResponse(
+    Guid Id,
+    Guid ChatId,
+    Guid SenderId,
+    string Body,
+    DateTime CreatedAt
     );
