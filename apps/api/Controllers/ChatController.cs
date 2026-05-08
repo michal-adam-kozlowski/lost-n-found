@@ -56,7 +56,10 @@ public class ChatController(AppDbContext db) : ControllerBase
             await db.SaveChangesAsync();
         }
 
-        return await ChatResponses(userId).FirstAsync(c => c.Id == chat.Id);
+        return await ChatResponses(db.Chats
+            .Where(c => c.ItemOwnerId == userId || c.InquirerId == userId)
+            .Where(c => c.Id == chat.Id))
+            .FirstAsync();
     }
 
     /// <summary>
@@ -73,7 +76,10 @@ public class ChatController(AppDbContext db) : ControllerBase
             return Unauthorized();
         }
 
-        return await ChatResponses(userId).OrderByDescending(x => x.LastMessageAt ?? x.CreatedAt).ToListAsync();
+        return await ChatResponses(db.Chats
+            .Where(c => c.ItemOwnerId == userId || c.InquirerId == userId)
+            .OrderByDescending(c => c.LastMessageAt ?? c.CreatedAt))
+            .ToListAsync();
     }
 
     /// <summary>
@@ -172,15 +178,14 @@ public class ChatController(AppDbContext db) : ControllerBase
 
 
     }
-    private IQueryable<ChatResponse> ChatResponses(Guid userId) =>
-          db.Chats.Where(x => x.ItemOwnerId == userId || x.InquirerId == userId)
-        .Select(x => new ChatResponse(
-              x.Id,
-              x.ItemId,
-              x.Item.Title,
-              x.CreatedAt,
-              x.LastMessageAt
-          ));
+    private static IQueryable<ChatResponse> ChatResponses(IQueryable<Chat> chats) =>
+         chats.Select(c => new ChatResponse(
+             c.Id,
+             c.ItemId,
+             c.Item.Title,
+             c.CreatedAt,
+             c.LastMessageAt
+             ));
 }
 
 
