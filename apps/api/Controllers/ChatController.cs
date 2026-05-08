@@ -5,13 +5,15 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using LostNFound.Api.Models;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.SignalR;
+using LostNFound.Api.Hubs;
 
 
 namespace LostNFound.Api.Controllers;
 
 [ApiController]
 [Route("api/chats")]
-public class ChatController(AppDbContext db) : ControllerBase
+public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogger<ChatController> logger) : ControllerBase
 {
 
     /// <summary>
@@ -126,13 +128,24 @@ public class ChatController(AppDbContext db) : ControllerBase
         db.ChatMessages.Add(message);
         await db.SaveChangesAsync();
 
-        return new ChatMessageResponse(
+        var response = new ChatMessageResponse(
             message.Id,
             message.ChatId,
             message.SenderId,
             message.Body,
             message.CreatedAt
             );
+
+        try
+        {
+            await chatHub.Clients.Group(chatId.ToString()).SendAsync("MessageCreated", response);
+        }
+        catch (Exception ex )
+        {
+            logger.LogError(ex, "Failed to send message {MessageId} to SignalR clients for chat {ChatId}", message.Id, chatId);
+        }
+
+        return response;
     }
 
     //todo: add pagination
