@@ -1,5 +1,5 @@
 import { Avatar, Button, Group, Menu, MenuDropdown, MenuItem, MenuTarget } from "@mantine/core";
-import { IconListDetails, IconLogout, IconUser } from "@tabler/icons-react";
+import { IconListDetails, IconLogout, IconSettings } from "@tabler/icons-react";
 import Link from "next/link";
 import React from "react";
 import { getCurrentUser } from "@/actions/auth";
@@ -19,11 +19,11 @@ export default async function AppHeaderAuth() {
               </div>
             </MenuTarget>
             <MenuDropdown>
-              <MenuItem leftSection={<IconUser />} component="a" href="/account">
-                Mój profil
-              </MenuItem>
               <MenuItem leftSection={<IconListDetails />} component="a" href="/account/items?view=list&page=1">
                 Moje ogłoszenia
+              </MenuItem>
+              <MenuItem leftSection={<IconSettings />} component="a" href="/account/settings">
+                Ustawienia
               </MenuItem>
               <MenuItem leftSection={<IconLogout />} component="a" href="/logout" c="red.8">
                 Wyloguj się
@@ -32,9 +32,6 @@ export default async function AppHeaderAuth() {
           </Menu>
         </Group>
         <Group hiddenFrom="md">
-          <Button component="a" href="/account" variant="default" leftSection={<IconUser />} fullWidth>
-            Mój profil
-          </Button>
           <Button
             component="a"
             href="/account/items?view=list&page=1"
@@ -43,6 +40,9 @@ export default async function AppHeaderAuth() {
             fullWidth
           >
             Moje ogłoszenia
+          </Button>
+          <Button component="a" href="/account/settings" variant="default" leftSection={<IconSettings />} fullWidth>
+            Ustawienia
           </Button>
           <Button component="a" href="/logout" variant="default" leftSection={<IconLogout />} fullWidth c="red.8">
             Wyloguj się

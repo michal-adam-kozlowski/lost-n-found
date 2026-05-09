@@ -1,4 +1,5 @@
 import {
+  AccountApi,
   AdminApi,
   AuthApi,
   CategoriesApi,
@@ -60,6 +61,8 @@ export const itemsApi = new ItemsApi(config);
 export const itemImagesApi = new ItemImagesApi(config);
 
 export const authApi = new AuthApi(config);
+
+export const accountApi = new AccountApi(config);
 
 export const adminApi = new AdminApi(config);
 

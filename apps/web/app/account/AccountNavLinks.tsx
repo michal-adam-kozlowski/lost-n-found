@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { IconListDetails, IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
+import { IconListDetails, IconLogout, IconSettings } from "@tabler/icons-react";
 import Link from "next/link";
 import { NavLink } from "@mantine/core";
 
@@ -10,17 +10,6 @@ export default function AccountNavLinks() {
 
   return (
     <>
-      <Link href="/account" prefetch={false}>
-        <NavLink
-          variant="filled"
-          active={pathname === "/account"}
-          leftSection={<IconUser />}
-          label="Mój profil"
-          component="span"
-          color="black"
-          className="rounded-xl"
-        />
-      </Link>
       <Link href="/account/items?view=list&page=1" prefetch={false}>
         <NavLink
           variant="filled"
