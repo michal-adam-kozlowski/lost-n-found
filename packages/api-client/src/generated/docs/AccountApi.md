@@ -82,7 +82,7 @@ example().catch(console.error);
 
 ## apiAccountDelete
 
-> apiAccountDelete()
+> apiAccountDelete(deleteAccountRequest)
 
 
 
@@ -103,8 +103,13 @@ async function example() {
   });
   const api = new AccountApi(config);
 
+  const body = {
+    // DeleteAccountRequest
+    deleteAccountRequest: ...,
+  } satisfies ApiAccountDeleteRequest;
+
   try {
-    const data = await api.apiAccountDelete();
+    const data = await api.apiAccountDelete(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -117,7 +122,10 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **deleteAccountRequest** | [DeleteAccountRequest](DeleteAccountRequest.md) |  | |
 
 ### Return type
 
@@ -129,7 +137,7 @@ This endpoint does not need any parameter.
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
+- **Content-Type**: `application/json`, `text/json`, `application/*+json`
 - **Accept**: `text/plain`, `application/json`, `text/json`
 
 

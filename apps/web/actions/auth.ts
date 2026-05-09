@@ -97,6 +97,20 @@ export async function register(email: string, password: string) {
   }
 }
 
+export async function deleteAccount(password: string) {
+  try {
+    await accountApi.apiAccountDelete({ deleteAccountRequest: { password } }, addTokenToInit(await getToken()));
+    await logout();
+    return { success: true };
+  } catch (e) {
+    const error = (e as ApiError).data;
+    if (!error) {
+      throw e;
+    }
+    return { success: false, errors: error.errors };
+  }
+}
+
 export async function changePassword(oldPassword: string, newPassword: string) {
   try {
     await accountApi.apiAccountChangePasswordPost(
