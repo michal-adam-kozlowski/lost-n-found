@@ -54,7 +54,7 @@ public class AccountController(UserManager<ApplicationUser> userManager, IItemDe
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult> Delete()
+    public async Task<ActionResult> Delete([FromBody] DeleteAccountRequest req)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdClaim, out var userId))
@@ -65,6 +65,13 @@ public class AccountController(UserManager<ApplicationUser> userManager, IItemDe
         if (user == null)
         {
             return Unauthorized();
+        }
+
+        var passwordValid = await userManager.CheckPasswordAsync(user, req.Password);
+        if (!passwordValid)
+        {
+            ModelState.AddModelError(nameof(req.Password), "Incorrect password.");
+            return ValidationProblem(ModelState);
         }
         //delete all user's items is necessary before deleting the user, otherwise it will cause a foreign key constraint violation 
         var itemIds = await db.Items.Where(i => i.CreatedByUserId == userId).Select(i => i.Id).ToListAsync();
@@ -90,4 +97,8 @@ public class AccountController(UserManager<ApplicationUser> userManager, IItemDe
 public record ChangePasswordRequest(
     [Required] string CurrentPassword,
     [Required, MinLength(6)] string NewPassword
+);
+
+public record DeleteAccountRequest(
+    [Required] string Password
 );
