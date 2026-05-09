@@ -110,6 +110,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
             e.HasIndex(x => new { x.ItemOwnerId, x.LastMessageAt });
             e.HasIndex(x => new { x.InquirerId, x.LastMessageAt });
+            e.HasIndex(x => new { x.ItemId, x.ItemChatCount }).IsUnique();
         });
 
         modelBuilder.Entity<ChatMessage>(e =>

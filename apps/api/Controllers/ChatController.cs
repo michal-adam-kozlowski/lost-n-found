@@ -47,11 +47,13 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
         var chat = await db.Chats.FirstOrDefaultAsync(c => c.ItemId == req.ItemId && c.ItemOwnerId == item.CreatedByUserId && c.InquirerId == userId);
         if (chat == null)
         {
+            var nextNumber = await db.Chats.Where(c => c.ItemId == req.ItemId).CountAsync() + 1;
             chat = new Chat
             {
                 ItemId = req.ItemId,
                 ItemOwnerId = item.CreatedByUserId,
-                InquirerId = userId
+                InquirerId = userId,
+                ItemChatCount = nextNumber
             };
 
             db.Chats.Add(chat);
@@ -60,7 +62,7 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 
         return await ChatResponses(db.Chats
             .Where(c => c.ItemOwnerId == userId || c.InquirerId == userId)
-            .Where(c => c.Id == chat.Id))
+            .Where(c => c.Id == chat.Id), userId)
             .FirstAsync();
     }
 
@@ -80,7 +82,7 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 
         return await ChatResponses(db.Chats
             .Where(c => c.ItemOwnerId == userId || c.InquirerId == userId)
-            .OrderByDescending(c => c.LastMessageAt ?? c.CreatedAt))
+            .OrderByDescending(c => c.LastMessageAt ?? c.CreatedAt), userId)
             .ToListAsync();
     }
 
@@ -191,11 +193,15 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 
 
     }
-    private static IQueryable<ChatResponse> ChatResponses(IQueryable<Chat> chats) =>
+
+      private static IQueryable<ChatResponse> ChatResponses(IQueryable<Chat> chats, Guid currentUserId) =>
          chats.Select(c => new ChatResponse(
              c.Id,
              c.ItemId,
              c.Item.Title,
+             c.Item.Type,
+             c.ItemOwnerId == currentUserId,
+             c.ItemOwnerId == currentUserId ? c.ItemChatCount : null,
              c.CreatedAt,
              c.LastMessageAt
              ));
@@ -204,11 +210,13 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 
 public record CreateChatRequest(Guid ItemId);
 
-//TODO: Check what else is needed on frontend
 public record ChatResponse(
     Guid Id,
     Guid ItemId,
     string ItemTitle,
+    string ItemType,
+    bool IsItemOwner,
+    int? ItemChatCount, 
     DateTime CreatedAt,
     DateTime? LastMessageAt
     );

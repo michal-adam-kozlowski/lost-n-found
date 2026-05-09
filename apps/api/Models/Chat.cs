@@ -6,6 +6,7 @@ public class Chat
     public Guid ItemId { get; set; }
     public Guid ItemOwnerId { get; set;  }
     public Guid InquirerId { get; set; }
+    public int ItemChatCount { get; set; } // Number of chats for the item, only relevant for the item owner
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastMessageAt { get; set; }
 
