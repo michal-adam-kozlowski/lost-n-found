@@ -45,6 +45,9 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 
 
         var chat = await db.Chats.FirstOrDefaultAsync(c => c.ItemId == req.ItemId && c.ItemOwnerId == item.CreatedByUserId && c.InquirerId == userId);
+        
+        var chatWasCreated = false;
+
         if (chat == null)
         {
             var nextNumber = await db.Chats.Where(c => c.ItemId == req.ItemId).CountAsync() + 1;
@@ -58,11 +61,35 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 
             db.Chats.Add(chat);
             await db.SaveChangesAsync();
+
+            chatWasCreated = true;
         }
 
+        var inquirerResponse = await GetChatResponseAsync(chat.Id, userId);
+
+        if (chatWasCreated)
+        {
+            try
+            {
+                var ownerResponse = await GetChatResponseAsync(chat.Id, chat.ItemOwnerId);
+
+                await chatHub.Clients.User(chat.ItemOwnerId.ToString()).SendAsync("ChatCreated", ownerResponse);
+
+                await chatHub.Clients.User(chat.InquirerId.ToString()).SendAsync("ChatCreated", inquirerResponse);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to send chat {ChatId} to SignalR clients for item {ItemId}", chat.Id, req.ItemId);
+            }
+        }
+
+        return inquirerResponse;
+    }
+
+    private async Task<ChatResponse> GetChatResponseAsync(Guid chatId, Guid currentUserId)
+    {
         return await ChatResponses(db.Chats
-            .Where(c => c.ItemOwnerId == userId || c.InquirerId == userId)
-            .Where(c => c.Id == chat.Id), userId)
+            .Where(c => c.Id == chatId), currentUserId)
             .FirstAsync();
     }
 
@@ -140,7 +167,11 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 
         try
         {
-            await chatHub.Clients.Group(chatId.ToString()).SendAsync("MessageCreated", response);
+            await chatHub.Clients.Users(new[]
+            { 
+                chat.ItemOwnerId.ToString(), 
+                chat.InquirerId.ToString() 
+            }).SendAsync("MessageCreated", response);
         }
         catch (Exception ex )
         {
