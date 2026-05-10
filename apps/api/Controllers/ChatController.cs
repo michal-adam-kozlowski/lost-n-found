@@ -21,6 +21,10 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
     /// </summary>
     [HttpPost]
     [Authorize]
+    [ProducesResponseType<ChatResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ChatResponse>> CreateOrGet([FromBody] CreateChatRequest req)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -99,6 +103,8 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 
     [HttpGet]
     [Authorize]
+    [ProducesResponseType<List<ChatResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<List<ChatResponse>>> GetMine()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -118,6 +124,11 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
     /// </summary>
     [HttpPost("{chatId:guid}/messages")]
     [Authorize]
+    [ProducesResponseType<ChatMessageResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ChatMessageResponse>> SendMessage([FromBody] SendMessageRequest req, Guid chatId)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -188,6 +199,10 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
     /// </summary>
     [HttpGet("{chatId:guid}/messages")]
     [Authorize]
+    [ProducesResponseType<List<ChatMessageResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<List<ChatMessageResponse>>> GetMessages(Guid chatId)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
