@@ -42,6 +42,7 @@ export default function ChangePasswordSection() {
         color: "green",
       });
       form.reset();
+      return;
     }
     if (Array.isArray(res.errors)) {
       setErrors(res.errors);
