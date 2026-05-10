@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 export default function Page() {
-  return <div>Mój profil</div>;
+  redirect("/account/settings");
 }

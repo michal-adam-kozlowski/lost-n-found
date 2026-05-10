@@ -16,12 +16,17 @@
 import * as runtime from '../runtime';
 import type {
   ChangePasswordRequest,
+  DeleteAccountRequest,
   ProblemDetails,
   ValidationProblemDetails,
 } from '../models/index';
 
 export interface ApiAccountChangePasswordPostRequest {
     changePasswordRequest: ChangePasswordRequest;
+}
+
+export interface ApiAccountDeleteRequest {
+    deleteAccountRequest: DeleteAccountRequest;
 }
 
 /**
@@ -56,22 +61,24 @@ export interface AccountApiInterface {
 
     /**
      * Creates request options for apiAccountDelete without sending the request
+     * @param {DeleteAccountRequest} deleteAccountRequest 
      * @throws {RequiredError}
      * @memberof AccountApiInterface
      */
-    apiAccountDeleteRequestOpts(): Promise<runtime.RequestOpts>;
+    apiAccountDeleteRequestOpts(requestParameters: ApiAccountDeleteRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
+     * @param {DeleteAccountRequest} deleteAccountRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountApiInterface
      */
-    apiAccountDeleteRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    apiAccountDeleteRaw(requestParameters: ApiAccountDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      */
-    apiAccountDelete(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    apiAccountDelete(requestParameters: ApiAccountDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
 }
 
@@ -137,10 +144,19 @@ export class AccountApi extends runtime.BaseAPI implements AccountApiInterface {
     /**
      * Creates request options for apiAccountDelete without sending the request
      */
-    async apiAccountDeleteRequestOpts(): Promise<runtime.RequestOpts> {
+    async apiAccountDeleteRequestOpts(requestParameters: ApiAccountDeleteRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['deleteAccountRequest'] == null) {
+            throw new runtime.RequiredError(
+                'deleteAccountRequest',
+                'Required parameter "deleteAccountRequest" was null or undefined when calling apiAccountDelete().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -158,13 +174,14 @@ export class AccountApi extends runtime.BaseAPI implements AccountApiInterface {
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
+            body: requestParameters['deleteAccountRequest'],
         };
     }
 
     /**
      */
-    async apiAccountDeleteRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.apiAccountDeleteRequestOpts();
+    async apiAccountDeleteRaw(requestParameters: ApiAccountDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.apiAccountDeleteRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -172,8 +189,8 @@ export class AccountApi extends runtime.BaseAPI implements AccountApiInterface {
 
     /**
      */
-    async apiAccountDelete(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAccountDeleteRaw(initOverrides);
+    async apiAccountDelete(requestParameters: ApiAccountDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiAccountDeleteRaw(requestParameters, initOverrides);
     }
 
 }

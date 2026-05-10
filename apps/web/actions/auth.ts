@@ -1,6 +1,6 @@
 "use server";
 
-import { ApiError, authApi } from "@/lib/api";
+import { accountApi, addTokenToInit, ApiError, authApi } from "@/lib/api";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
@@ -87,6 +87,41 @@ export async function register(email: string, password: string) {
       },
     });
     await saveToken(res.accessToken);
+    return { success: true };
+  } catch (e) {
+    const error = (e as ApiError).data;
+    if (!error) {
+      throw e;
+    }
+    return { success: false, errors: error.errors };
+  }
+}
+
+export async function deleteAccount(password: string) {
+  try {
+    await accountApi.apiAccountDelete({ deleteAccountRequest: { password } }, addTokenToInit(await getToken()));
+    await logout();
+    return { success: true };
+  } catch (e) {
+    const error = (e as ApiError).data;
+    if (!error) {
+      throw e;
+    }
+    return { success: false, errors: error.errors };
+  }
+}
+
+export async function changePassword(oldPassword: string, newPassword: string) {
+  try {
+    await accountApi.apiAccountChangePasswordPost(
+      {
+        changePasswordRequest: {
+          currentPassword: oldPassword,
+          newPassword,
+        },
+      },
+      addTokenToInit(await getToken()),
+    );
     return { success: true };
   } catch (e) {
     const error = (e as ApiError).data;

@@ -22,6 +22,7 @@ docs/CoordinateX.md
 docs/CreateItemRequest.md
 docs/CreateItemRequestLongitude.md
 docs/CurrentUserResponse.md
+docs/DeleteAccountRequest.md
 docs/DownloadUrlResult.md
 docs/ElevationModel.md
 docs/Envelope.md

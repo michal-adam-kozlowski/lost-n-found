@@ -387,6 +387,19 @@ export interface CurrentUserResponse {
 /**
  * 
  * @export
+ * @interface DeleteAccountRequest
+ */
+export interface DeleteAccountRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof DeleteAccountRequest
+     */
+    password: string;
+}
+/**
+ * 
+ * @export
  * @interface DownloadUrlResult
  */
 export interface DownloadUrlResult {
