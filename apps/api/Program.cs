@@ -181,7 +181,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(corsOrigins)
             .AllowAnyHeader()
-            .AllowAnyMethod()));
+            .AllowAnyMethod()
+            .AllowCredentials()));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
