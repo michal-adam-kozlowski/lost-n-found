@@ -170,6 +170,105 @@ export interface ChangePasswordRequest {
 /**
  * 
  * @export
+ * @interface ChatMessageResponse
+ */
+export interface ChatMessageResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatMessageResponse
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatMessageResponse
+     */
+    chatId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatMessageResponse
+     */
+    senderId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatMessageResponse
+     */
+    body: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatMessageResponse
+     */
+    createdAt: string;
+}
+/**
+ * 
+ * @export
+ * @interface ChatResponse
+ */
+export interface ChatResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    itemId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    itemTitle: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    itemType: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ChatResponse
+     */
+    isItemOwner: boolean;
+    /**
+     * 
+     * @type {ChatResponseItemChatCount}
+     * @memberof ChatResponse
+     */
+    itemChatCount: ChatResponseItemChatCount | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    createdAt: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    lastMessageAt: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface ChatResponseItemChatCount
+ */
+export interface ChatResponseItemChatCount {
+}
+/**
+ * 
+ * @export
  * @interface Coordinate
  */
 export interface Coordinate {
@@ -302,6 +401,19 @@ export interface CoordinateSequenceFactory {
  * @interface CoordinateX
  */
 export interface CoordinateX {
+}
+/**
+ * 
+ * @export
+ * @interface CreateChatRequest
+ */
+export interface CreateChatRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateChatRequest
+     */
+    itemId: string;
 }
 /**
  * 
@@ -1401,10 +1513,10 @@ export interface ProblemDetails {
     title?: string | null;
     /**
      * 
-     * @type {ProblemDetailsStatus}
+     * @type {ChatResponseItemChatCount}
      * @memberof ProblemDetails
      */
-    status?: ProblemDetailsStatus | null;
+    status?: ChatResponseItemChatCount | null;
     /**
      * 
      * @type {string}
@@ -1417,13 +1529,6 @@ export interface ProblemDetails {
      * @memberof ProblemDetails
      */
     instance?: string | null;
-}
-/**
- * 
- * @export
- * @interface ProblemDetailsStatus
- */
-export interface ProblemDetailsStatus {
 }
 /**
  * 
@@ -1447,6 +1552,19 @@ export interface RegisterUserRequest {
 /**
  * 
  * @export
+ * @interface SendMessageRequest
+ */
+export interface SendMessageRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof SendMessageRequest
+     */
+    body: string;
+}
+/**
+ * 
+ * @export
  * @interface ValidationProblemDetails
  */
 export interface ValidationProblemDetails {
@@ -1464,10 +1582,10 @@ export interface ValidationProblemDetails {
     title?: string | null;
     /**
      * 
-     * @type {ProblemDetailsStatus}
+     * @type {ChatResponseItemChatCount}
      * @memberof ValidationProblemDetails
      */
-    status?: ProblemDetailsStatus | null;
+    status?: ChatResponseItemChatCount | null;
     /**
      * 
      * @type {string}

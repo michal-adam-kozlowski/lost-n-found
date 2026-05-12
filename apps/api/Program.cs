@@ -10,12 +10,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using LostNFound.Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,6 +86,22 @@ builder.Services
             ClockSkew = TimeSpan.Zero,
 
             RoleClaimType = ClaimTypes.Role
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Allow JWT in query string for SignalR requests (e.g. /hubs/chat?access_token=...)
+                var accessToken = context.Request.Query["access_token"];
+                // If the request is for our hub
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+                {
+                    // Read the token out of the query string
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -165,7 +181,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(corsOrigins)
             .AllowAnyHeader()
-            .AllowAnyMethod()));
+            .AllowAnyMethod()
+            .AllowCredentials()));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -185,6 +202,8 @@ builder.Services.AddOpenApi(options =>
         return Task.CompletedTask;
     });
 });
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -217,6 +236,8 @@ app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok", timestamp = DateTime.UtcNow }));
 app.MapControllers();

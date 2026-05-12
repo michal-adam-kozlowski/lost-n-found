@@ -2,6 +2,7 @@ apis/AccountApi.ts
 apis/AdminApi.ts
 apis/AuthApi.ts
 apis/CategoriesApi.ts
+apis/ChatApi.ts
 apis/ItemImagesApi.ts
 apis/ItemsApi.ts
 apis/LostNFoundApiApi.ts
@@ -15,10 +16,15 @@ docs/CategoriesApi.md
 docs/Category.md
 docs/CategoryResponse.md
 docs/ChangePasswordRequest.md
+docs/ChatApi.md
+docs/ChatMessageResponse.md
+docs/ChatResponse.md
+docs/ChatResponseItemChatCount.md
 docs/Coordinate.md
 docs/CoordinateSequence.md
 docs/CoordinateSequenceFactory.md
 docs/CoordinateX.md
+docs/CreateChatRequest.md
 docs/CreateItemRequest.md
 docs/CreateItemRequestLongitude.md
 docs/CurrentUserResponse.md
@@ -45,8 +51,8 @@ docs/PrecisionModel.md
 docs/PresignImageRequest.md
 docs/PresignResult.md
 docs/ProblemDetails.md
-docs/ProblemDetailsStatus.md
 docs/RegisterUserRequest.md
+docs/SendMessageRequest.md
 docs/ValidationProblemDetails.md
 index.ts
 models/index.ts

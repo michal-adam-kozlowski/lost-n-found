@@ -11,6 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Item> Items => Set<Item>();
     public DbSet<ItemImage> ItemImages => Set<ItemImage>();
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Chat> Chats => Set<Chat>();
+    public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -80,6 +82,61 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         {
             e.Property(x => x.BlockedAt).HasColumnType("timestamptz");
         });
+
+        modelBuilder.Entity<Chat>(e =>
+        {
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.CreatedAt).HasColumnType("timestamptz");
+            e.Property(x => x.LastMessageAt).HasColumnType("timestamptz");
+
+            e.HasOne(x => x.Item)
+                .WithMany()
+                .HasForeignKey(x => x.ItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(x => x.ItemOwner)
+                .WithMany()
+                .HasForeignKey(x => x.ItemOwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasOne(x => x.Inquirer)
+                .WithMany()
+                .HasForeignKey(x => x.InquirerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasIndex(x => new { x.ItemId, x.InquirerId })
+                .IsUnique();
+
+            e.HasIndex(x => new { x.ItemOwnerId, x.LastMessageAt });
+            e.HasIndex(x => new { x.InquirerId, x.LastMessageAt });
+            e.HasIndex(x => new { x.ItemId, x.ItemChatCount }).IsUnique();
+        });
+
+        modelBuilder.Entity<ChatMessage>(e =>
+        {
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Body)
+                .IsRequired()
+                .HasMaxLength(2000);
+
+            e.Property(x => x.CreatedAt).HasColumnType("timestamptz");
+
+            e.HasOne(x => x.Chat)
+                .WithMany(x => x.Messages)
+                .HasForeignKey(x => x.ChatId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(x => x.Sender)
+                .WithMany()
+                .HasForeignKey(x => x.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasIndex(x => new { x.ChatId, x.CreatedAt, x.Id });
+        });
+
+
 
     }
 }
