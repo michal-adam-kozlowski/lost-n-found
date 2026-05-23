@@ -203,6 +203,12 @@ export interface ChatMessageResponse {
      * @memberof ChatMessageResponse
      */
     createdAt: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ChatMessageResponse
+     */
+    isRead: boolean;
 }
 /**
  * 
@@ -258,6 +264,12 @@ export interface ChatResponse {
      * @memberof ChatResponse
      */
     lastMessageAt: string | null;
+    /**
+     * 
+     * @type {ChatResponseItemChatCount}
+     * @memberof ChatResponse
+     */
+    unreadCount: ChatResponseItemChatCount | null;
 }
 /**
  * 
@@ -1561,6 +1573,19 @@ export interface SendMessageRequest {
      * @memberof SendMessageRequest
      */
     body: string;
+}
+/**
+ * 
+ * @export
+ * @interface UnreadCountResponse
+ */
+export interface UnreadCountResponse {
+    /**
+     * 
+     * @type {ChatResponseItemChatCount}
+     * @memberof UnreadCountResponse
+     */
+    count: ChatResponseItemChatCount | null;
 }
 /**
  * 

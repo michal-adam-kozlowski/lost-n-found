@@ -8,6 +8,7 @@ import { LoadingProvider } from "@/lib/context/LoadingContext";
 import { AuthProvider } from "@/lib/context/AuthContext";
 import { SignalRProvider } from "@/lib/context/SignalRContext";
 import { ChatHubProvider } from "@/lib/context/ChatHubContext";
+import { UnreadMessagesProvider } from "@/lib/context/UnreadMessagesContext";
 import { ChatNotifications } from "@components/chat/ChatNotifications";
 
 const CHAT_HUB_URL = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080"}/hubs/chat`;
@@ -20,10 +21,12 @@ export default function ClientProviders({ children }: Readonly<{ children: React
           <AuthProvider>
             <SignalRProvider hubUrl={CHAT_HUB_URL}>
               <ChatHubProvider>
-                <Suspense>
-                  <ChatNotifications />
-                </Suspense>
-                {children}
+                <UnreadMessagesProvider>
+                  <Suspense>
+                    <ChatNotifications />
+                  </Suspense>
+                  {children}
+                </UnreadMessagesProvider>
               </ChatHubProvider>
             </SignalRProvider>
           </AuthProvider>

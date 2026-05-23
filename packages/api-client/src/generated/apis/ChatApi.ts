@@ -20,6 +20,7 @@ import type {
   CreateChatRequest,
   ProblemDetails,
   SendMessageRequest,
+  UnreadCountResponse,
 } from '../models/index';
 
 export interface ApiChatsChatIdMessagesGetRequest {
@@ -29,6 +30,10 @@ export interface ApiChatsChatIdMessagesGetRequest {
 export interface ApiChatsChatIdMessagesPostRequest {
     chatId: string;
     sendMessageRequest: SendMessageRequest;
+}
+
+export interface ApiChatsChatIdMessagesReadPostRequest {
+    chatId: string;
 }
 
 export interface ApiChatsPostRequest {
@@ -91,6 +96,29 @@ export interface ChatApiInterface {
     apiChatsChatIdMessagesPost(requestParameters: ApiChatsChatIdMessagesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ChatMessageResponse>;
 
     /**
+     * Creates request options for apiChatsChatIdMessagesReadPost without sending the request
+     * @param {string} chatId 
+     * @throws {RequiredError}
+     * @memberof ChatApiInterface
+     */
+    apiChatsChatIdMessagesReadPostRequestOpts(requestParameters: ApiChatsChatIdMessagesReadPostRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @summary Marks all unread messages in a chat (sent by the other participant) as read.
+     * @param {string} chatId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ChatApiInterface
+     */
+    apiChatsChatIdMessagesReadPostRaw(requestParameters: ApiChatsChatIdMessagesReadPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     * Marks all unread messages in a chat (sent by the other participant) as read.
+     */
+    apiChatsChatIdMessagesReadPost(requestParameters: ApiChatsChatIdMessagesReadPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
      * Creates request options for apiChatsGet without sending the request
      * @throws {RequiredError}
      * @memberof ChatApiInterface
@@ -133,6 +161,27 @@ export interface ChatApiInterface {
      * Creates or gets a chat for a given item.
      */
     apiChatsPost(requestParameters: ApiChatsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ChatResponse>;
+
+    /**
+     * Creates request options for apiChatsUnreadCountGet without sending the request
+     * @throws {RequiredError}
+     * @memberof ChatApiInterface
+     */
+    apiChatsUnreadCountGetRequestOpts(): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @summary Returns the total count of unread messages across all the authenticated user\'s chats.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ChatApiInterface
+     */
+    apiChatsUnreadCountGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UnreadCountResponse>>;
+
+    /**
+     * Returns the total count of unread messages across all the authenticated user\'s chats.
+     */
+    apiChatsUnreadCountGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UnreadCountResponse>;
 
 }
 
@@ -258,6 +307,58 @@ export class ChatApi extends runtime.BaseAPI implements ChatApiInterface {
     }
 
     /**
+     * Creates request options for apiChatsChatIdMessagesReadPost without sending the request
+     */
+    async apiChatsChatIdMessagesReadPostRequestOpts(requestParameters: ApiChatsChatIdMessagesReadPostRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['chatId'] == null) {
+            throw new runtime.RequiredError(
+                'chatId',
+                'Required parameter "chatId" was null or undefined when calling apiChatsChatIdMessagesReadPost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/chats/{chatId}/messages/read`;
+        urlPath = urlPath.replace(`{${"chatId"}}`, encodeURIComponent(String(requestParameters['chatId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Marks all unread messages in a chat (sent by the other participant) as read.
+     */
+    async apiChatsChatIdMessagesReadPostRaw(requestParameters: ApiChatsChatIdMessagesReadPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.apiChatsChatIdMessagesReadPostRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Marks all unread messages in a chat (sent by the other participant) as read.
+     */
+    async apiChatsChatIdMessagesReadPost(requestParameters: ApiChatsChatIdMessagesReadPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiChatsChatIdMessagesReadPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
      * Creates request options for apiChatsGet without sending the request
      */
     async apiChatsGetRequestOpts(): Promise<runtime.RequestOpts> {
@@ -354,6 +455,51 @@ export class ChatApi extends runtime.BaseAPI implements ChatApiInterface {
      */
     async apiChatsPost(requestParameters: ApiChatsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ChatResponse> {
         const response = await this.apiChatsPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for apiChatsUnreadCountGet without sending the request
+     */
+    async apiChatsUnreadCountGetRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/chats/unread-count`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Returns the total count of unread messages across all the authenticated user\'s chats.
+     */
+    async apiChatsUnreadCountGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UnreadCountResponse>> {
+        const requestOptions = await this.apiChatsUnreadCountGetRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response);
+    }
+
+    /**
+     * Returns the total count of unread messages across all the authenticated user\'s chats.
+     */
+    async apiChatsUnreadCountGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UnreadCountResponse> {
+        const response = await this.apiChatsUnreadCountGetRaw(initOverrides);
         return await response.value();
     }
 

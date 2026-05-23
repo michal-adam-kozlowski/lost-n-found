@@ -23,3 +23,14 @@ export async function sendMessage(chatId: string, body: string) {
   const token = await getToken();
   return chatApi.apiChatsChatIdMessagesPost({ chatId, sendMessageRequest: { body } }, addTokenToInit(token));
 }
+
+export async function getUnreadCount() {
+  const token = await getToken();
+  const result = await chatApi.apiChatsUnreadCountGet(addTokenToInit(token));
+  return result.count;
+}
+
+export async function markMessagesRead(chatId: string) {
+  const token = await getToken();
+  await chatApi.apiChatsChatIdMessagesReadPost({ chatId }, addTokenToInit(token));
+}

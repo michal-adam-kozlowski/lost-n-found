@@ -23,7 +23,7 @@ export function ChatNotifications() {
       const id = notifications.show({
         id: `msg-${msg.id}`,
         title: "Nowa wiadomość",
-        message: msg.body.length > 80 ? msg.body.slice(0, 80) + "…" : msg.body,
+        message: "",
         color: "blue",
         autoClose: 5000,
         onClick: () => {
@@ -41,8 +41,8 @@ export function ChatNotifications() {
 
       const id = notifications.show({
         id: `chat-${chat.id}`,
-        title: "Nowa wiadomość",
-        message: `Dotyczy: ${chat.itemTitle}`,
+        title: `Nowe zapytanie`,
+        message: `Zapytanie #${chat.itemChatCount} dotyczące ${chat.itemTitle}`,
         color: "blue",
         autoClose: 6000,
         onClick: () => {

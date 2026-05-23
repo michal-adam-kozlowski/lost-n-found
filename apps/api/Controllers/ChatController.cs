@@ -17,6 +17,57 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 {
 
     /// <summary>
+    /// Returns the total count of unread messages across all the authenticated user's chats.
+    /// </summary>
+    [HttpGet("unread-count")]
+    [Authorize]
+    [ProducesResponseType<UnreadCountResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<UnreadCountResponse>> GetUnreadCount()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var count = await db.ChatMessages
+            .Where(m => m.SenderId != userId && m.ReadAt == null &&
+                        (m.Chat.ItemOwnerId == userId || m.Chat.InquirerId == userId))
+            .CountAsync();
+
+        return new UnreadCountResponse(count);
+    }
+
+    /// <summary>
+    /// Marks all unread messages in a chat (sent by the other participant) as read.
+    /// </summary>
+    [HttpPost("{chatId:guid}/messages/read")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> MarkMessagesRead(Guid chatId)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var chat = await db.Chats.FirstOrDefaultAsync(c => c.Id == chatId);
+        if (chat == null)
+            return NotFound();
+
+        if (chat.ItemOwnerId != userId && chat.InquirerId != userId)
+            return Forbid();
+
+        var now = DateTime.UtcNow;
+        await db.ChatMessages
+            .Where(m => m.ChatId == chatId && m.SenderId != userId && m.ReadAt == null)
+            .ExecuteUpdateAsync(s => s.SetProperty(m => m.ReadAt, now));
+
+        return NoContent();
+    }
+
+    /// <summary>
     /// Creates or gets a chat for a given item.
     /// </summary>
     [HttpPost]
@@ -173,7 +224,8 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
             message.ChatId,
             message.SenderId,
             message.Body,
-            message.CreatedAt
+            message.CreatedAt,
+            false
             );
 
         try
@@ -231,7 +283,8 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
                 m.ChatId,
                 m.SenderId,
                 m.Body,
-                m.CreatedAt
+                m.CreatedAt,
+                m.SenderId == userId || m.ReadAt != null
             ))
             .ToListAsync();
 
@@ -249,7 +302,8 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
              c.ItemOwnerId == currentUserId,
              c.ItemOwnerId == currentUserId ? c.ItemChatCount : null,
              c.CreatedAt,
-             c.LastMessageAt
+             c.LastMessageAt,
+             c.Messages.Count(m => m.SenderId != currentUserId && m.ReadAt == null)
              ));
 }
 
@@ -264,7 +318,8 @@ public record ChatResponse(
     bool IsItemOwner,
     int? ItemChatCount, 
     DateTime CreatedAt,
-    DateTime? LastMessageAt
+    DateTime? LastMessageAt,
+    int? UnreadCount
     );
 
 public record SendMessageRequest(
@@ -276,5 +331,8 @@ public record ChatMessageResponse(
     Guid ChatId,
     Guid SenderId,
     string Body,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    bool IsRead
     );
+
+public record UnreadCountResponse(int? Count);

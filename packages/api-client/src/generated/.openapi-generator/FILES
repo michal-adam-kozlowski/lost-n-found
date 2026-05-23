@@ -53,6 +53,7 @@ docs/PresignResult.md
 docs/ProblemDetails.md
 docs/RegisterUserRequest.md
 docs/SendMessageRequest.md
+docs/UnreadCountResponse.md
 docs/ValidationProblemDetails.md
 index.ts
 models/index.ts

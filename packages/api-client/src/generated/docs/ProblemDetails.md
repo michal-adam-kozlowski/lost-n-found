@@ -8,7 +8,7 @@ Name | Type
 ------------ | -------------
 `type` | string
 `title` | string
-`status` | [ProblemDetailsStatus](ProblemDetailsStatus.md)
+`status` | [ChatResponseItemChatCount](ChatResponseItemChatCount.md)
 `detail` | string
 `instance` | string
 
