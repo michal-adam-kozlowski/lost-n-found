@@ -8,6 +8,7 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { redirect, usePathname, useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/actions/auth";
 import { notifications } from "@mantine/notifications";
+import { useAuth } from "@/lib/context/AuthContext";
 
 interface FormValues {
   email: string;
@@ -34,6 +35,7 @@ export default function Page() {
   const pathname = usePathname();
   const params = useSearchParams();
   const router = useRouter();
+  const { refreshAuth } = useAuth();
 
   useEffect(() => {
     if (params.has("loggedOut")) {
@@ -43,6 +45,7 @@ export default function Page() {
         message: "",
         color: "green",
       });
+      void refreshAuth();
       const newParams = new URLSearchParams(params.toString());
       newParams.delete("loggedOut");
       router.replace(`${pathname}?${newParams.toString()}`);
@@ -64,6 +67,7 @@ export default function Page() {
         message: "",
         color: "green",
       });
+      await refreshAuth();
       if (returnPath) {
         redirect(returnPath);
       } else {

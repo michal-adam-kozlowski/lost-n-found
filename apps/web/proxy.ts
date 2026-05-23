@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { getCurrentUser } from "@/actions/auth";
 
-const pathsRequireAuth = ["/add", "/account"];
+const pathsRequireAuth = ["/add", "/account", "/chats"];
 const pathsRequireNoAuth = ["/login", "/register"];
 
 export async function proxy(request: NextRequest) {

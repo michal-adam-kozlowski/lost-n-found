@@ -5,19 +5,20 @@ import Link from "next/link";
 import AppHeaderAuth from "@components/layout/AppHeaderAuth";
 import AppHeaderDrawer from "@components/layout/AppHeaderDrawer";
 import { IconPlus } from "@tabler/icons-react";
-import { currentUserHasRole } from "@/actions/auth";
+import { currentUserHasRole, getCurrentUser } from "@/actions/auth";
 import { UserRole } from "@/lib/utils/types";
 
 function HeaderLink({
   href,
   horizontal,
   children,
-}: Readonly<{ href: string; horizontal?: boolean; children: React.ReactNode }>) {
+  prefetch,
+}: Readonly<{ href: string; horizontal?: boolean; children: React.ReactNode; prefetch?: boolean }>) {
   const classes = horizontal
     ? "w-full flex hover:bg-gray-100 items-center p-4"
     : "h-full flex hover:bg-gray-100 items-center px-4";
   return (
-    <Link href={href} className={classes} prefetch={true}>
+    <Link href={href} className={classes} prefetch={prefetch ?? true}>
       {children}
     </Link>
   );
@@ -25,6 +26,7 @@ function HeaderLink({
 
 export async function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boolean }>) {
   const isAdmin = await currentUserHasRole(UserRole.Admin);
+  const user = await getCurrentUser();
 
   return (
     <Container size="lg" h="100%" px="0">
@@ -37,6 +39,11 @@ export async function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boo
             {isAdmin && <HeaderLink href="/admin">Panel administracyjny</HeaderLink>}
             <HeaderLink href="/items?type=found&view=list&page=1">Znalezione</HeaderLink>
             <HeaderLink href="/items?type=lost&view=list&page=1">Zgubione</HeaderLink>
+            {user && (
+              <HeaderLink href="/chats" prefetch={false}>
+                Rozmowy
+              </HeaderLink>
+            )}
             <Link href="/add">
               <Button leftSection={<IconPlus />} variant="filled" color="blue" radius="sm" mx="sm">
                 Dodaj ogłoszenie
@@ -65,6 +72,11 @@ export async function AppHeader({ showLinks = true }: Readonly<{ showLinks?: boo
                 <HeaderLink href="/items?type=lost&view=list&page=1" horizontal>
                   Zgubione
                 </HeaderLink>
+                {user && (
+                  <HeaderLink href="/chats" horizontal prefetch={false}>
+                    Rozmowy
+                  </HeaderLink>
+                )}
                 <Link href="/add" className="w-full mx-3 my-3">
                   <Button leftSection={<IconPlus />} variant="filled" color="blue" radius="sm" fullWidth>
                     Dodaj ogłoszenie

@@ -1,0 +1,42 @@
+"use client";
+
+import React, { createContext, useCallback, useContext } from "react";
+import type { ChatMessageResponse, ChatResponse } from "@lost-n-found/api-client";
+import { useSignalR } from "@/lib/context/SignalRContext";
+
+type MessageHandler = (msg: ChatMessageResponse) => void;
+type ChatCreatedHandler = (chat: ChatResponse) => void;
+
+interface ChatHubContextValue {
+  subscribeToMessages: (handler: MessageHandler) => () => void;
+  subscribeToChats: (handler: ChatCreatedHandler) => () => void;
+}
+
+const ChatHubContext = createContext<ChatHubContextValue>({
+  subscribeToMessages: () => () => {},
+  subscribeToChats: () => () => {},
+});
+
+export function ChatHubProvider({ children }: Readonly<{ children: React.ReactNode }>) {
+  const { subscribe } = useSignalR();
+
+  const subscribeToMessages = useCallback(
+    (handler: MessageHandler) => subscribe<ChatMessageResponse>("MessageCreated", handler),
+    [subscribe],
+  );
+
+  const subscribeToChats = useCallback(
+    (handler: ChatCreatedHandler) => subscribe<ChatResponse>("ChatCreated", handler),
+    [subscribe],
+  );
+
+  return (
+    <ChatHubContext.Provider value={{ subscribeToMessages, subscribeToChats }}>
+      {children}
+    </ChatHubContext.Provider>
+  );
+}
+
+export function useChatHubContext() {
+  return useContext(ChatHubContext);
+}

@@ -7,6 +7,7 @@ import { deleteAccount } from "@/actions/auth";
 import { useRouter } from "next/navigation";
 import { notifications } from "@mantine/notifications";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { useAuth } from "@/lib/context/AuthContext";
 
 interface FormValues {
   password: string;
@@ -24,6 +25,7 @@ export default function DeleteAccountSection() {
   });
   const [errors, setErrors] = useState<string[]>([]);
   const router = useRouter();
+  const { refreshAuth } = useAuth();
 
   const handleSubmit = async (values: FormValues) => {
     setErrors([]);
@@ -34,6 +36,7 @@ export default function DeleteAccountSection() {
         message: "Twoje konto zostało pomyślnie usunięte.",
         color: "green",
       });
+      await refreshAuth();
       router.replace("/");
       return;
     }

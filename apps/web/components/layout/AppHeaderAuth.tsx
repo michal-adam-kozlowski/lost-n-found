@@ -1,5 +1,5 @@
 import { Avatar, Button, Group, Menu, MenuDropdown, MenuItem, MenuTarget } from "@mantine/core";
-import { IconListDetails, IconLogout, IconSettings } from "@tabler/icons-react";
+import { IconListDetails, IconLogout, IconMessage, IconSettings } from "@tabler/icons-react";
 import Link from "next/link";
 import React from "react";
 import { getCurrentUser } from "@/actions/auth";
@@ -21,6 +21,9 @@ export default async function AppHeaderAuth() {
             <MenuDropdown>
               <MenuItem leftSection={<IconListDetails />} component="a" href="/account/items?view=list&page=1">
                 Moje ogłoszenia
+              </MenuItem>
+              <MenuItem leftSection={<IconMessage />} component="a" href="/chats">
+                Moje rozmowy
               </MenuItem>
               <MenuItem leftSection={<IconSettings />} component="a" href="/account/settings">
                 Ustawienia
