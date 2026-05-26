@@ -31,9 +31,7 @@ export function ChatHubProvider({ children }: Readonly<{ children: React.ReactNo
   );
 
   return (
-    <ChatHubContext.Provider value={{ subscribeToMessages, subscribeToChats }}>
-      {children}
-    </ChatHubContext.Provider>
+    <ChatHubContext.Provider value={{ subscribeToMessages, subscribeToChats }}>{children}</ChatHubContext.Provider>
   );
 }
 

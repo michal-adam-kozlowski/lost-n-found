@@ -242,6 +242,18 @@ export interface ChatResponse {
     itemType: string;
     /**
      * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    itemLocationLabel: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    itemOccurredAt: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof ChatResponse
      */
@@ -270,6 +282,18 @@ export interface ChatResponse {
      * @memberof ChatResponse
      */
     unreadCount: ChatResponseItemChatCount | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    imageId: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    imageBlurDataUrl: string | null;
 }
 /**
  * 

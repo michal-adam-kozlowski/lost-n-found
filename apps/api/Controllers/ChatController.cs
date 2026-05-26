@@ -244,8 +244,6 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
         return response;
     }
 
-    //todo: add pagination
-
     /// <summary>
     /// Gets all messages of a chat. Only the inquirer and the item owner can see the messages in the chat.
     /// </summary>
@@ -293,17 +291,29 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 
     }
 
-      private static IQueryable<ChatResponse> ChatResponses(IQueryable<Chat> chats, Guid currentUserId) =>
+      private IQueryable<ChatResponse> ChatResponses(IQueryable<Chat> chats, Guid currentUserId) =>
          chats.Select(c => new ChatResponse(
              c.Id,
              c.ItemId,
              c.Item.Title,
              c.Item.Type,
+             c.Item.LocationLabel,
+             c.Item.OccurredAt,
              c.ItemOwnerId == currentUserId,
              c.ItemOwnerId == currentUserId ? c.ItemChatCount : null,
              c.CreatedAt,
              c.LastMessageAt,
-             c.Messages.Count(m => m.SenderId != currentUserId && m.ReadAt == null)
+             c.Messages.Count(m => m.SenderId != currentUserId && m.ReadAt == null),
+             db.ItemImages
+                 .Where(i => i.ItemId == c.ItemId && i.UploadStatus == UploadStatus.Uploaded)
+                 .OrderBy(i => i.CreatedAt).ThenBy(i => i.Id)
+                 .Select(i => (Guid?)i.Id)
+                 .FirstOrDefault(),
+             db.ItemImages
+                 .Where(i => i.ItemId == c.ItemId && i.UploadStatus == UploadStatus.Uploaded)
+                 .OrderBy(i => i.CreatedAt).ThenBy(i => i.Id)
+                 .Select(i => i.BlurDataUrl)
+                 .FirstOrDefault()
              ));
 }
 
@@ -315,11 +325,15 @@ public record ChatResponse(
     Guid ItemId,
     string ItemTitle,
     string ItemType,
+    string? ItemLocationLabel,
+    DateOnly ItemOccurredAt,
     bool IsItemOwner,
     int? ItemChatCount, 
     DateTime CreatedAt,
     DateTime? LastMessageAt,
-    int? UnreadCount
+    int? UnreadCount,
+    Guid? ImageId,
+    string? ImageBlurDataUrl
     );
 
 public record SendMessageRequest(

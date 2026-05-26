@@ -52,10 +52,16 @@ export async function fetchPolandFeature(): Promise<MapTilerFeature | null> {
   const params = new URLSearchParams({
     key: MAPTILER_API_KEY,
     language: "pl",
+    country: "pl",
+    types: "country",
   });
-  const url = `https://api.maptiler.com/geocoding/country.107.json?${params}`;
-  const response = await fetch(url);
-  if (!response.ok) return null;
-  const data: MapTilerGeocodingResponse = await response.json();
+  const urlId = `https://api.maptiler.com/geocoding/Poland.json?${params}`;
+  const responseId = await fetch(urlId);
+  if (!responseId.ok) return null;
+  const id = (await responseId.json()).features?.[0]?.id;
+  const urlData = `https://api.maptiler.com/geocoding/${id}.json?${params}`;
+  const responseData = await fetch(urlData);
+  if (!responseData.ok) return null;
+  const data: MapTilerGeocodingResponse = await responseData.json();
   return data.features?.[0] ?? null;
 }

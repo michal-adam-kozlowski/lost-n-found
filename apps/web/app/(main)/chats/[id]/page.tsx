@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/actions/auth";
 import { getChats, getMessages } from "@/actions/chat";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import ChatConversation from "@/app/(main)/chats/[id]/ChatConversation";
 import { ApiError } from "@/lib/api";
 import { connection } from "next/server";
@@ -10,9 +10,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const { id } = await params;
 
   const user = await getCurrentUser();
-  if (!user) {
-    redirect(`/login?return=/chats/${id}`);
-  }
 
   let messages;
   try {
@@ -30,5 +27,5 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     notFound();
   }
 
-  return <ChatConversation chatId={id} initialMessages={messages} currentUserId={user.id} chat={chat} />;
+  return <ChatConversation chatId={id} initialMessages={messages} currentUserId={user!.id} chat={chat} />;
 }

@@ -1,17 +1,16 @@
-import { getCurrentUser } from "@/actions/auth";
-import { getChats } from "@/actions/chat";
-import { redirect } from "next/navigation";
-import ChatsPage from "@/app/(main)/chats/ChatsPage";
-import { connection } from "next/server";
+import { Center, Stack, Text, ThemeIcon } from "@mantine/core";
+import { IconMessages } from "@tabler/icons-react";
 
-export default async function Page() {
-  await connection();
-  const user = await getCurrentUser();
-  if (!user) {
-    redirect("/login?return=/chats");
-  }
-
-  const chats = await getChats();
-
-  return <ChatsPage initialChats={chats} currentUserId={user.id} />;
+export default function Page() {
+  return (
+    <Center flex={1} h="100%">
+      <Stack align="center" gap="xs" c="dimmed">
+        <ThemeIcon size={64} variant="light" color="gray" radius="xl">
+          <IconMessages size={32} />
+        </ThemeIcon>
+        <Text fw={500}>Wybierz rozmowę</Text>
+        <Text size="sm">Kliknij rozmowę po lewej stronie, aby ją otworzyć.</Text>
+      </Stack>
+    </Center>
+  );
 }

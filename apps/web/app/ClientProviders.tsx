@@ -19,16 +19,16 @@ export default function ClientProviders({ children }: Readonly<{ children: React
       <LoadingProvider>
         <CategoriesProvider>
           <AuthProvider>
-            <SignalRProvider hubUrl={CHAT_HUB_URL}>
-              <ChatHubProvider>
-                <UnreadMessagesProvider>
-                  <Suspense>
+            <Suspense>
+              <SignalRProvider hubUrl={CHAT_HUB_URL}>
+                <ChatHubProvider>
+                  <UnreadMessagesProvider>
                     <ChatNotifications />
-                  </Suspense>
-                  {children}
-                </UnreadMessagesProvider>
-              </ChatHubProvider>
-            </SignalRProvider>
+                    {children}
+                  </UnreadMessagesProvider>
+                </ChatHubProvider>
+              </SignalRProvider>{" "}
+            </Suspense>
           </AuthProvider>
         </CategoriesProvider>
       </LoadingProvider>
