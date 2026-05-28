@@ -17,7 +17,7 @@ const UnreadMessagesContext = createContext<UnreadMessagesContextValue>({
 
 export function UnreadMessagesProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [unreadCount, setUnreadCount] = useState(0);
-  const { subscribeToMessages } = useChatHubContext();
+  const { subscribeToMessages, subscribeToChatsDeleted } = useChatHubContext();
   const { user } = useAuth();
   const pathname = usePathname();
   const pathnameRef = useRef(pathname);
@@ -54,10 +54,17 @@ export function UnreadMessagesProvider({ children }: Readonly<{ children: React.
       setUnreadCount((c) => c + 1);
     });
 
+    const unsubDeleted = subscribeToChatsDeleted(() => {
+      void getUnreadCount()
+        .then((count) => setUnreadCount(count as number))
+        .catch(() => {});
+    });
+
     return () => {
       unsubMsg();
+      unsubDeleted();
     };
-  }, [subscribeToMessages]);
+  }, [subscribeToMessages, subscribeToChatsDeleted]);
 
   const clearUnread = useCallback(() => setUnreadCount(0), []);
 

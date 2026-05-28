@@ -188,7 +188,9 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
             return Unauthorized();
         }
 
-        var chat = await db.Chats.FirstOrDefaultAsync(c => c.Id == chatId);
+        var chat = await db.Chats
+            .Include(c => c.Item)
+            .FirstOrDefaultAsync(c => c.Id == chatId);
         if (chat == null)
         {
             return NotFound();
@@ -230,11 +232,21 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
 
         try
         {
+            var signalREvent = new MessageCreatedEvent(
+                message.Id,
+                message.ChatId,
+                message.SenderId,
+                message.Body,
+                message.CreatedAt,
+                false,
+                chat.Item.Title
+            );
+
             await chatHub.Clients.Users(new[]
             { 
                 chat.ItemOwnerId.ToString(), 
                 chat.InquirerId.ToString() 
-            }).SendAsync("MessageCreated", response);
+            }).SendAsync("MessageCreated", signalREvent);
         }
         catch (Exception ex )
         {
@@ -347,6 +359,17 @@ public record ChatMessageResponse(
     string Body,
     DateTime CreatedAt,
     bool IsRead
+    );
+
+/// <summary>SignalR-only payload — extends ChatMessageResponse with item context for notifications.</summary>
+public record MessageCreatedEvent(
+    Guid Id,
+    Guid ChatId,
+    Guid SenderId,
+    string Body,
+    DateTime CreatedAt,
+    bool IsRead,
+    string ItemTitle
     );
 
 public record UnreadCountResponse(int? Count);

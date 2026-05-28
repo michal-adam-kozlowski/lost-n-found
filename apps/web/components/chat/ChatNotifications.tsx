@@ -14,7 +14,7 @@ export function ChatNotifications() {
     pathnameRef.current = pathname;
   }, [pathname]);
 
-  const { subscribeToMessages, subscribeToChats } = useChatHubContext();
+  const { subscribeToMessages, subscribeToChats, subscribeToChatsDeleted } = useChatHubContext();
 
   useEffect(() => {
     const unsubMsg = subscribeToMessages((msg) => {
@@ -23,7 +23,7 @@ export function ChatNotifications() {
       const id = notifications.show({
         id: `msg-${msg.id}`,
         title: "Nowa wiadomość",
-        message: "",
+        message: msg.itemTitle,
         color: "blue",
         autoClose: 5000,
         onClick: () => {
@@ -51,12 +51,25 @@ export function ChatNotifications() {
         },
       });
     });
+    const unsubDeleted = subscribeToChatsDeleted(({ chatId, itemTitle }) => {
+      const current = pathnameRef.current;
+      if (current === `/chats/${chatId}`) return;
+
+      notifications.show({
+        id: `chat-deleted-${chatId}`,
+        title: "Rozmowa usunięta",
+        message: `Ogłoszenie „${itemTitle}" zostało usunięte przez autora.`,
+        color: "orange",
+        autoClose: 6000,
+      });
+    });
 
     return () => {
       unsubMsg();
       unsubChat();
+      unsubDeleted();
     };
-  }, [subscribeToMessages, subscribeToChats]);
+  }, [subscribeToMessages, subscribeToChats, subscribeToChatsDeleted]);
 
   return null;
 }
