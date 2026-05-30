@@ -27,7 +27,9 @@ jobs:
         run: pnpm install
 
       - name: Install Playwright browsers
-        run: pnpm --filter web exec playwright install --with-deps
+        run: pnpm --filter web exec playwright install --with-deps chromium
+        env:
+          DEBIAN_FRONTEND: noninteractive
 
       - name: Start backend (Docker Compose)
         run: docker compose -f infra/docker-compose.yml up -d --build --wait
