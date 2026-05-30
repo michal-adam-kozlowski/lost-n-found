@@ -8,7 +8,7 @@ Name | Type
 ------------ | -------------
 `precisionModel` | [PrecisionModel](PrecisionModel.md)
 `coordinateSequenceFactory` | [CoordinateSequenceFactory](CoordinateSequenceFactory.md)
-`srid` | [ApplicationUserAccessFailedCount](ApplicationUserAccessFailedCount.md)
+`srid` | number
 `elevationModel` | [ElevationModel](ElevationModel.md)
 `geometryServices` | [NtsGeometryServices](NtsGeometryServices.md)
 

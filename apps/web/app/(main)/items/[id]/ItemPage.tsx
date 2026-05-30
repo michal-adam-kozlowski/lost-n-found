@@ -5,12 +5,12 @@ import { notFound } from "next/navigation";
 import { getMarkersForItems } from "@/lib/utils/items";
 import ItemImagesGallery from "@components/items/ItemImagesGallery";
 import LocationViewer from "@components/maps/LocationViewer";
-import { Badge, Box, Group, Stack, Title, Text, Card, CardSection, Button } from "@mantine/core";
+import { Badge, Box, Group, Stack, Title, Text, Card, CardSection } from "@mantine/core";
 import React from "react";
 import dayjs from "dayjs";
 import ItemEditButton from "@/app/(main)/items/[id]/ItemEditButton";
 import ItemDeleteButton from "@/app/(main)/items/[id]/ItemDeleteButton";
-import { IconMessage } from "@tabler/icons-react";
+import { StartChatButton } from "@/app/(main)/items/[id]/StartChatButton";
 import ItemCategory from "@components/items/ItemCategory";
 
 export default async function ItemPage({ itemId, currentUserId }: { itemId: string; currentUserId?: string | null }) {
@@ -83,11 +83,11 @@ export default async function ItemPage({ itemId, currentUserId }: { itemId: stri
                   <ItemDeleteButton itemUserId={item.createdByUserId} itemId={item.id} currentUserId={currentUserId} />
                 </Group>
               </>
-            ) : (
+            ) : currentUserId ? (
               <Group gap="md">
-                <Button leftSection={<IconMessage />}>Skontaktuj się</Button>
+                <StartChatButton itemId={item.id} />
               </Group>
-            )}
+            ) : null}
           </CardSection>
         </Card>
         <Box className="basis-sm grow shrink h-100 max-h-[min(400px,calc(100vw-var(--mantine-spacing-md)*2))]">

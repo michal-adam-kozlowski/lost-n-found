@@ -122,6 +122,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasMaxLength(2000);
 
             e.Property(x => x.CreatedAt).HasColumnType("timestamptz");
+            e.Property(x => x.ReadAt).HasColumnType("timestamptz");
 
             e.HasOne(x => x.Chat)
                 .WithMany(x => x.Messages)

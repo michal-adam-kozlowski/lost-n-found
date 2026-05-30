@@ -98,17 +98,10 @@ export interface ApplicationUser {
     lockoutEnabled?: boolean;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof ApplicationUser
      */
-    accessFailedCount?: ApplicationUserAccessFailedCount;
-}
-/**
- * 
- * @export
- * @interface ApplicationUserAccessFailedCount
- */
-export interface ApplicationUserAccessFailedCount {
+    accessFailedCount?: number;
 }
 /**
  * 
@@ -203,6 +196,12 @@ export interface ChatMessageResponse {
      * @memberof ChatMessageResponse
      */
     createdAt: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatMessageResponse
+     */
+    itemTitle: string;
 }
 /**
  * 
@@ -236,16 +235,28 @@ export interface ChatResponse {
     itemType: string;
     /**
      * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    itemLocationLabel: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    itemOccurredAt: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof ChatResponse
      */
     isItemOwner: boolean;
     /**
      * 
-     * @type {ChatResponseItemChatCount}
+     * @type {number}
      * @memberof ChatResponse
      */
-    itemChatCount: ChatResponseItemChatCount | null;
+    itemChatCount: number | null;
     /**
      * 
      * @type {string}
@@ -258,13 +269,24 @@ export interface ChatResponse {
      * @memberof ChatResponse
      */
     lastMessageAt: string | null;
-}
-/**
- * 
- * @export
- * @interface ChatResponseItemChatCount
- */
-export interface ChatResponseItemChatCount {
+    /**
+     * 
+     * @type {number}
+     * @memberof ChatResponse
+     */
+    unreadCount: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    imageId: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatResponse
+     */
+    imageBlurDataUrl: string | null;
 }
 /**
  * 
@@ -274,28 +296,28 @@ export interface ChatResponseItemChatCount {
 export interface Coordinate {
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Coordinate
      */
-    x?: CoordinateX;
+    x?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Coordinate
      */
-    y?: CoordinateX;
+    y?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Coordinate
      */
-    z?: CoordinateX;
+    z?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Coordinate
      */
-    m?: CoordinateX;
+    m?: number;
     /**
      * 
      * @type {Coordinate}
@@ -317,22 +339,22 @@ export interface Coordinate {
 export interface CoordinateSequence {
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof CoordinateSequence
      */
-    dimension?: ApplicationUserAccessFailedCount;
+    dimension?: number;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof CoordinateSequence
      */
-    measures?: ApplicationUserAccessFailedCount;
+    measures?: number;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof CoordinateSequence
      */
-    spatial?: ApplicationUserAccessFailedCount;
+    spatial?: number;
     /**
      * 
      * @type {number}
@@ -353,16 +375,16 @@ export interface CoordinateSequence {
     hasM?: boolean;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof CoordinateSequence
      */
-    zOrdinateIndex?: ApplicationUserAccessFailedCount;
+    zOrdinateIndex?: number;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof CoordinateSequence
      */
-    mOrdinateIndex?: ApplicationUserAccessFailedCount;
+    mOrdinateIndex?: number;
     /**
      * 
      * @type {Coordinate}
@@ -377,10 +399,10 @@ export interface CoordinateSequence {
     last?: Coordinate;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof CoordinateSequence
      */
-    count?: ApplicationUserAccessFailedCount;
+    count?: number;
 }
 /**
  * 
@@ -394,13 +416,6 @@ export interface CoordinateSequenceFactory {
      * @memberof CoordinateSequenceFactory
      */
     ordinates?: number;
-}
-/**
- * 
- * @export
- * @interface CoordinateX
- */
-export interface CoordinateX {
 }
 /**
  * 
@@ -447,16 +462,16 @@ export interface CreateItemRequest {
     description: string | null;
     /**
      * 
-     * @type {CreateItemRequestLongitude}
+     * @type {number}
      * @memberof CreateItemRequest
      */
-    longitude: CreateItemRequestLongitude | null;
+    longitude: number | null;
     /**
      * 
-     * @type {CreateItemRequestLongitude}
+     * @type {number}
      * @memberof CreateItemRequest
      */
-    latitude: CreateItemRequestLongitude | null;
+    latitude: number | null;
     /**
      * 
      * @type {string}
@@ -469,13 +484,6 @@ export interface CreateItemRequest {
      * @memberof CreateItemRequest
      */
     occurredAt: string;
-}
-/**
- * 
- * @export
- * @interface CreateItemRequestLongitude
- */
-export interface CreateItemRequestLongitude {
 }
 /**
  * 
@@ -555,64 +563,64 @@ export interface Envelope {
     isNull?: boolean;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Envelope
      */
-    width?: CoordinateX;
+    width?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Envelope
      */
-    height?: CoordinateX;
+    height?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Envelope
      */
-    diameter?: CoordinateX;
+    diameter?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Envelope
      */
-    minX?: CoordinateX;
+    minX?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Envelope
      */
-    maxX?: CoordinateX;
+    maxX?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Envelope
      */
-    minY?: CoordinateX;
+    minY?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Envelope
      */
-    maxY?: CoordinateX;
+    maxY?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Envelope
      */
-    area?: CoordinateX;
+    area?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Envelope
      */
-    minExtent?: CoordinateX;
+    minExtent?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Envelope
      */
-    maxExtent?: CoordinateX;
+    maxExtent?: number;
     /**
      * 
      * @type {Coordinate}
@@ -640,10 +648,10 @@ export interface Geometry {
     userData?: any | null;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof Geometry
      */
-    srid?: ApplicationUserAccessFailedCount;
+    srid?: number;
     /**
      * 
      * @type {string}
@@ -676,16 +684,16 @@ export interface Geometry {
     coordinates?: Array<Coordinate> | null;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof Geometry
      */
-    numPoints?: ApplicationUserAccessFailedCount;
+    numPoints?: number;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof Geometry
      */
-    numGeometries?: ApplicationUserAccessFailedCount;
+    numGeometries?: number;
     /**
      * 
      * @type {boolean}
@@ -706,16 +714,16 @@ export interface Geometry {
     isEmpty?: boolean;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Geometry
      */
-    area?: CoordinateX;
+    area?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Geometry
      */
-    length?: CoordinateX;
+    length?: number;
     /**
      * 
      * @type {Point}
@@ -791,10 +799,10 @@ export interface GeometryFactory {
     coordinateSequenceFactory?: CoordinateSequenceFactory;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof GeometryFactory
      */
-    srid?: ApplicationUserAccessFailedCount;
+    srid?: number;
     /**
      * 
      * @type {ElevationModel}
@@ -962,10 +970,10 @@ export interface ItemImage {
     mimeType: string;
     /**
      * 
-     * @type {ItemImageSizeBytes}
+     * @type {number}
      * @memberof ItemImage
      */
-    sizeBytes?: ItemImageSizeBytes;
+    sizeBytes?: number;
     /**
      * 
      * @type {number}
@@ -1031,13 +1039,6 @@ export interface ItemImageInfo {
 /**
  * 
  * @export
- * @interface ItemImageSizeBytes
- */
-export interface ItemImageSizeBytes {
-}
-/**
- * 
- * @export
  * @interface ItemResponse
  */
 export interface ItemResponse {
@@ -1073,16 +1074,16 @@ export interface ItemResponse {
     description: string | null;
     /**
      * 
-     * @type {CreateItemRequestLongitude}
+     * @type {number}
      * @memberof ItemResponse
      */
-    longitude: CreateItemRequestLongitude | null;
+    longitude: number | null;
     /**
      * 
-     * @type {CreateItemRequestLongitude}
+     * @type {number}
      * @memberof ItemResponse
      */
-    latitude: CreateItemRequestLongitude | null;
+    latitude: number | null;
     /**
      * 
      * @type {string}
@@ -1190,10 +1191,10 @@ export interface NtsGeometryServices {
     coordinateEqualityComparer?: object;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof NtsGeometryServices
      */
-    defaultSRID?: ApplicationUserAccessFailedCount;
+    defaultSRID?: number;
     /**
      * 
      * @type {CoordinateSequenceFactory}
@@ -1233,10 +1234,10 @@ export interface Point {
     coordinates?: Array<Coordinate> | null;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof Point
      */
-    numPoints?: ApplicationUserAccessFailedCount;
+    numPoints?: number;
     /**
      * 
      * @type {boolean}
@@ -1257,16 +1258,16 @@ export interface Point {
     boundaryDimension?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Point
      */
-    x?: CoordinateX;
+    x?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Point
      */
-    y?: CoordinateX;
+    y?: number;
     /**
      * 
      * @type {Coordinate}
@@ -1293,16 +1294,16 @@ export interface Point {
     boundary?: Geometry;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Point
      */
-    z?: CoordinateX;
+    z?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Point
      */
-    m?: CoordinateX;
+    m?: number;
     /**
      * 
      * @type {GeometryFactory}
@@ -1317,10 +1318,10 @@ export interface Point {
     userData?: any | null;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof Point
      */
-    srid?: ApplicationUserAccessFailedCount;
+    srid?: number;
     /**
      * 
      * @type {PrecisionModel}
@@ -1329,10 +1330,10 @@ export interface Point {
     precisionModel?: PrecisionModel;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof Point
      */
-    numGeometries?: ApplicationUserAccessFailedCount;
+    numGeometries?: number;
     /**
      * 
      * @type {boolean}
@@ -1347,16 +1348,16 @@ export interface Point {
     isValid?: boolean;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Point
      */
-    area?: CoordinateX;
+    area?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof Point
      */
-    length?: CoordinateX;
+    length?: number;
     /**
      * 
      * @type {Point}
@@ -1408,22 +1409,22 @@ export interface PrecisionModel {
     isFloating?: boolean;
     /**
      * 
-     * @type {ApplicationUserAccessFailedCount}
+     * @type {number}
      * @memberof PrecisionModel
      */
-    maximumSignificantDigits?: ApplicationUserAccessFailedCount;
+    maximumSignificantDigits?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof PrecisionModel
      */
-    scale?: CoordinateX;
+    scale?: number;
     /**
      * 
-     * @type {CoordinateX}
+     * @type {number}
      * @memberof PrecisionModel
      */
-    gridSize?: CoordinateX;
+    gridSize?: number;
     /**
      * 
      * @type {number}
@@ -1451,10 +1452,10 @@ export interface PresignImageRequest {
     contentType: string;
     /**
      * 
-     * @type {ItemImageSizeBytes}
+     * @type {number}
      * @memberof PresignImageRequest
      */
-    sizeBytes: ItemImageSizeBytes;
+    sizeBytes: number;
 }
 /**
  * 
@@ -1513,10 +1514,10 @@ export interface ProblemDetails {
     title?: string | null;
     /**
      * 
-     * @type {ChatResponseItemChatCount}
+     * @type {number}
      * @memberof ProblemDetails
      */
-    status?: ChatResponseItemChatCount | null;
+    status?: number | null;
     /**
      * 
      * @type {string}
@@ -1565,6 +1566,19 @@ export interface SendMessageRequest {
 /**
  * 
  * @export
+ * @interface UnreadCountResponse
+ */
+export interface UnreadCountResponse {
+    /**
+     * 
+     * @type {number}
+     * @memberof UnreadCountResponse
+     */
+    count: number | null;
+}
+/**
+ * 
+ * @export
  * @interface ValidationProblemDetails
  */
 export interface ValidationProblemDetails {
@@ -1582,10 +1596,10 @@ export interface ValidationProblemDetails {
     title?: string | null;
     /**
      * 
-     * @type {ChatResponseItemChatCount}
+     * @type {number}
      * @memberof ValidationProblemDetails
      */
-    status?: ChatResponseItemChatCount | null;
+    status?: number | null;
     /**
      * 
      * @type {string}

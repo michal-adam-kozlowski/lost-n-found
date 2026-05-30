@@ -16,8 +16,8 @@ export function getMarkersForItems(items: ItemResponse[]): InteractiveMarker<Ite
     .filter((item) => item.longitude && item.latitude)
     .map((item) => ({
       key: item.id,
-      latitude: (item.latitude as number) ?? 0,
-      longitude: (item.longitude as number) ?? 0,
+      latitude: item.latitude ?? 0,
+      longitude: item.longitude ?? 0,
       data: item,
       color: item.type === "found" ? "var(--mantine-color-green-7)" : "var(--mantine-color-red-7)",
     }));

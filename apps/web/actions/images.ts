@@ -2,7 +2,7 @@
 
 import { getToken } from "@/actions/auth";
 import { addTokenToInit, itemImagesApi } from "@/lib/api";
-import type { DownloadUrlResult, ItemImageSizeBytes, PresignResult } from "@lost-n-found/api-client";
+import type { DownloadUrlResult, PresignResult } from "@lost-n-found/api-client";
 import { updateTag } from "next/cache";
 
 export async function presignImageUpload(
@@ -18,7 +18,7 @@ export async function presignImageUpload(
       presignImageRequest: {
         fileName,
         contentType,
-        sizeBytes: sizeBytes as ItemImageSizeBytes,
+        sizeBytes,
       },
     },
     addTokenToInit(token),

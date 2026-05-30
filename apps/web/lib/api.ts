@@ -3,6 +3,7 @@ import {
   AdminApi,
   AuthApi,
   CategoriesApi,
+  ChatApi,
   Configuration,
   InitOverrideFunction,
   ItemImagesApi,
@@ -67,3 +68,5 @@ export const accountApi = new AccountApi(config);
 export const adminApi = new AdminApi(config);
 
 export const categoriesApi = new CategoriesApi(config);
+
+export const chatApi = new ChatApi(config);

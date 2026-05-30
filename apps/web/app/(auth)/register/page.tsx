@@ -8,6 +8,7 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { redirect, usePathname } from "next/navigation";
 import { register } from "@/actions/auth";
 import { notifications } from "@mantine/notifications";
+import { useAuth } from "@/lib/context/AuthContext";
 
 interface FormValues {
   email: string;
@@ -35,6 +36,7 @@ export default function Page() {
   });
   const [errors, setErrors] = useState<string[]>([]);
   const pathname = usePathname();
+  const { refreshAuth } = useAuth();
 
   useEffect(() => {
     form.reset();
@@ -49,6 +51,7 @@ export default function Page() {
         message: "",
         color: "green",
       });
+      await refreshAuth();
       redirect("/");
     }
     if (Array.isArray(res.errors)) {

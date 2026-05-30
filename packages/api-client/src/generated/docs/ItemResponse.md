@@ -11,8 +11,8 @@ Name | Type
 `title` | string
 `type` | string
 `description` | string
-`longitude` | [CreateItemRequestLongitude](CreateItemRequestLongitude.md)
-`latitude` | [CreateItemRequestLongitude](CreateItemRequestLongitude.md)
+`longitude` | number
+`latitude` | number
 `locationLabel` | string
 `occurredAt` | string
 `createdAt` | string

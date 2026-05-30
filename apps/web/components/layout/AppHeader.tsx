@@ -12,12 +12,13 @@ function HeaderLink({
   href,
   horizontal,
   children,
-}: Readonly<{ href: string; horizontal?: boolean; children: React.ReactNode }>) {
+  prefetch,
+}: Readonly<{ href: string; horizontal?: boolean; children: React.ReactNode; prefetch?: boolean }>) {
   const classes = horizontal
     ? "w-full flex hover:bg-gray-100 items-center p-4"
     : "h-full flex hover:bg-gray-100 items-center px-4";
   return (
-    <Link href={href} className={classes} prefetch={true}>
+    <Link href={href} className={classes} prefetch={prefetch ?? true}>
       {children}
     </Link>
   );
