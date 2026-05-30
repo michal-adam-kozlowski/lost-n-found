@@ -227,26 +227,16 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
             message.SenderId,
             message.Body,
             message.CreatedAt,
-            false
+            chat.Item.Title
             );
 
         try
         {
-            var signalREvent = new MessageCreatedEvent(
-                message.Id,
-                message.ChatId,
-                message.SenderId,
-                message.Body,
-                message.CreatedAt,
-                false,
-                chat.Item.Title
-            );
-
             await chatHub.Clients.Users(new[]
             { 
                 chat.ItemOwnerId.ToString(), 
                 chat.InquirerId.ToString() 
-            }).SendAsync("MessageCreated", signalREvent);
+            }).SendAsync("MessageCreated", response);
         }
         catch (Exception ex )
         {
@@ -294,7 +284,7 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
                 m.SenderId,
                 m.Body,
                 m.CreatedAt,
-                m.SenderId == userId || m.ReadAt != null
+                m.Chat.Item.Title
             ))
             .ToListAsync();
 
@@ -358,17 +348,6 @@ public record ChatMessageResponse(
     Guid SenderId,
     string Body,
     DateTime CreatedAt,
-    bool IsRead
-    );
-
-/// <summary>SignalR-only payload — extends ChatMessageResponse with item context for notifications.</summary>
-public record MessageCreatedEvent(
-    Guid Id,
-    Guid ChatId,
-    Guid SenderId,
-    string Body,
-    DateTime CreatedAt,
-    bool IsRead,
     string ItemTitle
     );
 

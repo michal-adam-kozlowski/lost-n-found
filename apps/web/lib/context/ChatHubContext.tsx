@@ -4,12 +4,7 @@ import React, { createContext, useCallback, useContext } from "react";
 import type { ChatMessageResponse, ChatResponse } from "@lost-n-found/api-client";
 import { useSignalR } from "@/lib/context/SignalRContext";
 
-/** SignalR-only — extends ChatMessageResponse with item context for notifications. */
-export interface MessageCreatedEvent extends ChatMessageResponse {
-  itemTitle: string;
-}
-
-type MessageHandler = (msg: MessageCreatedEvent) => void;
+type MessageHandler = (msg: ChatMessageResponse) => void;
 type ChatCreatedHandler = (chat: ChatResponse) => void;
 
 export interface ChatDeletedPayload {
@@ -36,7 +31,7 @@ export function ChatHubProvider({ children }: Readonly<{ children: React.ReactNo
   const { subscribe } = useSignalR();
 
   const subscribeToMessages = useCallback(
-    (handler: MessageHandler) => subscribe<MessageCreatedEvent>("MessageCreated", handler),
+    (handler: MessageHandler) => subscribe<ChatMessageResponse>("MessageCreated", handler),
     [subscribe],
   );
 

@@ -198,10 +198,10 @@ export interface ChatMessageResponse {
     createdAt: string;
     /**
      * 
-     * @type {boolean}
+     * @type {string}
      * @memberof ChatMessageResponse
      */
-    isRead: boolean;
+    itemTitle: string;
 }
 /**
  * 

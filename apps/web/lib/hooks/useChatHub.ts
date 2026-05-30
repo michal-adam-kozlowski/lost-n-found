@@ -2,11 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import { useChatHubContext } from "@/lib/context/ChatHubContext";
-import type { ChatResponse } from "@lost-n-found/api-client";
-import type { ChatDeletedPayload, MessageCreatedEvent } from "@/lib/context/ChatHubContext";
+import type { ChatMessageResponse, ChatResponse } from "@lost-n-found/api-client";
+import type { ChatDeletedPayload } from "@/lib/context/ChatHubContext";
 
 interface ChatHubHandlers {
-  onMessageCreated?: (msg: MessageCreatedEvent) => void;
+  onMessageCreated?: (msg: ChatMessageResponse) => void;
   onChatCreated?: (chat: ChatResponse) => void;
   onChatDeleted?: (payload: ChatDeletedPayload) => void;
 }
