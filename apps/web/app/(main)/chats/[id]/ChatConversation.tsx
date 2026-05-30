@@ -5,11 +5,10 @@ import { useChatHub } from "@/lib/hooks/useChatHub";
 import { markMessagesRead, sendMessage } from "@/actions/chat";
 import type { ChatMessageResponse, ChatResponse } from "@lost-n-found/api-client";
 import dayjs from "dayjs";
-import { ActionIcon, Alert, Badge, Box, Button, Center, Flex, ScrollArea, Text, TextInput } from "@mantine/core";
+import { ActionIcon, Alert, Badge, Box, Center, Flex, ScrollArea, Text, TextInput } from "@mantine/core";
 import { IconAlertCircle, IconSend } from "@tabler/icons-react";
 import ChatConversationHeader from "./ChatConversationHeader";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useRouter } from "next/navigation";
 
 interface Props {
   chatId: string;
@@ -25,7 +24,6 @@ export default function ChatConversation({ chatId, initialMessages, currentUserI
   const bottomRef = useRef<HTMLDivElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
 
   useChatHub({
     onMessageCreated: (msg) => {
@@ -80,10 +78,7 @@ export default function ChatConversation({ chatId, initialMessages, currentUserI
 
       {deleted && (
         <Alert icon={<IconAlertCircle size={16} />} color="orange" radius={0} title="Ogłoszenie usunięte">
-          To ogłoszenie zostało usunięte. Ta rozmowa nie jest już dostępna.{" "}
-          <Button variant="subtle" size="compact-sm" onClick={() => router.push("/chats")}>
-            Wróć do wiadomości
-          </Button>
+          To ogłoszenie zostało usunięte. Ta rozmowa nie jest już dostępna.
         </Alert>
       )}
 

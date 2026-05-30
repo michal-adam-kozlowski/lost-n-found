@@ -62,9 +62,6 @@ export default function ChatsSidebar({ initialChats, currentUserId }: Props) {
     },
     onChatDeleted: ({ chatId }) => {
       setChats((prev) => prev.filter((c) => c.id !== chatId));
-      if (pathname === `/chats/${chatId}`) {
-        router.push("/chats");
-      }
     },
   });
 
