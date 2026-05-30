@@ -95,7 +95,7 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
             return Problem(
                 statusCode: StatusCodes.Status400BadRequest,
                 title: "Bad Request",
-                detail: "You cannot start a chat with yourself.");
+                detail: "Nie możesz rozpocząć rozmowy z samym sobą.");
         }
 
 
@@ -207,7 +207,7 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
             return Problem(
                 statusCode: StatusCodes.Status400BadRequest,
                 title: "Bad Request",
-                detail: "Message can't be empty."
+                detail: "Wiadomość nie może być pusta."
                 );
         }
         var message = new ChatMessage

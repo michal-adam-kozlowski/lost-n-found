@@ -42,7 +42,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
                 return Problem(
                     statusCode: StatusCodes.Status401Unauthorized,
                     title: "Unauthorized",
-                    detail: "mine filter requires login");
+                    detail: "Filtr 'moje' wymaga zalogowania");
             }
             query = query.Where(i => i.CreatedByUserId == userId);
         }
@@ -51,7 +51,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
         {
             if (!ValidTypes.Contains(type))
             {
-                ModelState.AddModelError(nameof(type), "type filter must be 'lost' or 'found'");
+                ModelState.AddModelError(nameof(type), "Filtr typu musi mieć wartość 'lost' lub 'found'");
                 return ValidationProblem(ModelState);
             }
             query = query.Where(i => i.Type == type);
@@ -64,7 +64,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
 
         if (occurredAtFrom.HasValue && occurredAtTo.HasValue && occurredAtFrom.Value > occurredAtTo.Value)
         {
-            ModelState.AddModelError(nameof(occurredAtFrom), "occurredAtFrom must be earlier than or equal to occurredAtTo");
+            ModelState.AddModelError(nameof(occurredAtFrom), "'occurredAtFrom' musi być wcześniejsza lub równa 'occurredAtTo'");
             return ValidationProblem(ModelState);
         }
 
@@ -123,7 +123,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
             return Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 title: "Not Found",
-                detail: $"No item found with id {id}");
+                detail: $"Nie znaleziono ogłoszenia o id {id}");
         }
         var images = await db.ItemImages
             .Where(i => i.ItemId == id && i.UploadStatus == UploadStatus.Uploaded)
@@ -156,14 +156,14 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
 
         if (!ValidTypes.Contains(req.Type))
         {
-            ModelState.AddModelError(nameof(req.Type), "type must be 'lost' or 'found'");
+            ModelState.AddModelError(nameof(req.Type), "Typ musi mieć wartość 'lost' lub 'found'");
             return ValidationProblem(ModelState);
         }
             
         var categoryExists = await db.Categories.AnyAsync(c => c.Id == req.CategoryId);
         if (!categoryExists)
         {
-            ModelState.AddModelError(nameof(req.CategoryId), "invalid categoryId");
+            ModelState.AddModelError(nameof(req.CategoryId), "Nieprawidłowe ID kategorii");
             return ValidationProblem(ModelState);
         }
             
@@ -173,7 +173,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
        
         if (req.OccurredAt == default || req.OccurredAt > DateOnly.FromDateTime(DateTime.Now))
         {
-            ModelState.AddModelError(nameof(req.OccurredAt), "OccurredAt in invalid");
+            ModelState.AddModelError(nameof(req.OccurredAt), "Data zdarzenia jest nieprawidłowa");
             return ValidationProblem(ModelState);
         }
 
@@ -222,7 +222,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
             return Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 title: "Not Found",
-                detail: $"No item found with id {id}");
+                detail: $"Nie znaleziono ogłoszenia o id {id}");
         }
 
         if (userId != item.CreatedByUserId)
@@ -230,7 +230,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
             return Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
                 title: "Unauthorized",
-                detail: "Item can only be deleted by its owner");
+                detail: "Ogłoszenie może zostać usunięte tylko przez jego właściciela");
         }
 
         
@@ -265,7 +265,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
             return Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 title: "Not Found",
-                detail: $"No item found with id {id}");
+                detail: $"Nie znaleziono ogłoszenia o id {id}");
         }
 
         if (userId != item.CreatedByUserId)
@@ -273,18 +273,18 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
             return Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
                 title: "Unauthorized",
-                detail: "Item can only be modified by its owner");
+                detail: "Ogłoszenie może zostać zmodyfikowane tylko przez jego właściciela");
         }
 
         if (!await db.Categories.AnyAsync(c => c.Id == req.CategoryId))
         {
-            ModelState.AddModelError(nameof(req.CategoryId), "invalid categoryId");
+            ModelState.AddModelError(nameof(req.CategoryId), "Nieprawidłowe ID kategorii");
             return ValidationProblem(ModelState);
         }
 
         if (!ValidTypes.Contains(req.Type))
         {
-            ModelState.AddModelError(nameof(req.Type), "type must be 'lost' or 'found'");
+            ModelState.AddModelError(nameof(req.Type), "Typ musi mieć wartość 'lost' lub 'found'");
             return ValidationProblem(ModelState);
         }
 
@@ -294,7 +294,7 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
 
         if (req.OccurredAt == default || req.OccurredAt > DateOnly.FromDateTime(DateTime.Now))
         {
-            ModelState.AddModelError(nameof(req.OccurredAt), "OccurredAt in invalid");
+            ModelState.AddModelError(nameof(req.OccurredAt), "Data zdarzenia jest nieprawidłowa");
             return ValidationProblem(ModelState);
         }
 
@@ -337,11 +337,11 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
 
 public record CreateItemRequest(
     Guid CategoryId,
-    [Required] string Title,
-    [Required] string Type,
+    [Required(ErrorMessage = "Pole jest wymagane.")] string Title,
+    [Required(ErrorMessage = "Pole jest wymagane.")] string Type,
     string? Description, 
-    [Range(-180, 180)] double? Longitude,
-    [Range(-90, 90)] double? Latitude,
+    [Range(-180, 180, ErrorMessage = "Długość geograficzna musi być z zakresu od -180 do 180.")] double? Longitude,
+    [Range(-90, 90, ErrorMessage = "Szerokość geograficzna musi być z zakresu od -90 do 90.")] double? Latitude,
     string? LocationLabel,
     DateOnly OccurredAt
 );

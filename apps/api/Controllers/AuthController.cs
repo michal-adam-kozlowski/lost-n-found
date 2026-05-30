@@ -90,19 +90,19 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
         return Problem(
             statusCode: StatusCodes.Status401Unauthorized,
             title: "Unauthorized",
-            detail: "Invalid email or password");
+            detail: "Nieprawidłowy adres e-mail lub hasło");
     }
 
 }
 
 public record RegisterUserRequest(
-    [Required, EmailAddress] string Email,
-    [Required, MinLength(6)] string Password
+    [Required(ErrorMessage = "Pole jest wymagane."), EmailAddress(ErrorMessage = "Nieprawidłowy adres e-mail.")] string Email,
+    [Required(ErrorMessage = "Pole jest wymagane."), MinLength(6, ErrorMessage = "Hasło musi mieć co najmniej 6 znaków.")] string Password
 );
 
 public record LoginUserRequest(
-    [Required, EmailAddress] string Email,
-    [Required] string Password
+    [Required(ErrorMessage = "Pole jest wymagane."), EmailAddress(ErrorMessage = "Nieprawidłowy adres e-mail.")] string Email,
+    [Required(ErrorMessage = "Pole jest wymagane.")] string Password
 );
 public record LoginUserResponse(string AccessToken, DateTime ExpiresAtUtc, Guid Id, string Email);
 

@@ -99,15 +99,15 @@ public class ItemImagesController(IItemImageService imageService) : ControllerBa
     {
         var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(claim, out var id))
-            throw new UnauthorizedAccessException("UserId claim is invalid");
+            throw new UnauthorizedAccessException("Nieprawidłowy identyfikator użytkownika");
         return id;
     }
 }
 
 public record PresignImageRequest(
-    [Required] string FileName,
-    [Required] string ContentType,
-    [Required, Range(1, long.MaxValue)] long SizeBytes
+    [Required(ErrorMessage = "Pole jest wymagane.")] string FileName,
+    [Required(ErrorMessage = "Pole jest wymagane.")] string ContentType,
+    [Required(ErrorMessage = "Pole jest wymagane."), Range(1, long.MaxValue, ErrorMessage = "Rozmiar pliku musi być większy od 0.")] long SizeBytes
 );
 
 public record ConfirmImageResponse(Guid ImageId, string Status);

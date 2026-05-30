@@ -106,7 +106,7 @@ public class AdminController(AppDbContext db, IItemDeletionService itemDeletionS
             return Problem(
                 statusCode: StatusCodes.Status400BadRequest,
                 title: "Bad Request",
-                detail: "Admin users cannot be blocked.");
+                detail: "Nie można zablokować administratorów.");
         }
 
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -116,7 +116,7 @@ public class AdminController(AppDbContext db, IItemDeletionService itemDeletionS
             return Problem(
                 statusCode: StatusCodes.Status400BadRequest,
                 title: "Bad Request",
-                detail: "Invalid user ID in token.");
+                detail: "Nieprawidłowy identyfikator użytkownika w tokenie.");
         }
 
         if (currentUserId == user.Id)
@@ -124,7 +124,7 @@ public class AdminController(AppDbContext db, IItemDeletionService itemDeletionS
             return Problem(
                 statusCode: StatusCodes.Status400BadRequest,
                 title: "Bad Request",
-                detail: "Users cannot block themselves.");
+                detail: "Użytkownik nie może zablokować samego siebie.");
         }
 
         user.BlockedAt = DateTime.UtcNow;
