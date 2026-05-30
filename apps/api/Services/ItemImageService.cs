@@ -34,20 +34,20 @@ public class ItemImageService(
         var upload = uploadOptions.Value;
 
         var item = await db.Items.FindAsync([itemId], ct)
-            ?? throw new KeyNotFoundException("Item not found.");
+            ?? throw new KeyNotFoundException("Nie znaleziono ogłoszenia.");
 
         if (item.CreatedByUserId != userId)
-            throw new UnauthorizedAccessException("You do not have permission to modify this item.");
+            throw new UnauthorizedAccessException("Nie masz uprawnień do modyfikacji tego ogłoszenia.");
 
         if (!upload.AllowedMimeTypes.Contains(request.ContentType))
-            throw new ValidationException($"Content type '{request.ContentType}' is not allowed.");
+            throw new ValidationException($"Typ treści '{request.ContentType}' jest niedozwolony.");
 
         var maxBytes = (long)upload.MaxFileSizeMb * 1024 * 1024;
         if (request.SizeBytes <= 0 || request.SizeBytes > maxBytes)
-            throw new ValidationException($"File size must be between 1 byte and {upload.MaxFileSizeMb} MB.");
+            throw new ValidationException($"Rozmiar pliku musi wynosić od 1 bajta do {upload.MaxFileSizeMb} MB.");
 
         if (!MimeToExtension.TryGetValue(request.ContentType, out var extension))
-            throw new ValidationException($"No known extension for content type '{request.ContentType}'.");
+            throw new ValidationException($"Nieznane rozszerzenie dla typu treści '{request.ContentType}'.");
 
         var imageId = Guid.NewGuid();
         var objectKey = $"{upload.ObjectPrefix}/{itemId}/{imageId}/original.{extension}";
@@ -86,13 +86,13 @@ public class ItemImageService(
     {
         var image = await db.ItemImages
             .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId, ct)
-            ?? throw new KeyNotFoundException("Image not found.");
+            ?? throw new KeyNotFoundException("Nie znaleziono zdjęcia.");
 
         if (image.UploadedByUserId != userId)
-            throw new UnauthorizedAccessException("You do not have permission to confirm this upload.");
+            throw new UnauthorizedAccessException("Nie masz uprawnień do potwierdzenia tego przesłania.");
 
         if (image.UploadStatus != UploadStatus.Pending)
-            throw new ValidationException($"Image is in '{image.UploadStatus}' state and cannot be confirmed.");
+            throw new ValidationException($"Zdjęcie jest w stanie '{image.UploadStatus}' i nie może zostać potwierdzone.");
 
         image.UploadStatus = UploadStatus.Uploaded;
         await db.SaveChangesAsync(ct);
@@ -127,7 +127,7 @@ public class ItemImageService(
     {
         var image = await db.ItemImages
             .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId && i.UploadStatus == UploadStatus.Uploaded && i.Item.CreatedByUser.BlockedAt == null, ct)
-            ?? throw new KeyNotFoundException("Image not found.");
+            ?? throw new KeyNotFoundException("Nie znaleziono zdjęcia.");
 
         var expirySeconds = uploadOptions.Value.PresignedUrlExpirySeconds;
         var downloadUrl = storage.GeneratePresignedDownloadUrl(image.ObjectKey, expirySeconds);
@@ -140,10 +140,10 @@ public class ItemImageService(
     {
         var image = await db.ItemImages
             .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId && i.UploadStatus == UploadStatus.Uploaded && i.Item.CreatedByUser.BlockedAt == null, ct)
-            ?? throw new KeyNotFoundException("Image not found.");
+            ?? throw new KeyNotFoundException("Nie znaleziono zdjęcia.");
 
         if (string.IsNullOrEmpty(image.ThumbnailObjectKey))
-            throw new KeyNotFoundException("Thumbnail not available for this image.");
+            throw new KeyNotFoundException("Miniatura nie jest dostępna dla tego zdjęcia.");
 
         var expirySeconds = uploadOptions.Value.PresignedUrlExpirySeconds;
         var downloadUrl = storage.GeneratePresignedDownloadUrl(image.ThumbnailObjectKey, expirySeconds);
@@ -160,13 +160,13 @@ public class ItemImageService(
     {
         var image = await db.ItemImages
             .FirstOrDefaultAsync(i => i.Id == imageId && i.ItemId == itemId, ct)
-            ?? throw new KeyNotFoundException("Image not found.");
+            ?? throw new KeyNotFoundException("Nie znaleziono zdjęcia.");
 
         if (image.UploadedByUserId != userId)
-            throw new UnauthorizedAccessException("You do not have permission to delete this image.");
+            throw new UnauthorizedAccessException("Nie masz uprawnień do usunięcia tego zdjęcia.");
 
         if (image.UploadStatus == UploadStatus.Deleted)
-            throw new ValidationException("Image is already deleted.");
+            throw new ValidationException("Zdjęcie zostało już usunięte.");
 
         // Delete from storage first; if this fails, the DB record remains unchanged.
         if (image.UploadStatus == UploadStatus.Uploaded)

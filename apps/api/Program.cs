@@ -16,6 +16,8 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using LostNFound.Api.Hubs;
+using LostNFound.Api.Identity;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +50,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
       })
       .AddRoles<IdentityRole<Guid>>()
       .AddEntityFrameworkStores<AppDbContext>()
-      .AddSignInManager();
+      .AddSignInManager()
+      .AddErrorDescriber<PolishIdentityErrorDescriber>();
 
 var jwtSection = builder.Configuration.GetSection("JWT");
 

@@ -70,7 +70,7 @@ public class AccountController(UserManager<ApplicationUser> userManager, IItemDe
         var passwordValid = await userManager.CheckPasswordAsync(user, req.Password);
         if (!passwordValid)
         {
-            ModelState.AddModelError(nameof(req.Password), "Incorrect password.");
+            ModelState.AddModelError(nameof(req.Password), "Nieprawidłowe hasło.");
             return ValidationProblem(ModelState);
         }
         //delete all user's items is necessary before deleting the user, otherwise it will cause a foreign key constraint violation 
@@ -95,10 +95,10 @@ public class AccountController(UserManager<ApplicationUser> userManager, IItemDe
 
 }
 public record ChangePasswordRequest(
-    [Required] string CurrentPassword,
-    [Required, MinLength(6)] string NewPassword
+    [Required(ErrorMessage = "Pole jest wymagane.")] string CurrentPassword,
+    [Required(ErrorMessage = "Pole jest wymagane."), MinLength(6, ErrorMessage = "Hasło musi mieć co najmniej 6 znaków.")] string NewPassword
 );
 
 public record DeleteAccountRequest(
-    [Required] string Password
+    [Required(ErrorMessage = "Pole jest wymagane.")] string Password
 );
