@@ -8,7 +8,7 @@ Name | Type
 ------------ | -------------
 `type` | string
 `title` | string
-`status` | [ChatResponseItemChatCount](ChatResponseItemChatCount.md)
+`status` | number
 `detail` | string
 `instance` | string
 `errors` | { [key: string]: Array&lt;string&gt;; }

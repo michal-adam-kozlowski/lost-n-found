@@ -10,7 +10,6 @@ apis/index.ts
 docs/AccountApi.md
 docs/AdminApi.md
 docs/ApplicationUser.md
-docs/ApplicationUserAccessFailedCount.md
 docs/AuthApi.md
 docs/CategoriesApi.md
 docs/Category.md
@@ -19,14 +18,11 @@ docs/ChangePasswordRequest.md
 docs/ChatApi.md
 docs/ChatMessageResponse.md
 docs/ChatResponse.md
-docs/ChatResponseItemChatCount.md
 docs/Coordinate.md
 docs/CoordinateSequence.md
 docs/CoordinateSequenceFactory.md
-docs/CoordinateX.md
 docs/CreateChatRequest.md
 docs/CreateItemRequest.md
-docs/CreateItemRequestLongitude.md
 docs/CurrentUserResponse.md
 docs/DeleteAccountRequest.md
 docs/DownloadUrlResult.md
@@ -38,7 +34,6 @@ docs/GetUserResponse.md
 docs/Item.md
 docs/ItemImage.md
 docs/ItemImageInfo.md
-docs/ItemImageSizeBytes.md
 docs/ItemImagesApi.md
 docs/ItemResponse.md
 docs/ItemsApi.md

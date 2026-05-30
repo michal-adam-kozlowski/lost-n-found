@@ -9,7 +9,7 @@ Name | Type
 `geometryOverlay` | object
 `geometryRelate` | object
 `coordinateEqualityComparer` | object
-`defaultSRID` | [ApplicationUserAccessFailedCount](ApplicationUserAccessFailedCount.md)
+`defaultSRID` | number
 `defaultCoordinateSequenceFactory` | [CoordinateSequenceFactory](CoordinateSequenceFactory.md)
 `defaultPrecisionModel` | [PrecisionModel](PrecisionModel.md)
 `defaultElevationModel` | [ElevationModel](ElevationModel.md)

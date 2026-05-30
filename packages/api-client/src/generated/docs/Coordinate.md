@@ -6,10 +6,10 @@
 
 Name | Type
 ------------ | -------------
-`x` | [CoordinateX](CoordinateX.md)
-`y` | [CoordinateX](CoordinateX.md)
-`z` | [CoordinateX](CoordinateX.md)
-`m` | [CoordinateX](CoordinateX.md)
+`x` | number
+`y` | number
+`z` | number
+`m` | number
 `coordinateValue` | [Coordinate](Coordinate.md)
 `isValid` | boolean
 

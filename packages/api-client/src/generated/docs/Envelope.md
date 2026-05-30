@@ -7,16 +7,16 @@
 Name | Type
 ------------ | -------------
 `isNull` | boolean
-`width` | [CoordinateX](CoordinateX.md)
-`height` | [CoordinateX](CoordinateX.md)
-`diameter` | [CoordinateX](CoordinateX.md)
-`minX` | [CoordinateX](CoordinateX.md)
-`maxX` | [CoordinateX](CoordinateX.md)
-`minY` | [CoordinateX](CoordinateX.md)
-`maxY` | [CoordinateX](CoordinateX.md)
-`area` | [CoordinateX](CoordinateX.md)
-`minExtent` | [CoordinateX](CoordinateX.md)
-`maxExtent` | [CoordinateX](CoordinateX.md)
+`width` | number
+`height` | number
+`diameter` | number
+`minX` | number
+`maxX` | number
+`minY` | number
+`maxY` | number
+`area` | number
+`minExtent` | number
+`maxExtent` | number
 `centre` | [Coordinate](Coordinate.md)
 
 

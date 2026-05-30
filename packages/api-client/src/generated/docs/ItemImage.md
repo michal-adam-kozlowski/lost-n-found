@@ -12,7 +12,7 @@ Name | Type
 `objectKey` | string
 `originalFileName` | string
 `mimeType` | string
-`sizeBytes` | [ItemImageSizeBytes](ItemImageSizeBytes.md)
+`sizeBytes` | number
 `uploadStatus` | number
 `thumbnailObjectKey` | string
 `blurDataUrl` | string

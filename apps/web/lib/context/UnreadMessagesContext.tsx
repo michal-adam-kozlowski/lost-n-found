@@ -33,7 +33,7 @@ export function UnreadMessagesProvider({ children }: Readonly<{ children: React.
       return;
     }
     void getUnreadCount()
-      .then((count) => setUnreadCount(count as number))
+      .then((count) => setUnreadCount(count ?? 0))
       .catch(() => {});
   }, [user]);
 
@@ -43,7 +43,7 @@ export function UnreadMessagesProvider({ children }: Readonly<{ children: React.
     const chatId = match[1];
     void markMessagesRead(chatId)
       .then(() => getUnreadCount())
-      .then((count) => setUnreadCount(count as number))
+      .then((count) => setUnreadCount(count ?? 0))
       .catch(() => {});
   }, [pathname]);
 
@@ -56,7 +56,7 @@ export function UnreadMessagesProvider({ children }: Readonly<{ children: React.
 
     const unsubDeleted = subscribeToChatsDeleted(() => {
       void getUnreadCount()
-        .then((count) => setUnreadCount(count as number))
+        .then((count) => setUnreadCount(count ?? 0))
         .catch(() => {});
     });
 

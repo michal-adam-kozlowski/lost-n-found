@@ -7,9 +7,9 @@
 Name | Type
 ------------ | -------------
 `isFloating` | boolean
-`maximumSignificantDigits` | [ApplicationUserAccessFailedCount](ApplicationUserAccessFailedCount.md)
-`scale` | [CoordinateX](CoordinateX.md)
-`gridSize` | [CoordinateX](CoordinateX.md)
+`maximumSignificantDigits` | number
+`scale` | number
+`gridSize` | number
 `precisionModelType` | number
 
 

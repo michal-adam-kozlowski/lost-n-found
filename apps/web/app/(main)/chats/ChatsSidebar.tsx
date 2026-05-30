@@ -50,7 +50,7 @@ export default function ChatsSidebar({ initialChats, currentUserId }: Props) {
             return {
               ...c,
               lastMessageAt: msg.createdAt,
-              unreadCount: isIncoming && !isCurrentChat ? ((c.unreadCount as number) ?? 0) + 1 : c.unreadCount,
+              unreadCount: isIncoming && !isCurrentChat ? (c.unreadCount ?? 0) + 1 : c.unreadCount,
             };
           })
           .sort((a, b) => {
@@ -87,7 +87,7 @@ export default function ChatsSidebar({ initialChats, currentUserId }: Props) {
 
         {chats.map((chat) => {
           const isActive = pathname === `/chats/${chat.id}`;
-          const unread = (chat.unreadCount as number) ?? 0;
+          const unread = chat.unreadCount ?? 0;
           const lastTime = chat.lastMessageAt ? dayjs(chat.lastMessageAt).locale("pl").fromNow() : null;
           const occuredAt = chat.itemOccurredAt ? dayjs(chat.itemOccurredAt).locale("pl").format("DD MMMM YYYY") : null;
 

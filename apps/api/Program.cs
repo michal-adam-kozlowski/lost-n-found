@@ -192,6 +192,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddSchemaTransformer<NumericTypeSchemaTransformer>();
     options.AddOperationTransformer((operation, context, cancellationToken) =>
     {
         if (context.Description.ActionDescriptor.EndpointMetadata.OfType<IAuthorizeData>().Any())
@@ -298,6 +299,27 @@ static string ConvertDatabaseUrl(string databaseUrl)
     return $"Host={host};Port={port};Database={database};" +
            $"Username={username};Password={password};" +
            "Ssl Mode=Require;Trust Server Certificate=true";
+}
+
+/// <summary>
+/// Strips the spurious "string" type that System.Text.Json.Schema emits for numeric types in OpenAPI 3.1.
+/// Without this, int/int?/double fields appear as e.g. { "type": ["integer", "string"], "pattern": "..." }
+/// which confuses the typescript-fetch OpenAPI Generator — it creates empty interface types instead of number.
+/// </summary>
+internal sealed class NumericTypeSchemaTransformer : IOpenApiSchemaTransformer
+{
+    public Task TransformAsync(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
+    {
+        if (schema.Type.HasValue
+            && (schema.Type.Value & JsonSchemaType.String) != 0
+            && (schema.Type.Value & (JsonSchemaType.Integer | JsonSchemaType.Number)) != 0)
+        {
+            schema.Type = schema.Type.Value & ~JsonSchemaType.String;
+            schema.Pattern = null;
+        }
+
+        return Task.CompletedTask;
+    }
 }
 
 internal sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvider authenticationSchemeProvider) : IOpenApiDocumentTransformer

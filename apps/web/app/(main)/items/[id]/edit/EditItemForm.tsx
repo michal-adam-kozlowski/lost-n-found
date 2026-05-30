@@ -110,7 +110,7 @@ export default function EditItemForm({
       categoryId: item.categoryId,
       description: item.description || "",
       occurredAt: dayjs(item.occurredAt).toDate(),
-      location: { latitude: item.latitude as number, longitude: item.longitude as number },
+      location: item.latitude && item.longitude ? { latitude: item.latitude, longitude: item.longitude } : null,
       locationLabel: item.locationLabel || "",
     },
     clearInputErrorOnChange: true,
