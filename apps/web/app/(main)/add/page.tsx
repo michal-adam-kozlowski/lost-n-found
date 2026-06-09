@@ -35,7 +35,6 @@ export default function Page() {
             <ListItem className="mb-2">Opisz cechy charakterystyczne przedmiotu.</ListItem>
             <ListItem className="mb-2">Wskaż dokładne miejsce na mapie.</ListItem>
             <ListItem className="mb-2">Dodaj zdjęcie, jeśli je posiadasz.</ListItem>
-            <ListItem className="mb-2">Uzupełnij dane kontaktowe, aby ułatwić odnalezienie właściciela</ListItem>
           </List>
         </Card>
         <div>

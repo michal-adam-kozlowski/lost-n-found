@@ -123,7 +123,7 @@ export default function RegionFilter({ value, onChange }: RegionFilterProps) {
         <TextInput
           ref={inputRef}
           label="Lokalizacja"
-          placeholder="Wybierz lokalizację"
+          placeholder="Wybierz obszar (np. miasto, województwo...)"
           value={inputValue}
           style={{ flex: 1, minWidth: 160 }}
           onChange={(e) => {
