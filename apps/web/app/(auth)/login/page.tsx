@@ -133,6 +133,9 @@ export default function Page() {
           <Card.Section p="lg" pt="md" withBorder className="flex! flex-col gap-3">
             <TextInput label="Email" placeholder="email@example.com" withAsterisk {...form.getInputProps("email")} />
             <PasswordInput label="Hasło" placeholder="Twoje hasło" withAsterisk {...form.getInputProps("password")} />
+            <Anchor component={Link} href="/forgot-password" size="sm">
+              Zapomniałeś hasła?
+            </Anchor>
             <Button fullWidth mt="sm" type="submit">
               Zaloguj się
             </Button>
