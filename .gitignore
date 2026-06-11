@@ -36,6 +36,7 @@ playwright-report/
 *.suo
 *.userosscache
 *.sln.docstates
+appsettings.Development.json
 
 # ── JetBrains Rider ──────────────────────────────────────────────────────────
 .idea/
