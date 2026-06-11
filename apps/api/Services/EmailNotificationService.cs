@@ -100,11 +100,20 @@ public class EmailNotificationService(AppDbContext db, ILogger<EmailNotification
 
         foreach (var match in matches)
         {
+            // Notify existing item owner about the new item (existing behavior)
             await EnqueueAsync(match.CreatedByUserId, match.Email, "item_match", new
             {
                 newItemTitle = newItem.Title,
                 matchedItemTitle = match.ItemTitle,
                 newItemType = newItem.Type
+            });
+
+            // Notify new item poster about the existing match
+            await EnqueueAsync(newItem.CreatedByUserId, newItem.CreatedByUser.Email!, "item_match", new
+            {
+                newItemTitle = match.ItemTitle,
+                matchedItemTitle = newItem.Title,
+                newItemType = oppositeType
             });
         }
     }
