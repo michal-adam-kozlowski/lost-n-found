@@ -13,7 +13,7 @@ namespace LostNFound.Api.Controllers;
 [ApiController]
 [Route("api/admin")]
 [Authorize(Policy = AuthConstants.AdminOnlyPolicy)]
-public class AdminController(AppDbContext db, IItemDeletionService itemDeletionService, UserManager<ApplicationUser> userManager) : ControllerBase
+public class AdminController(AppDbContext db, IItemDeletionService itemDeletionService, IEmailNotificationService emailNotificationService, UserManager<ApplicationUser> userManager) : ControllerBase
 {
     //only for testing 
     /*
@@ -43,10 +43,13 @@ public class AdminController(AppDbContext db, IItemDeletionService itemDeletionS
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteItem(Guid itemId)
     {
+        var item = await db.Items.FindAsync(itemId);
+        var itemTitle = item?.Title;
+        var ownerId = item?.CreatedByUserId;
+
         try
         {
             await itemDeletionService.DeleteItemAsync(itemId);
-            return NoContent();
         }
         catch (KeyNotFoundException e)
         {
@@ -56,6 +59,12 @@ public class AdminController(AppDbContext db, IItemDeletionService itemDeletionS
                 detail: e.Message);
         }
 
+        if (itemTitle is not null && ownerId is not null)
+        {
+            await emailNotificationService.EnqueueItemRemovedNotificationAsync(itemTitle, ownerId.Value);
+        }
+
+        return NoContent();
     }
 
     /// <summary>
@@ -138,6 +147,8 @@ public class AdminController(AppDbContext db, IItemDeletionService itemDeletionS
             }
             return ValidationProblem(ModelState);
         }
+
+        await emailNotificationService.EnqueueUserBlockedNotificationAsync(userId);
 
         return NoContent();
     }
