@@ -88,7 +88,7 @@ public class EmailTemplateService(IConfiguration configuration) : IEmailTemplate
         var userId = p.GetProperty("userId").GetString()!;
         var token = p.GetProperty("token").GetString()!;
         var encodedToken = Uri.EscapeDataString(token);
-        var link = $"{FrontendUrl}/auth/confirm-email?userId={userId}&token={encodedToken}";
+        var link = $"{FrontendUrl}/confirm-email?userId={userId}&token={encodedToken}";
 
         var subject = "Potwierdź swój adres email — LostNFound";
         var html = WrapHtml($"""
@@ -106,7 +106,7 @@ public class EmailTemplateService(IConfiguration configuration) : IEmailTemplate
         var email = p.GetProperty("email").GetString()!;
         var token = p.GetProperty("token").GetString()!;
         var encodedToken = Uri.EscapeDataString(token);
-        var link = $"{FrontendUrl}/auth/reset-password?email={Uri.EscapeDataString(email)}&token={encodedToken}";
+        var link = $"{FrontendUrl}/reset-password?email={Uri.EscapeDataString(email)}&token={encodedToken}";
 
         var subject = "Reset hasła — LostNFound";
         var html = WrapHtml($"""
