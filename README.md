@@ -79,6 +79,7 @@ Frontend: **http://localhost:3000**
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8080` | Backend base URL |
+| `NEXT_PUBLIC_MAPTILER_API_KEY` |  | MapTiler API key for maps |
 
 ### Backend — environment / `appsettings.json`
 
@@ -86,33 +87,6 @@ Frontend: **http://localhost:3000**
 |----------|---------|-------------|
 | `ConnectionStrings__Default` | `Host=localhost;Port=5432;Database=lostnfound;Username=postgres;Password=postgres` | PostgreSQL DSN |
 | `ASPNETCORE_ENVIRONMENT` | `Development` | Controls Swagger visibility and log levels |
-
----
-
-## API Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/health` | Returns `{ status, timestamp }` |
-| `POST` | `/api/auth/register` | Registers a new user |
-| `POST` | `/api/auth/login` | Validates credentials and returns a JWT access token |
-| `GET` | `/api/auth/me` | Checks that the bearer token works and returns the current user |
-| `GET` | `/api/items` | Returns all items, newest first |
-| `POST` | `/api/items` | Creates a new item |
-
-### POST /api/items — request body
-
-```json
-{
-  "title": "Blue Backpack",
-  "type": "lost",
-  "description": "Left near the library.",
-  "latitude": 52.2297,
-  "longitude": 21.0122
-}
-```
-
-`type` must be `"lost"` or `"found"`. `description`, `latitude`, `longitude` are optional.
 
 ---
 
@@ -188,17 +162,16 @@ docker compose down -v          # stop + remove volumes (full DB reset)
 
 ## Database Schema
 
-**Table: `Items`**
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `Id` | `uuid` | Primary key, set client-side |
-| `Title` | `text` | Required |
-| `Type` | `text` | `"lost"` or `"found"` |
-| `Description` | `text` | Nullable |
-| `Latitude` | `numeric` | Nullable |
-| `Longitude` | `numeric` | Nullable |
-| `CreatedAt` | `timestamptz` | UTC, set on creation |
+| Table | Description |
+|-------|-------------|
+| `Items` | Lost or found items with location (PostGIS), category, and occurrence date |
+| `ItemImages` | Images attached to items, including S3 storage metadata and thumbnails |
+| `Categories` | Lookup table of item categories |
+| `Chats` | Conversations between an item owner and an inquirer |
+| `ChatMessages` | Individual messages within a chat, with read-status tracking |
+| `AspNetUsers` | User accounts (ASP.NET Identity); extended with a `BlockedAt` field |
+| `AspNetRoles` | Roles (`Admin`, etc.) managed by ASP.NET Identity |
+| `AspNetUserRoles` | Many-to-many join between users and roles |
 
 ---
 

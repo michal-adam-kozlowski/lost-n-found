@@ -155,7 +155,7 @@ export default function GeocoderControl({ onLocationSelect }: GeocoderControlPro
               onKeyDown={handleKeyDown}
               onClick={() => (results.length > 0 || searchCompleted) && combobox.openDropdown()}
               onFocus={() => (results.length > 0 || searchCompleted) && combobox.openDropdown()}
-              placeholder="Wyszukaj miejsce..."
+              placeholder="Wyszukaj konkretne miejsce..."
               size="md"
               radius="md"
               classNames={{
