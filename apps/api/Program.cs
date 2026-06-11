@@ -51,7 +51,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
       .AddRoles<IdentityRole<Guid>>()
       .AddEntityFrameworkStores<AppDbContext>()
       .AddSignInManager()
-      .AddErrorDescriber<PolishIdentityErrorDescriber>();
+      .AddErrorDescriber<PolishIdentityErrorDescriber>()
+      .AddDefaultTokenProviders();
 
 var jwtSection = builder.Configuration.GetSection("JWT");
 
@@ -178,6 +179,33 @@ builder.Services.AddHttpClient<IMapTilerService, MapTilerService>(client =>
     var referer = corsOrigins.FirstOrDefault() ?? "http://localhost:3000";
     client.DefaultRequestHeaders.Referrer = new Uri(referer);
 });
+
+// Email notifications
+var resendApiKey = builder.Configuration["Resend:ApiKey"];
+var useRealEmail = !isDesignTime && !string.IsNullOrWhiteSpace(resendApiKey);
+
+if (useRealEmail)
+{
+    var resendSection = builder.Configuration.GetSection("Resend");
+    builder.Services
+        .AddOptions<ResendOptions>()
+        .Bind(resendSection)
+        .Validate(o => !string.IsNullOrWhiteSpace(o.ApiKey), "Resend:ApiKey is required")
+        .Validate(o => !string.IsNullOrWhiteSpace(o.FromEmail), "Resend:FromEmail is required")
+        .ValidateOnStart();
+
+    builder.Services.AddHttpClient<IEmailSender, ResendEmailSender>(client =>
+    {
+        client.BaseAddress = new Uri("https://api.resend.com");
+    });
+}
+else
+{
+    builder.Services.AddSingleton<IEmailSender, LoggingEmailSender>();
+}
+builder.Services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
+builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+builder.Services.AddHostedService<EmailProcessingBackgroundService>();
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>

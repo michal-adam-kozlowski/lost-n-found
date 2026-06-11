@@ -1,4 +1,5 @@
 ﻿using LostNFound.Api.Data;
+using LostNFound.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -13,7 +14,11 @@ namespace LostNFound.Api.Controllers;
 
 [ApiController]
 [Route("api/chats")]
-public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogger<ChatController> logger) : ControllerBase
+public class ChatController(
+    AppDbContext db,
+    IHubContext<ChatHub> chatHub,
+    IEmailNotificationService emailNotificationService,
+    ILogger<ChatController> logger) : ControllerBase
 {
 
     /// <summary>
@@ -136,6 +141,8 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
             {
                 logger.LogError(ex, "Failed to send chat {ChatId} to SignalR clients for item {ItemId}", chat.Id, req.ItemId);
             }
+
+            await emailNotificationService.EnqueueChatCreatedNotificationAsync(chat.Id);
         }
 
         return inquirerResponse;
@@ -242,6 +249,8 @@ public class ChatController(AppDbContext db, IHubContext<ChatHub> chatHub, ILogg
         {
             logger.LogError(ex, "Failed to send message {MessageId} to SignalR clients for chat {ChatId}", message.Id, chatId);
         }
+
+        await emailNotificationService.EnqueueChatMessageNotificationAsync(chatId, userId);
 
         return response;
     }

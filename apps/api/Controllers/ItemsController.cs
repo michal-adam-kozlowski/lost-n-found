@@ -12,7 +12,7 @@ namespace LostNFound.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionService, IMapTilerService mapTiler) : ControllerBase
+public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionService, IEmailNotificationService emailNotificationService, IMapTilerService mapTiler) : ControllerBase
 {
     private static readonly HashSet<string> ValidTypes = ["lost", "found"];
 
@@ -191,6 +191,8 @@ public class ItemsController(AppDbContext db, IItemDeletionService itemDeletionS
 
         db.Items.Add(item);
         await db.SaveChangesAsync();
+
+        await emailNotificationService.EnqueueItemMatchNotificationsAsync(item.Id);
 
         //TODO: check how to return img at creation, for now return empty
         return CreatedAtAction(nameof(GetById), new { id = item.Id }, ToResponse(item, []));

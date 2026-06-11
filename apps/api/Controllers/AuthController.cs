@@ -10,7 +10,11 @@ namespace LostNFound.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenService jwtTokenService) : ControllerBase
+public class AuthController(
+    UserManager<ApplicationUser> userManager,
+    SignInManager<ApplicationUser> signInManager,
+    IJwtTokenService jwtTokenService,
+    IEmailNotificationService emailNotificationService) : ControllerBase
 {
     /// <summary>
     /// Registers a new user and returns a JWT access token.
@@ -36,6 +40,9 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
             }
             return ValidationProblem(ModelState);
         }
+
+        var emailToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        await emailNotificationService.EnqueueEmailVerificationNotificationAsync(user.Id, emailToken);
 
         var token = await jwtTokenService.CreateTokenAsync(user);
 
@@ -85,6 +92,57 @@ public class AuthController(UserManager<ApplicationUser> userManager, SignInMana
         return Ok(new CurrentUserResponse(userId, emailClaim));
     }
 
+    [HttpPost("forgot-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+
+        // Always return 200 to prevent email enumeration
+        if (user is null) return Ok();
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        await emailNotificationService.EnqueuePasswordResetNotificationAsync(user.Id, token);
+
+        return Ok();
+    }
+
+    [HttpPost("reset-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+            return Problem(statusCode: 400, title: "Błąd", detail: "Nieprawidłowy token resetowania hasła.");
+
+        var result = await userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(error.Code, error.Description);
+            return ValidationProblem(ModelState);
+        }
+
+        return Ok();
+    }
+
+    [HttpGet("confirm-email")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] Guid userId, [FromQuery] string token)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+            return Problem(statusCode: 400, title: "Błąd", detail: "Nieprawidłowy link weryfikacyjny.");
+
+        var result = await userManager.ConfirmEmailAsync(user, token);
+        if (!result.Succeeded)
+            return Problem(statusCode: 400, title: "Błąd", detail: "Nieprawidłowy lub wygasły token weryfikacyjny.");
+
+        return Ok();
+    }
+
     private ObjectResult UnauthorizedProblem()
     {
         return Problem(
@@ -107,3 +165,6 @@ public record LoginUserRequest(
 public record LoginUserResponse(string AccessToken, DateTime ExpiresAtUtc, Guid Id, string Email);
 
 public record CurrentUserResponse(Guid UserId, string Email);
+
+public record ForgotPasswordRequest([Required, EmailAddress] string Email);
+public record ResetPasswordRequest([Required, EmailAddress] string Email, [Required] string Token, [Required, MinLength(6)] string NewPassword);

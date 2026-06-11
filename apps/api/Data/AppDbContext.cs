@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Chat> Chats => Set<Chat>();
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+    public DbSet<NotificationQueue> NotificationQueue => Set<NotificationQueue>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -137,7 +138,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             e.HasIndex(x => new { x.ChatId, x.CreatedAt, x.Id });
         });
 
+        modelBuilder.Entity<NotificationQueue>(entity =>
+        {
+            entity.HasKey(n => n.Id);
+            entity.Property(n => n.RecipientEmail).IsRequired();
+            entity.Property(n => n.Type).IsRequired().HasMaxLength(50);
+            entity.Property(n => n.Payload).IsRequired().HasColumnType("jsonb");
+            entity.Property(n => n.Status).IsRequired().HasMaxLength(20);
+            entity.Property(n => n.CreatedAt).HasColumnType("timestamptz");
+            entity.Property(n => n.ProcessedAt).HasColumnType("timestamptz");
+            entity.Property(n => n.LastAttemptAt).HasColumnType("timestamptz");
 
+            entity.HasOne(n => n.RecipientUser)
+                .WithMany()
+                .HasForeignKey(n => n.RecipientUserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            entity.HasIndex(n => new { n.Status, n.CreatedAt });
+        });
     }
 }
