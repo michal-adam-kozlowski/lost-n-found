@@ -84,11 +84,11 @@ public class EmailNotificationService(AppDbContext db, ILogger<EmailNotification
               AND i."CreatedByUserId" != {2}
               AND i."Location" IS NOT NULL
               AND (
-                similarity(i."Title", {3}) >= 0.3
-                OR (i."Description" IS NOT NULL AND similarity(i."Description", {4}) >= 0.3)
+                similarity(i."Title", {3}) >= 0.15
+                OR (i."Description" IS NOT NULL AND similarity(i."Description", {4}) >= 0.15)
               )
               AND u."BlockedAt" IS NULL
-              AND ST_DWithin(i."Location"::geography, {5}::geography, 1000)
+              AND ST_DWithin(i."Location"::geography, {5}::geography, 5000)
             """,
             oppositeType,
             newItemId,
