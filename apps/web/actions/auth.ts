@@ -131,3 +131,38 @@ export async function changePassword(oldPassword: string, newPassword: string) {
     return { success: false, errors: error.errors };
   }
 }
+
+export async function confirmEmail(userId: string, token: string): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    await authApi.apiAuthConfirmEmailGet({ userId, token });
+    return { success: true };
+  } catch (e) {
+    const error = (e as ApiError).data;
+    return { success: false, error: error?.detail ?? "Nieprawidłowy lub wygasły link weryfikacyjny." };
+  }
+}
+
+export async function forgotPassword(email: string): Promise<{ success: true }> {
+  try {
+    await authApi.apiAuthForgotPasswordPost({ forgotPasswordRequest: { email } });
+  } catch {
+    // Ignore errors — always return success to prevent email enumeration
+  }
+  return { success: true };
+}
+
+export async function resetPassword(email: string, token: string, newPassword: string): Promise<AuthResponse> {
+  try {
+    await authApi.apiAuthResetPasswordPost({ resetPasswordRequest: { email, token, newPassword } });
+    return { success: true };
+  } catch (e) {
+    const error = (e as ApiError).data;
+    if (!error) {
+      throw e;
+    }
+    if (error.detail) {
+      return { success: false, errors: [error.detail] };
+    }
+    return { success: false, errors: error.errors };
+  }
+}
