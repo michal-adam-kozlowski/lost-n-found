@@ -4,11 +4,11 @@ All URIs are relative to *http://localhost*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**apiItemsItemIdImagesImageIdConfirmPost**](ItemImagesApi.md#apiitemsitemidimagesimageidconfirmpost) | **POST** /api/items/{itemId}/images/{imageId}/confirm | Confirms that the frontend has successfully uploaded the file to storage.  Transitions the image record from Pending to Uploaded. |
+| [**apiItemsItemIdImagesImageIdConfirmPost**](ItemImagesApi.md#apiitemsitemidimagesimageidconfirmpost) | **POST** /api/items/{itemId}/images/{imageId}/confirm | Confirms that the frontend has successfully uploaded the file to storage. Transitions the image record from Pending to Uploaded. |
 | [**apiItemsItemIdImagesImageIdDelete**](ItemImagesApi.md#apiitemsitemidimagesimageiddelete) | **DELETE** /api/items/{itemId}/images/{imageId} | Deletes the specified image. Marks the DB record as Deleted and removes the object from storage. |
 | [**apiItemsItemIdImagesImageIdDownloadUrlGet**](ItemImagesApi.md#apiitemsitemidimagesimageiddownloadurlget) | **GET** /api/items/{itemId}/images/{imageId}/download-url | Returns a time-limited presigned download URL for the specified image. |
 | [**apiItemsItemIdImagesImageIdThumbnailUrlGet**](ItemImagesApi.md#apiitemsitemidimagesimageidthumbnailurlget) | **GET** /api/items/{itemId}/images/{imageId}/thumbnail-url | Returns a time-limited presigned download URL for the thumbnail of the specified image. |
-| [**apiItemsItemIdImagesPresignPost**](ItemImagesApi.md#apiitemsitemidimagespresignpost) | **POST** /api/items/{itemId}/images/presign | Requests a presigned URL for uploading an image to the specified item.  The frontend should upload the file directly to the returned URL, then call the confirm endpoint. |
+| [**apiItemsItemIdImagesPresignPost**](ItemImagesApi.md#apiitemsitemidimagespresignpost) | **POST** /api/items/{itemId}/images/presign | Requests a presigned URL for uploading an image to the specified item. The frontend should upload the file directly to the returned URL, then call the confirm endpoint. |
 
 
 
@@ -16,7 +16,7 @@ All URIs are relative to *http://localhost*
 
 > ItemImage apiItemsItemIdImagesImageIdConfirmPost(itemId, imageId)
 
-Confirms that the frontend has successfully uploaded the file to storage.  Transitions the image record from Pending to Uploaded.
+Confirms that the frontend has successfully uploaded the file to storage. Transitions the image record from Pending to Uploaded.
 
 ### Example
 
@@ -304,7 +304,7 @@ example().catch(console.error);
 
 > PresignResult apiItemsItemIdImagesPresignPost(itemId, presignImageRequest)
 
-Requests a presigned URL for uploading an image to the specified item.  The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
+Requests a presigned URL for uploading an image to the specified item. The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
 
 ### Example
 

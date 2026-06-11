@@ -631,6 +631,19 @@ export interface Envelope {
 /**
  * 
  * @export
+ * @interface ForgotPasswordRequest
+ */
+export interface ForgotPasswordRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ForgotPasswordRequest
+     */
+    email: string;
+}
+/**
+ * 
+ * @export
  * @interface Geometry
  */
 export interface Geometry {
@@ -1549,6 +1562,31 @@ export interface RegisterUserRequest {
      * @memberof RegisterUserRequest
      */
     password: string;
+}
+/**
+ * 
+ * @export
+ * @interface ResetPasswordRequest
+ */
+export interface ResetPasswordRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ResetPasswordRequest
+     */
+    email: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResetPasswordRequest
+     */
+    token: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResetPasswordRequest
+     */
+    newPassword: string;
 }
 /**
  * 

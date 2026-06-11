@@ -16,12 +16,23 @@
 import * as runtime from '../runtime';
 import type {
   CurrentUserResponse,
+  ForgotPasswordRequest,
   LoginUserRequest,
   LoginUserResponse,
   ProblemDetails,
   RegisterUserRequest,
+  ResetPasswordRequest,
   ValidationProblemDetails,
 } from '../models/index';
+
+export interface ApiAuthConfirmEmailGetRequest {
+    userId?: string;
+    token?: string;
+}
+
+export interface ApiAuthForgotPasswordPostRequest {
+    forgotPasswordRequest: ForgotPasswordRequest;
+}
 
 export interface ApiAuthLoginPostRequest {
     loginUserRequest: LoginUserRequest;
@@ -31,6 +42,10 @@ export interface ApiAuthRegisterPostRequest {
     registerUserRequest: RegisterUserRequest;
 }
 
+export interface ApiAuthResetPasswordPostRequest {
+    resetPasswordRequest: ResetPasswordRequest;
+}
+
 /**
  * AuthApi - interface
  * 
@@ -38,6 +53,50 @@ export interface ApiAuthRegisterPostRequest {
  * @interface AuthApiInterface
  */
 export interface AuthApiInterface {
+    /**
+     * Creates request options for apiAuthConfirmEmailGet without sending the request
+     * @param {string} [userId] 
+     * @param {string} [token] 
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthConfirmEmailGetRequestOpts(requestParameters: ApiAuthConfirmEmailGetRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {string} [userId] 
+     * @param {string} [token] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthConfirmEmailGetRaw(requestParameters: ApiAuthConfirmEmailGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    apiAuthConfirmEmailGet(requestParameters: ApiAuthConfirmEmailGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * Creates request options for apiAuthForgotPasswordPost without sending the request
+     * @param {ForgotPasswordRequest} forgotPasswordRequest 
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthForgotPasswordPostRequestOpts(requestParameters: ApiAuthForgotPasswordPostRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {ForgotPasswordRequest} forgotPasswordRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthForgotPasswordPostRaw(requestParameters: ApiAuthForgotPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    apiAuthForgotPasswordPost(requestParameters: ApiAuthForgotPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
     /**
      * Creates request options for apiAuthLoginPost without sending the request
      * @param {LoginUserRequest} loginUserRequest 
@@ -105,12 +164,119 @@ export interface AuthApiInterface {
      */
     apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginUserResponse>;
 
+    /**
+     * Creates request options for apiAuthResetPasswordPost without sending the request
+     * @param {ResetPasswordRequest} resetPasswordRequest 
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthResetPasswordPostRequestOpts(requestParameters: ApiAuthResetPasswordPostRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {ResetPasswordRequest} resetPasswordRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthResetPasswordPostRaw(requestParameters: ApiAuthResetPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    apiAuthResetPasswordPost(requestParameters: ApiAuthResetPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
 }
 
 /**
  * 
  */
 export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
+
+    /**
+     * Creates request options for apiAuthConfirmEmailGet without sending the request
+     */
+    async apiAuthConfirmEmailGetRequestOpts(requestParameters: ApiAuthConfirmEmailGetRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['userId'] != null) {
+            queryParameters['userId'] = requestParameters['userId'];
+        }
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/auth/confirm-email`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async apiAuthConfirmEmailGetRaw(requestParameters: ApiAuthConfirmEmailGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.apiAuthConfirmEmailGetRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async apiAuthConfirmEmailGet(requestParameters: ApiAuthConfirmEmailGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiAuthConfirmEmailGetRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for apiAuthForgotPasswordPost without sending the request
+     */
+    async apiAuthForgotPasswordPostRequestOpts(requestParameters: ApiAuthForgotPasswordPostRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['forgotPasswordRequest'] == null) {
+            throw new runtime.RequiredError(
+                'forgotPasswordRequest',
+                'Required parameter "forgotPasswordRequest" was null or undefined when calling apiAuthForgotPasswordPost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/auth/forgot-password`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['forgotPasswordRequest'],
+        };
+    }
+
+    /**
+     */
+    async apiAuthForgotPasswordPostRaw(requestParameters: ApiAuthForgotPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.apiAuthForgotPasswordPostRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async apiAuthForgotPasswordPost(requestParameters: ApiAuthForgotPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiAuthForgotPasswordPostRaw(requestParameters, initOverrides);
+    }
 
     /**
      * Creates request options for apiAuthLoginPost without sending the request
@@ -249,6 +415,50 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
     async apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginUserResponse> {
         const response = await this.apiAuthRegisterPostRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for apiAuthResetPasswordPost without sending the request
+     */
+    async apiAuthResetPasswordPostRequestOpts(requestParameters: ApiAuthResetPasswordPostRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['resetPasswordRequest'] == null) {
+            throw new runtime.RequiredError(
+                'resetPasswordRequest',
+                'Required parameter "resetPasswordRequest" was null or undefined when calling apiAuthResetPasswordPost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/auth/reset-password`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['resetPasswordRequest'],
+        };
+    }
+
+    /**
+     */
+    async apiAuthResetPasswordPostRaw(requestParameters: ApiAuthResetPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.apiAuthResetPasswordPostRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async apiAuthResetPasswordPost(requestParameters: ApiAuthResetPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiAuthResetPasswordPostRaw(requestParameters, initOverrides);
     }
 
 }

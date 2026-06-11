@@ -64,7 +64,7 @@ export interface ItemImagesApiInterface {
 
     /**
      * 
-     * @summary Confirms that the frontend has successfully uploaded the file to storage.  Transitions the image record from Pending to Uploaded.
+     * @summary Confirms that the frontend has successfully uploaded the file to storage. Transitions the image record from Pending to Uploaded.
      * @param {string} itemId 
      * @param {string} imageId 
      * @param {*} [options] Override http request option.
@@ -74,7 +74,7 @@ export interface ItemImagesApiInterface {
     apiItemsItemIdImagesImageIdConfirmPostRaw(requestParameters: ApiItemsItemIdImagesImageIdConfirmPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ItemImage>>;
 
     /**
-     * Confirms that the frontend has successfully uploaded the file to storage.  Transitions the image record from Pending to Uploaded.
+     * Confirms that the frontend has successfully uploaded the file to storage. Transitions the image record from Pending to Uploaded.
      */
     apiItemsItemIdImagesImageIdConfirmPost(requestParameters: ApiItemsItemIdImagesImageIdConfirmPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ItemImage>;
 
@@ -164,7 +164,7 @@ export interface ItemImagesApiInterface {
 
     /**
      * 
-     * @summary Requests a presigned URL for uploading an image to the specified item.  The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
+     * @summary Requests a presigned URL for uploading an image to the specified item. The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
      * @param {string} itemId 
      * @param {PresignImageRequest} presignImageRequest 
      * @param {*} [options] Override http request option.
@@ -174,7 +174,7 @@ export interface ItemImagesApiInterface {
     apiItemsItemIdImagesPresignPostRaw(requestParameters: ApiItemsItemIdImagesPresignPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PresignResult>>;
 
     /**
-     * Requests a presigned URL for uploading an image to the specified item.  The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
+     * Requests a presigned URL for uploading an image to the specified item. The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
      */
     apiItemsItemIdImagesPresignPost(requestParameters: ApiItemsItemIdImagesPresignPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PresignResult>;
 
@@ -229,7 +229,7 @@ export class ItemImagesApi extends runtime.BaseAPI implements ItemImagesApiInter
     }
 
     /**
-     * Confirms that the frontend has successfully uploaded the file to storage.  Transitions the image record from Pending to Uploaded.
+     * Confirms that the frontend has successfully uploaded the file to storage. Transitions the image record from Pending to Uploaded.
      */
     async apiItemsItemIdImagesImageIdConfirmPostRaw(requestParameters: ApiItemsItemIdImagesImageIdConfirmPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ItemImage>> {
         const requestOptions = await this.apiItemsItemIdImagesImageIdConfirmPostRequestOpts(requestParameters);
@@ -239,7 +239,7 @@ export class ItemImagesApi extends runtime.BaseAPI implements ItemImagesApiInter
     }
 
     /**
-     * Confirms that the frontend has successfully uploaded the file to storage.  Transitions the image record from Pending to Uploaded.
+     * Confirms that the frontend has successfully uploaded the file to storage. Transitions the image record from Pending to Uploaded.
      */
     async apiItemsItemIdImagesImageIdConfirmPost(requestParameters: ApiItemsItemIdImagesImageIdConfirmPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ItemImage> {
         const response = await this.apiItemsItemIdImagesImageIdConfirmPostRaw(requestParameters, initOverrides);
@@ -474,7 +474,7 @@ export class ItemImagesApi extends runtime.BaseAPI implements ItemImagesApiInter
     }
 
     /**
-     * Requests a presigned URL for uploading an image to the specified item.  The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
+     * Requests a presigned URL for uploading an image to the specified item. The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
      */
     async apiItemsItemIdImagesPresignPostRaw(requestParameters: ApiItemsItemIdImagesPresignPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PresignResult>> {
         const requestOptions = await this.apiItemsItemIdImagesPresignPostRequestOpts(requestParameters);
@@ -484,7 +484,7 @@ export class ItemImagesApi extends runtime.BaseAPI implements ItemImagesApiInter
     }
 
     /**
-     * Requests a presigned URL for uploading an image to the specified item.  The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
+     * Requests a presigned URL for uploading an image to the specified item. The frontend should upload the file directly to the returned URL, then call the confirm endpoint.
      */
     async apiItemsItemIdImagesPresignPost(requestParameters: ApiItemsItemIdImagesPresignPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PresignResult> {
         const response = await this.apiItemsItemIdImagesPresignPostRaw(requestParameters, initOverrides);
